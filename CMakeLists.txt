@@ -2,11 +2,12 @@ cmake_minimum_required(VERSION 3.10.2)
 project(arxengine VERSION 0.1 LANGUAGES C CXX)
 
 list(APPEND SOURCES
-   src/placeholder.cpp 
+   src/color.cpp 
 )
 set(CMAKE_EXPORT_COMPILE_COMMANDS true)
 set(gcc_like_cxx "$<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang,GNU,LCC>")
 set(msvc_cxx "$<COMPILE_LANG_AND_ID:CXX,MSVC>")
+set(OpenGL_GL_PREFERENCE LEGACY)
 
 if (${PROJECT_TYPE} STREQUAL "Static")
     message(STATUS "Static library")
@@ -37,8 +38,8 @@ add_subdirectory(${THIRDPARTY_FOLDER}/glad)
 add_subdirectory(${THIRDPARTY_FOLDER}/stb_image)
 
 if (WIN32)
-    target_link_libraries(arxengine PRIVATE GLM GLFW3 STB_IMAGE GLAD OpenGL)
+    target_link_libraries(arxengine PRIVATE ${GLM} ${GLFW3} stb_image glad ${OpenGL})
 else()
-    target_link_libraries(arxengine PRIVATE GLM GLFW3 STB_IMAGE GLAD OpenGL m pthread )
+    target_link_libraries(arxengine PRIVATE ${GLM} ${GLFW3} stb_image glad ${OpenGL} m pthread )
 endif()
 

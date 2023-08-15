@@ -4,8 +4,8 @@ import os
 import curses
 
 project_types = {
-    "Shared" : "-DPROJECT_TYPE=Static",
-    "Static" : "-DPROJECT_TYPE=Shared"
+    "Shared" : "-DPROJECT_TYPE=Shared",
+    "Static" : "-DPROJECT_TYPE=Static"
 }
 
 release_types = {
@@ -22,20 +22,20 @@ def configure(win : 'curses._CursesWindow') -> None:
     cfgString = ["cmake","-S", ".", "-B"]
  
     keys_type = list(project_types)
-    win.addstr("Project type: ")
+    win.addstr("Project type: \n")
     for i in range(0, len(keys_type)):
-        win.addstr(i + 1, 0, f'[{i + 1}] {keys_type[i]}')
-    win.addstr(len(keys_type) + 1, 0, ": ")
+        win.addstr(f'[{i + 1}] {keys_type[i]}\n')
+    win.addstr(": ")
     option = int(win.getstr()) -1
     win.clear()
     projectTypeName = keys_type[option]
     projectType =  project_types[keys_type[option]] 
     
     keys_release = list(release_types)
-    win.addstr("Release type: ")
+    win.addstr("Release type: \n")
     for i in range(0, len(keys_release)):
-        win.addstr(i + 1, 0, f'[{i + 1}] {keys_release[i]}')
-    win.addstr(len(keys_release) + 1, 0, ": ")
+        win.addstr(f'[{i + 1}] {keys_release[i]}\n')
+    win.addstr(": ")
     option = int(win.getstr()) - 1
     releaseTypeName = keys_release[option]
     releaseType =  release_types[keys_release[option]]
@@ -70,15 +70,15 @@ def build(win : 'curses._CursesWindow'):
         os.system("cmake --build build/" + folders[0])
         return
     
-    win.addstr("Projects")
+    win.addstr("Projects\n")
     for i in range(0, len(folders)):
-        win.addstr(i + 1, 0, f'[{i + 1}] {folders[i]}')
+        win.addstr(f'[{i + 1}] {folders[i]}\n')
 
     win.addstr(len(folders) + 1, 0, ": ")
     option = int(win.getstr()) - 1
     curses.endwin()
     makeConsoleSane()
-    os.system("cmake --build " + folders[option])    
+    os.system("cmake --build build/" + folders[option])    
 
 main_menu_options = {
     "Configure" : configure,
