@@ -4,12 +4,12 @@ project(arxengine VERSION 0.1 LANGUAGES C CXX)
 list(APPEND SOURCES
    src/color.cpp 
 )
-set(CMAKE_EXPORT_COMPILE_COMMANDS true)
+set(CMAKE_EXPORT_COMPILE_COMMANDS True)
 set(gcc_like_cxx "$<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang,GNU,LCC>")
 set(msvc_cxx "$<COMPILE_LANG_AND_ID:CXX,MSVC>")
 set(OpenGL_GL_PREFERENCE LEGACY)
 
-if (${PROJECT_TYPE} STREQUAL "Static")
+if (DEFINED PROJECT_TYPE AND ${PROJECT_TYPE} STREQUAL "Static")
     message(STATUS "Static library")
     add_library(arxengine STATIC ${SOURCES})
 else()
@@ -19,14 +19,14 @@ endif()
 
 target_compile_options(arxengine PRIVATE "$<${gcc_like_cxx}:-Wall;-Wextra;-Wconversion;-std=c++17>"  
                                                         "$<${msvc_cxx}:/W3;/std:c++17>")
-target_include_directories(arxengine PUBLIC include)
+target_include_directories(arxengine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 set(CUSTOM_MODULES_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 list(APPEND CMAKE_MODULE_PATH ${CUSTOM_MODULES_PATH})
 
 find_package(OpenGL REQUIRED)
 set(THIRDPARTY_FOLDER ${CMAKE_CURRENT_SOURCE_DIR}/third_party)
-if (DEFINED USE_SUBMODULE)
+if (WIN32)
     add_subdirectory(${THIRDPARTY_FOLDER}/glm)
     add_subdirectory(${THIRDPARTY_FOLDER}/glfw3)
 else()
@@ -41,5 +41,11 @@ if (WIN32)
     target_link_libraries(arxengine PRIVATE ${GLM} ${GLFW3} stb_image glad ${OpenGL})
 else()
     target_link_libraries(arxengine PRIVATE ${GLM} ${GLFW3} stb_image glad ${OpenGL} m pthread )
+endif()
+
+if (DEFINED BUILD_TEST AND ${BUILD_TEST})
+    enable_testing()
+    add_subdirectory(testapi)
+    add_test(TestApi testapi) 
 endif()
 

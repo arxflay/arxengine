@@ -1,73 +1,135 @@
 import sys
 import platform
-import os
 import curses
+from enum import Enum
+import os
 
-project_types = {
-    "Shared" : "-DPROJECT_TYPE=Shared",
-    "Static" : "-DPROJECT_TYPE=Static"
-}
 
-release_types = {
-    "Debug" : "-DCMAKE_BUILD_TYPE=Debug",
-    "Release" : "-DCMAKE_BUILD_TYPE=Release"
-}
+class ProjectType(Enum):
+    Library = 1
+    Executable = 2
+    def __str__(self):
+        return self.name
 
-def makeConsoleSane():
-    if (os.name != "Windows"):
+class LibType(Enum):
+    Shared = 1
+    Static = 2
+    def __str__(self):
+        return self.name
+
+class ReleaseType(Enum):
+    Debug = 1
+    Release = 2
+    def __str__(self):
+        return self.name
+
+class AppOperations(Enum):
+    Configure = 1
+    Build = 2
+    def __str__(self):
+        return self.name
+
+def GetScriptRootFolder() -> os.path:
+    return os.path.abspath(os.path.dirname(os.path.abspath(__file__)))
+
+def GetScriptBuildPath(buildFolderName : str) -> os.path:
+    return os.path.join(os.path.abspath(os.path.dirname(os.path.abspath(__file__))), buildFolderName)
+
+class Configurator:
+    def __init__(self): 
+        self._cmd = ["cmake"]
+    def AddLibType(self, libType : LibType) -> None:
+        self._cmd.append(["-DPROJECT_TYPE=Shared", "-DPROJECT_TYPE=Static"][libType.value - 1])
+    def AddReleaseType(self, relType : ReleaseType) -> None:
+        self._cmd.append(["-DCMAKE_BUILD_TYPE=Debug", "-DCMAKE_BUILD_TYPE=Release"][relType.value - 1])
+    def AddBuildTest(self, buildTest : bool) -> None:
+        self._cmd.append(["-DBUILD_TEST=False", "-DBUILD_TEST=True"][int(buildTest)])
+    def AddSourceFolder(self, sourcePath : os.path) -> None:
+        self._cmd.extend(["-S", str(sourcePath)])
+    def AddLibBuildFolder(self, sourcePath : os.path, buildFolderName : str, libType : LibType, relType : ReleaseType) -> None:
+        self._cmd.extend(["-B", f'{str(sourcePath)}/{buildFolderName}/{str(libType)}_{str(relType)}'])
+    def AddExecBuildFolder(self, sourcePath : os.path, buildFolderName : str, relType : ReleaseType) -> None:
+        self._cmd.extend(["-B", f'{str(sourcePath)}/{buildFolderName}/Exec_{relType}'])
+    def AddBuildProjectCommand(self, buildFolder : os.path, projName : str):
+        self._cmd.extend(["--build", f'{buildFolder}/{projName}'])
+        
+    def GetCmd(self) -> str:
+        return " ".join(self._cmd)
+
+def MakeConsoleSane():
+    if (os.name != ["Unix", "Linux"]):
         os.system("stty sane")
 
-
-def configure(win : 'curses._CursesWindow') -> None:
-    cfgString = ["cmake","-S", ".", "-B"]
- 
-    keys_type = list(project_types)
-    win.addstr("Project type: \n")
-    for i in range(0, len(keys_type)):
-        win.addstr(f'[{i + 1}] {keys_type[i]}\n')
+def AskForInput(win : 'curses._CursesWindow') -> str:
     win.addstr(": ")
-    option = int(win.getstr()) -1
+    return win.getstr()
+
+def GetLibTypeFromUser(win : 'curses._CursesWindow') -> LibType:
     win.clear()
-    projectTypeName = keys_type[option]
-    projectType =  project_types[keys_type[option]] 
-    
-    keys_release = list(release_types)
+    cntr = 0
+    win.addstr("Library type: \n")
+    for libType in LibType:
+        win.addstr(f'[{cntr + 1}] {libType}\n')
+        cntr += 1
+    return LibType(int(AskForInput(win)))
+
+def GetReleaseTypeFromUser(win : 'curses._CursesWindow') -> ReleaseType:
+    win.clear()
+    cntr = 0
     win.addstr("Release type: \n")
-    for i in range(0, len(keys_release)):
-        win.addstr(f'[{i + 1}] {keys_release[i]}\n')
-    win.addstr(": ")
-    option = int(win.getstr()) - 1
-    releaseTypeName = keys_release[option]
-    releaseType =  release_types[keys_release[option]]
+    for relType in ReleaseType:
+        win.addstr(f'[{cntr + 1}] {relType}\n')
+        cntr += 1
+    return ReleaseType(int(AskForInput(win)))
 
-    projectFolder = f'build/{projectTypeName}_{releaseTypeName}'
-    cfgString.append(projectFolder)
-    cfgString.append(projectType)
-    cfgString.append(releaseType)
-    curses.endwin()
-    makeConsoleSane()
-    os.system(" ".join(cfgString))
+def GetDoBuildTestFromUser(win : 'curses._CursesWindow') -> bool:
+    win.clear()
+    win.addstr("Build test?\n")
+    win.addstr("[1] Yes\n")
+    win.addstr("[2] No \n")
+    return bool([True, False][int(AskForInput(win)) -1])
 
 
-valid_folder_names = [
-    "Shared_Debug",
-    "Static_Debug",
-    "Shared_Release",
-    "Static_Release"
-]
+def Configure(win : 'curses._CursesWindow', projType : ProjectType) -> None:
+    configurator = Configurator()
+    libType = None
+    if (projType == ProjectType.Library):
+        libType = GetLibTypeFromUser(win)
+        configurator.AddLibType(libType)
+    
+    relType = GetReleaseTypeFromUser(win)
+    configurator.AddReleaseType(relType)
+    if (projType == ProjectType.Library):
+        configurator.AddLibBuildFolder(GetScriptRootFolder(), "build", libType, relType)
+    else:
+        configurator.AddExecBuildFolder(GetScriptRootFolder(), "build", relType)
+    configurator.AddBuildTest(GetDoBuildTestFromUser(win))
+    configurator.AddSourceFolder(GetScriptRootFolder())
+    MakeConsoleSane()
+    os.system(configurator.GetCmd())
 
-def build(win : 'curses._CursesWindow'):
-    thisFolder = os.path.join(os.path.abspath(os.path.dirname(os.path.abspath(__file__))), "build")
-    folders = [name for name in os.listdir(thisFolder) if os.path.isdir(os.path.join(thisFolder, name)) and name in valid_folder_names]
+def Build(win : 'curses._CursesWindow', projType : ProjectType):
+    win.clear()
+    buildFolder =  GetScriptBuildPath("build")     
+    valid_folder_names = []
+    if (projType == ProjectType.Library):
+        for libType in LibType:
+            for relType in ReleaseType:
+                valid_folder_names.append(f'{str(libType)}_{str(relType)}')
+    else:
+        for relType in ReleaseType:
+            valid_folder_names.append(f'Exec_{str(relType)}')
+
+    folders = [name for name in os.listdir(buildFolder) if os.path.isdir(os.path.join(buildFolder, name)) and name in valid_folder_names]
     if (len(folders) == 0):
         curses.endwin()
-        makeConsoleSane()
+        MakeConsoleSane()
         print("Configured folder not found")
         return
     elif(len(folders) == 1):
         curses.endwin()
-        makeConsoleSane()
-        os.system("cmake --build build/" + folders[0])
+        MakeConsoleSane()
+        os.system(f'cmake --build {buildFolder}/{folders[0]}')
         return
     
     win.addstr("Projects\n")
@@ -77,36 +139,28 @@ def build(win : 'curses._CursesWindow'):
     win.addstr(len(folders) + 1, 0, ": ")
     option = int(win.getstr()) - 1
     curses.endwin()
-    makeConsoleSane()
-    os.system("cmake --build build/" + folders[option])    
+    MakeConsoleSane()
+    os.system(f'cmake --build {buildFolder}/{folders[option]}')    
 
-main_menu_options = {
-    "Configure" : configure,
-    "Build" : build 
-}
-
-def selectAction(win : 'curses._CursesWindow'):
-    keys = list(main_menu_options.keys())
-    if len(sys.argv) > 1:
-        if (sys.argv[1] in keys):
-            win.addstr(f'cfg {keys}')
-            return
-        main_menu_options[sys.argv[1]]()
-        return
-
-    win.addstr(0, 0, "Command: ")
-    for i in range(0, len(main_menu_options)):
-        win.addstr(i + 1, 0, f'[{i + 1}] {keys[i]}')
-    win.addstr(len(keys) + 1, 0, ": ")
-    win.refresh()
-    option = int(win.getstr()) - 1
+def SelectAction(win : 'curses._CursesWindow', projType : ProjectType):
+    cntr = 0
+    win.addstr("Commands: \n")
+    for cmd in AppOperations:
+        win.addstr(f'[{cntr + 1}] {cmd}\n')
+        cntr += 1
     
-    win.clear()
-    main_menu_options[keys[option]](win)
-
+    [Configure, Build][int(AskForInput(win)) - 1](win, projType)
+           
 def main() -> int:
-    win = curses.initscr()
-    selectAction(win)
+    win = curses.initscr() 
+    curses.echo()
+    win.keypad(True)
+    curses.cbreak()
+    try:
+        SelectAction(win, ProjectType.Library)
+    except Exception as e:
+        MakeConsoleSane()
+        raise e
     return 0
 
 if __name__ == '__main__':

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.25.0)
+cmake_minimum_required(VERSION 3.10.2)
 project(glad VERSION 1.0 LANGUAGES CXX C)
 add_library(glad STATIC
     src/glad.c    
