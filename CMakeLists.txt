@@ -1,8 +1,11 @@
 cmake_minimum_required(VERSION 3.10.2)
 project(arxengine VERSION 0.1 LANGUAGES C CXX)
 
+set(SOURCE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/src)
+
 list(APPEND SOURCES
-   src/color.cpp 
+    ${SOURCE_PATH}/color.cpp
+    ${SOURCE_PATH}/utils/stringutils.cpp
 )
 set(CMAKE_EXPORT_COMPILE_COMMANDS True)
 set(gcc_like_cxx "$<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang,GNU,LCC>")

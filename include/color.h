@@ -7,10 +7,10 @@
 
 ARX_NAMESPACE_BEGIN
 
-ARX_EXPORTS struct Color
+ARX_EXPORTS struct Color final
 {
-    Color();
-    Color(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255);
+    Color() noexcept;
+    Color(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255) noexcept;
     Color(std::string_view hexString);
     glm::vec3 GetNormalizedRGB() const noexcept;
     glm::vec4 GetNormalizedRGBA() const noexcept;
