@@ -4,7 +4,6 @@ import curses
 from enum import Enum
 import os
 
-
 class ProjectType(Enum):
     Library = 1
     Executable = 2
@@ -39,11 +38,11 @@ class Configurator:
     def __init__(self): 
         self._cmd = ["cmake"]
     def AddLibType(self, libType : LibType) -> None:
-        self._cmd.append(["-DPROJECT_TYPE=Shared", "-DPROJECT_TYPE=Static"][libType.value - 1])
+        self._cmd.append(["-DARX_LIB_STATIC=OFF", "-DARX_LIB_STATIC=ON"][libType.value - 1])
     def AddReleaseType(self, relType : ReleaseType) -> None:
         self._cmd.append(["-DCMAKE_BUILD_TYPE=Debug", "-DCMAKE_BUILD_TYPE=Release"][relType.value - 1])
     def AddBuildTest(self, buildTest : bool) -> None:
-        self._cmd.append(["-DBUILD_TEST=False", "-DBUILD_TEST=True"][int(buildTest)])
+        self._cmd.append(["-DARX_BUILD_TEST=OFF", "-DARX_BUILD_TEST=ON"][int(buildTest)])
     def AddSourceFolder(self, sourcePath : os.path) -> None:
         self._cmd.extend(["-S", str(sourcePath)])
     def AddLibBuildFolder(self, sourcePath : os.path, buildFolderName : str, libType : LibType, relType : ReleaseType) -> None:
@@ -89,7 +88,6 @@ def GetDoBuildTestFromUser(win : 'curses._CursesWindow') -> bool:
     win.addstr("[2] No \n")
     return bool([True, False][int(AskForInput(win)) -1])
 
-
 def Configure(win : 'curses._CursesWindow', projType : ProjectType) -> None:
     configurator = Configurator()
     libType = None
@@ -105,6 +103,7 @@ def Configure(win : 'curses._CursesWindow', projType : ProjectType) -> None:
         configurator.AddExecBuildFolder(GetScriptRootFolder(), "build", relType)
     configurator.AddBuildTest(GetDoBuildTestFromUser(win))
     configurator.AddSourceFolder(GetScriptRootFolder())
+    curses.endwin()
     MakeConsoleSane()
     os.system(configurator.GetCmd())
 
@@ -159,6 +158,7 @@ def main() -> int:
     try:
         SelectAction(win, ProjectType.Library)
     except Exception as e:
+        curses.endwin()
         MakeConsoleSane()
         raise e
     return 0

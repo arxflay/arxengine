@@ -7,12 +7,6 @@ list(APPEND TEST_SOURCES
     ${SOURCE_FOLDER}/main.cpp
 )
 
-if (WIN32)
-    add_subdirectory(../third_party/gtest)
-else()
-    find_package(GTest REQUIRED)
-endif()
-
 add_executable(testapi ${TEST_SOURCES})
 target_link_libraries(testapi PRIVATE GTest::gtest GTest::gtest_main)
 target_link_libraries(testapi PUBLIC arxengine)
