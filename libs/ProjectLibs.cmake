@@ -23,16 +23,18 @@ CPMAddPackage(NAME Freetype
     VERSION 2.12.1
     GIT_TAG e8ebfe988b5f57bfb9a3ecb13c70d9791bce9ecf
     OPTIONS
-        "BUILD_SHARED_LIBS ON")
+        "BUILD_SHARED_LIBS ON"
+        "FT_DISABLE_HARFBUZZ OFF")
 CPMAddPackage(NAME OpenAL
     GITHUB_REPOSITORY kcat/openal-soft
     VERSION 1.22.1
     GIT_TAG 05f5faf2655f4a51c69bfaacd4f67a740429f0dc
     OPTIONS
-        "BUILD_SHARED_LIBS ON")
-if(glfw3_ADDED)
-    message(STATUS "TEST")
-endif()
+        "LIBTYPE SHARED"
+        "ALSOFT_UTILS OFF"
+        "ALSOFT_NO_CONFIG_UTIL ON"
+        "ALSOFT_EXAMPLES OFF")
+
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/third_party/glad)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/third_party/stb_image)
 
