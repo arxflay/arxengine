@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.10.2)
-project(arxengine VERSION 0.1 LANGUAGES C CXX)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/ProjectVersion.cmake)
+project(arxengine VERSION ${VER_MAJOR}.${VER_MINOR} LANGUAGES C CXX)
 
 option(ARX_LIB_STATIC "Build as static library" OFF)
 option(ARX_BUILD_TEST "Build testapi" OFF)
@@ -29,9 +30,9 @@ target_include_directories(arxengine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 include(${CMAKE_CURRENT_SOURCE_DIR}/libs/ProjectLibs.cmake)
 
 if (WIN32)
-    target_link_libraries(arxengine PRIVATE ${glm} ${glfw3} stb_image glad ${OpenGL} ${OpenAL} ${Freetype})
+    target_link_libraries(arxengine PUBLIC glm glfw stb_image glad OpenGL::GL OpenAL freetype)
 else()
-    target_link_libraries(arxengine PRIVATE ${glm} ${glfw3} stb_image glad ${OpenGL} ${OpenAL} ${Freetype} m pthread )
+    target_link_libraries(arxengine PUBLIC glm::glm glfw stb_image glad OpenGL::GL OpenAL freetype m pthread)
 endif()
 
 if (${ARX_BUILD_TEST})

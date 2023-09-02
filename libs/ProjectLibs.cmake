@@ -5,8 +5,8 @@ if(NOT WIN32)
 endif()
 
 set(CPM_SOURCE_CACHE ${CMAKE_CURRENT_LIST_DIR}/third_party/CPM)
-include(${CMAKE_CURRENT_LIST_DIR}/FetchCPM.cmake)
-include(${CMAKE_CURRENT_LIST_DIR}/cmake/CPM.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/FetchCPM.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/CPM/CPM.cmake)
 CPMAddPackage("gh:g-truc/glm#0.9.9.8")
 CPMAddPackage(NAME glfw3
     GITHUB_REPOSITORY glfw/glfw
@@ -17,6 +17,7 @@ CPMAddPackage(NAME glfw3
         "GLFW_BUILD_EXAMPLES OFF"
         "GLFW_BULID_DOCS OFF"
         "BUILD_SHARED_LIBS ON")
+
 CPMAddPackage(NAME Freetype
     GITHUB_REPOSITORY freetype/freetype
     VERSION 2.12.1
@@ -29,7 +30,7 @@ CPMAddPackage(NAME OpenAL
     GIT_TAG 05f5faf2655f4a51c69bfaacd4f67a740429f0dc
     OPTIONS
         "BUILD_SHARED_LIBS ON")
-if(glfw3_FOUND)
+if(glfw3_ADDED)
     message(STATUS "TEST")
 endif()
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/third_party/glad)

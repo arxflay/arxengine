@@ -35,5 +35,5 @@ build/*
 .vscode/*
 .cache/*
 compile_commands.json
-libs/cmake/*
+cmake/CPM/*
 libs/third_party/CPM/*
