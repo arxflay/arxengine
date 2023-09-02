@@ -1,6 +1,5 @@
 import sys
 import platform
-import curses
 from enum import Enum
 import os
 
@@ -34,6 +33,11 @@ def GetScriptRootFolder() -> os.path:
 def GetScriptBuildPath(buildFolderName : str) -> os.path:
     return os.path.join(os.path.abspath(os.path.dirname(os.path.abspath(__file__))), buildFolderName)
 
+def AskForInput():
+    inp = input(": ")
+    print("----------")
+    return inp
+
 class Configurator:
     def __init__(self): 
         self._cmd = ["cmake"]
@@ -55,60 +59,67 @@ class Configurator:
     def GetCmd(self) -> str:
         return " ".join(self._cmd)
 
-def MakeConsoleSane():
-    if (os.name != ["Unix", "Linux"]):
-        os.system("stty sane")
-
-def AskForInput(win : 'curses._CursesWindow') -> str:
-    win.addstr(": ")
-    return win.getstr()
-
-def GetLibTypeFromUser(win : 'curses._CursesWindow') -> LibType:
-    win.clear()
+def GetLibTypeFromUser() -> LibType:
     cntr = 0
-    win.addstr("Library type: \n")
+    print("Library type:")
     for libType in LibType:
-        win.addstr(f'[{cntr + 1}] {libType}\n')
+        print(f'[{cntr + 1}] {libType}')
         cntr += 1
-    return LibType(int(AskForInput(win)))
+    libType = 0
+    while True:
+        try:
+            libType = LibType(int(AskForInput()))
+            break
+        except ValueError:
+            print("Invalid input. Try again.")
+    return libType 
 
-def GetReleaseTypeFromUser(win : 'curses._CursesWindow') -> ReleaseType:
-    win.clear()
+def GetReleaseTypeFromUser() -> ReleaseType:
     cntr = 0
-    win.addstr("Release type: \n")
+    print("Release type:")
     for relType in ReleaseType:
-        win.addstr(f'[{cntr + 1}] {relType}\n')
+        print(f'[{cntr + 1}] {relType}')
         cntr += 1
-    return ReleaseType(int(AskForInput(win)))
+    relType = 0
+    while True:
+        try:
+            relType = ReleaseType(int(AskForInput()))
+            break
+        except ValueError:
+            print("Invalid input. Try again.")
+    return relType
 
-def GetDoBuildTestFromUser(win : 'curses._CursesWindow') -> bool:
-    win.clear()
-    win.addstr("Build test?\n")
-    win.addstr("[1] Yes\n")
-    win.addstr("[2] No \n")
-    return bool([True, False][int(AskForInput(win)) -1])
+def GetDoBuildTestFromUser() -> bool:
+    print("Build test?")
+    print("[1] Yes")
+    print("[2] No")
+    i = 0
+    while True:
+        try:
+            i = int(AskForInput()) - 1
+            break
+        except ValueError:
+            print("Invalid input. Try again.")
+    return bool([True, False][i])
 
-def Configure(win : 'curses._CursesWindow', projType : ProjectType) -> None:
+def Configure(projType : ProjectType) -> None:
     configurator = Configurator()
     libType = None
     if (projType == ProjectType.Library):
-        libType = GetLibTypeFromUser(win)
+        libType = GetLibTypeFromUser()
         configurator.AddLibType(libType)
     
-    relType = GetReleaseTypeFromUser(win)
+    relType = GetReleaseTypeFromUser()
     configurator.AddReleaseType(relType)
     if (projType == ProjectType.Library):
         configurator.AddLibBuildFolder(GetScriptRootFolder(), "build", libType, relType)
     else:
         configurator.AddExecBuildFolder(GetScriptRootFolder(), "build", relType)
-    configurator.AddBuildTest(GetDoBuildTestFromUser(win))
+    configurator.AddBuildTest(GetDoBuildTestFromUser())
     configurator.AddSourceFolder(GetScriptRootFolder())
-    curses.endwin()
-    MakeConsoleSane()
     os.system(configurator.GetCmd())
 
-def Build(win : 'curses._CursesWindow', projType : ProjectType):
-    win.clear()
+def Build(projType : ProjectType):
     buildFolder =  GetScriptBuildPath("build")     
     valid_folder_names = []
     if (projType == ProjectType.Library):
@@ -121,46 +132,42 @@ def Build(win : 'curses._CursesWindow', projType : ProjectType):
 
     folders = [name for name in os.listdir(buildFolder) if os.path.isdir(os.path.join(buildFolder, name)) and name in valid_folder_names]
     if (len(folders) == 0):
-        curses.endwin()
-        MakeConsoleSane()
         print("Configured folder not found")
         return
     elif(len(folders) == 1):
-        curses.endwin()
-        MakeConsoleSane()
         os.system(f'cmake --build {buildFolder}/{folders[0]}')
         return
     
-    win.addstr("Projects\n")
+    print("Projects")
     for i in range(0, len(folders)):
-        win.addstr(f'[{i + 1}] {folders[i]}\n')
-
-    win.addstr(len(folders) + 1, 0, ": ")
-    option = int(win.getstr()) - 1
-    curses.endwin()
-    MakeConsoleSane()
+        print(f'[{i + 1}] {folders[i]}')
+    option = 0
+    while True:
+        try:
+            option = int(AskForInput()) - 1
+            break
+        except ValueError:
+            print("Invalid input. Try again.")
     os.system(f'cmake --build {buildFolder}/{folders[option]}')    
 
-def SelectAction(win : 'curses._CursesWindow', projType : ProjectType):
+def SelectAction(projType : ProjectType):
     cntr = 0
-    win.addstr("Commands: \n")
+    print("Commands: ")
     for cmd in AppOperations:
-        win.addstr(f'[{cntr + 1}] {cmd}\n')
+        print(f'[{cntr + 1}] {cmd}')
         cntr += 1
+    i = 0
+    while True:
+        try:
+            i = int(AskForInput()) - 1
+            break
+        except ValueError:
+            print("Invalid input. Try again.")
     
-    [Configure, Build][int(AskForInput(win)) - 1](win, projType)
+    [Configure, Build][i](projType)
            
 def main() -> int:
-    win = curses.initscr() 
-    curses.echo()
-    win.keypad(True)
-    curses.cbreak()
-    try:
-        SelectAction(win, ProjectType.Library)
-    except Exception as e:
-        curses.endwin()
-        MakeConsoleSane()
-        raise e
+    SelectAction(ProjectType.Library)
     return 0
 
 if __name__ == '__main__':
