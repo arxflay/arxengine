@@ -5,7 +5,7 @@
 
 ARX_NAMESPACE_BEGIN
 
-ARX_EXPORTS class StringUtils
+class ARX_EXPORTS StringUtils
 {
 public:
     static uint8_t GetByteFromHexStr(const char *hexStr);
