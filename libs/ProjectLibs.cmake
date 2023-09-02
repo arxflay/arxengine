@@ -24,7 +24,12 @@ CPMAddPackage(NAME Freetype
     GIT_TAG e8ebfe988b5f57bfb9a3ecb13c70d9791bce9ecf
     OPTIONS
         "BUILD_SHARED_LIBS ON"
-        "FT_DISABLE_HARFBUZZ OFF")
+        "FT_DISABLE_ZLIB ON"
+        "FT_DISABLE_BZIP2 ON"
+        "FT_DISABLE_PNG ON"
+        "FT_DISABLE_HARFBUZZ ON"
+        "FT_DISABLE_BROTLI ON"
+        "FT_ENABLE_ERROR_STRINGS ON")
 CPMAddPackage(NAME OpenAL
     GITHUB_REPOSITORY kcat/openal-soft
     VERSION 1.22.1
