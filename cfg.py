@@ -33,6 +33,7 @@ class ReleaseType(Enum):
 class AppOperations(Enum):
     Configure = 0
     Build = 1
+    Test = 2
     def __str__(self):
         return self.name
 
@@ -100,6 +101,18 @@ def GetReleaseTypeFromUser() -> ReleaseType:
 def GetDoBuildTestFromUser() -> bool:
     return bool([True, False][SelectVariant("Build test", ["Yes", "No"])])
 
+def GetBuildFolders(projType : ProjectType, buildFolder : os.path) -> list:
+    valid_folder_names = []
+    if (projType == ProjectType.Library):
+        for libType in LibType:
+            for relType in ReleaseType:
+                valid_folder_names.append(f'{str(libType)}_{str(relType)}')
+    else:
+        for relType in ReleaseType:
+            valid_folder_names.append(f'Exec_{str(relType)}')
+
+    return [name for name in os.listdir(buildFolder) if os.path.isdir(os.path.join(buildFolder, name)) and name in valid_folder_names]
+
 def Configure(projType : ProjectType) -> None:
     configurator = Configurator()
     libType = None
@@ -120,16 +133,7 @@ def Configure(projType : ProjectType) -> None:
 def Build(projType : ProjectType):
     configurator = Configurator()
     buildFolder =  GetScriptBuildPath("build")     
-    valid_folder_names = []
-    if (projType == ProjectType.Library):
-        for libType in LibType:
-            for relType in ReleaseType:
-                valid_folder_names.append(f'{str(libType)}_{str(relType)}')
-    else:
-        for relType in ReleaseType:
-            valid_folder_names.append(f'Exec_{str(relType)}')
-
-    folders = [name for name in os.listdir(buildFolder) if os.path.isdir(os.path.join(buildFolder, name)) and name in valid_folder_names]
+    folders = GetBuildFolders(projType, buildFolder) 
     if (len(folders) == 0):
         print("Configured projects not found")
         return
@@ -139,8 +143,19 @@ def Build(projType : ProjectType):
     configurator.AddBuildReleaseType(relType)
     os.system(configurator.GetCmd())    
 
+def Test(projType : ProjectType):
+    buildFolder =  GetScriptBuildPath("build")     
+    folders = GetBuildFolders(projType, buildFolder) 
+    if (len(folders) == 0):
+        print("Configured projects not found")
+        return
+
+    folder = folders[SelectVariant("Projects", folders)]
+    fullPath = os.path.join(buildFolder, folder)
+    os.system(f'sh -c "cd {fullPath} && ctest"')
+
 def SelectAction(projType : ProjectType):
-    [Configure, Build][SelectVariant("Commands",  AppOperations)](projType)
+    [Configure, Build, Test][SelectVariant("Commands",  AppOperations)](projType)
            
 def main() -> int:
     SelectAction(ProjectType.Library)

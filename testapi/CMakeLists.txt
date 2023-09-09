@@ -11,3 +11,5 @@ add_executable(testapi ${TEST_SOURCES})
 target_link_libraries(testapi PRIVATE arxengine GTest::gtest GTest::gtest_main)
 target_compile_options(testapi PRIVATE "$<${gcc_like_cxx}:-Wall;-Wextra;-Wconversion;-std=c++17>"  
                                                         "$<${msvc_cxx}:/W3;/std:c++17>")
+
+gtest_add_tests(TARGET testapi SOURCES ${TEST_SOURCES})
