@@ -21,4 +21,9 @@ struct ARX_EXPORTS Color final
     uint8_t a;
 };
 
+namespace defaults
+{
+    static inline const Color WHITE_COLOR(0xFF, 0xFF, 0xFF);
+};
+
 ARX_NAMESPACE_END
