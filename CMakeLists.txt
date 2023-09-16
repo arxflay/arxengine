@@ -11,6 +11,11 @@ list(APPEND SOURCES
     ${SOURCE_PATH}/color.cpp
     ${SOURCE_PATH}/utils/stringutils.cpp
     ${SOURCE_PATH}/ArxException.cpp
+    ${SOURCE_PATH}/ArxWindow.cpp
+    ${SOURCE_PATH}/UIObject.cpp
+    ${SOURCE_PATH}/ArxEngine.cpp
+    ${SOURCE_PATH}/UIApp.cpp
+    ${SOURCE_PATH}/Evt.cpp
 )
 set(CMAKE_EXPORT_COMPILE_COMMANDS True)
 set(gcc_like_cxx "$<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang,GNU,LCC>")
