@@ -5,10 +5,10 @@
 ARX_NAMESPACE_BEGIN
 
 ArxWindow::ArxWindow(UIObject *parent, std::string_view title, Size size, Position position, int attributes)
-    : UIObject(parent, size, position)
+    : UIObject(parent, ArxWindow::GetRectSize() < size ? size : ArxWindow::GetRectSize(), position)
     , m_title(title)
 {
-    GLFWwindow *win = glfwCreateWindow(size.height, size.width, title.data(), nullptr, nullptr);
+    GLFWwindow *win = glfwCreateWindow(ArxWindow::GetSize().width, ArxWindow::GetSize().height, title.data(), nullptr, nullptr);
     SetGLFWwindow(win);
     SetWindowAttributes(attributes);
     glfwSetWindowUserPointer(GetGLFWwindow(), this);
@@ -29,7 +29,7 @@ void ArxWindow::InitGlfwCallbacks()
 
 /*static*/ void ArxWindow::close_callback(GLFWwindow *win)
 {
-    ArxWindow *arxWin = reinterpret_cast<ArxWindow*>(glfwGetWindowUserPointer(win));
+    ArxWindow *arxWin = static_cast<ArxWindow*>(glfwGetWindowUserPointer(win));
     std::cout << arxWin->GetTitle() << std::endl;
     if (arxWin->GetParent())
         arxWin->SetParent(nullptr);
@@ -47,33 +47,32 @@ void ArxWindow::InitGlfwCallbacks()
     if (focused)
     {
         glfwMakeContextCurrent(win);
-        ArxWindow *arxWin = reinterpret_cast<ArxWindow*>(glfwGetWindowUserPointer(win));
+        ArxWindow *arxWin = static_cast<ArxWindow*>(glfwGetWindowUserPointer(win));
         glViewport(0, 0, arxWin->GetSize().width, arxWin->GetSize().height);
     }
 }
 
 /*static*/ void ArxWindow::size_callback(GLFWwindow *win, int width, int height)
 {
-    ArxWindow *arxWin = reinterpret_cast<ArxWindow*>(glfwGetWindowUserPointer(win));
-    arxWin->SetSize(Size{ width, height });
+    ArxWindow *arxWin = static_cast<ArxWindow*>(glfwGetWindowUserPointer(win));
+    arxWin->UIObject::SetSize(Size{ width, height });
     glViewport(0, 0, arxWin->GetSize().width, arxWin->GetSize().height);
 }
 
 /*static*/ void ArxWindow::position_callback(GLFWwindow *win, int x, int y)
 {
-    ArxWindow *arxWin = reinterpret_cast<ArxWindow*>(glfwGetWindowUserPointer(win));
-    arxWin->SetPosition(Position{ x, y });
+    ArxWindow *arxWin = static_cast<ArxWindow*>(glfwGetWindowUserPointer(win));
+    arxWin->UIObject::SetPosition(Position{ x, y });
 }
 
 void ArxWindow::SetPosition(const Position &pos)
 {
-    UIObject::SetPosition(pos);
-    //TODO(fix) glfwSetWindowPos(m_win.get(), pos.x, pos.y);
+    glfwSetWindowPos(GetGLFWwindow(), pos.x, pos.y);
 }
 
 Size ArxWindow::GetRectSize() 
 {
-   return Size{ 1, 1 }; 
+    return Size{ 1, 1 };
 }
 
 void ArxWindow::Draw()
@@ -103,8 +102,7 @@ void ArxWindow::SetMaxSize(const Size &s)
 
 void ArxWindow::SetSize(const Size &s)
 {
-    UIObject::SetSize(s);
-    //TODO(fix) glfwSetWindowSize(m_win.get(), GetSize().width, GetSize().height);
+    glfwSetWindowSize(GetGLFWwindow(), s.width, s.height);
 }
 
 void ArxWindow::Show(bool visible)
@@ -136,7 +134,7 @@ std::string_view ArxWindow::GetTitle()
 void ArxWindow::SetTitle(std::string_view title)
 {
     m_title = title;
-    glfwSetWindowTitle(GetGLFWwindow(), m_title.data());
+    glfwSetWindowTitle(GetGLFWwindow(), GetTitle().data());
 }
 
 GLFWwindow *ArxWindow::GetGLFWwindow()
