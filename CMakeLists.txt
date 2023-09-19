@@ -15,7 +15,8 @@ list(APPEND SOURCES
     ${SOURCE_PATH}/UIObject.cpp
     ${SOURCE_PATH}/ArxEngine.cpp
     ${SOURCE_PATH}/UIApp.cpp
-    ${SOURCE_PATH}/Evt.cpp
+    ${SOURCE_PATH}/Event.cpp
+    ${SOURCE_PATH}/EventLoop.cpp
 )
 set(CMAKE_EXPORT_COMPILE_COMMANDS True)
 set(gcc_like_cxx "$<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang,GNU,LCC>")

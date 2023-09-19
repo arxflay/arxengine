@@ -1,11 +1,7 @@
-#include "Evt.h"
-#include "ArxWindow.h"
+#include "Event.h"
 #include "EventHandler.h"
 
-#include <GLFW/glfw3.h>
-
 ARX_NAMESPACE_BEGIN
-
 void EventProcessor::Process(Event &&e)
 {
     while(true)
@@ -18,6 +14,7 @@ void EventProcessor::Process(Event &&e)
     }
 }
 
+//EvtFuncWrapperIterator
 Event::EvtFuncWrapperIterator::EvtFuncWrapperIterator(EvtFuncWrapperInnerIterator begin, EvtFuncWrapperInnerIterator end)
         : m_current(begin), m_end(end)
 {
@@ -43,6 +40,7 @@ std::reference_wrapper<Event::EventFunctionWrapper> Event::EvtFuncWrapperIterato
     return std::ref(*m_current); 
 }
 
+//Event
 Event::Event()
     : m_callingObject(nullptr), m_skipCalled(false)
 {
@@ -81,24 +79,6 @@ void Event::SetObject(IEventHandlable *callingObject)
 bool Event::IsSkipCalled()
 {
     return m_skipCalled;
-}
-
-int EventLoop::Run()
-{
-    EventProcessor evtProcessor;
-    while(true)
-    {
-        glfwPollEvents();
-        while(!m_eventQueue.empty())
-        {
-            evtProcessor.Process(std::move(m_eventQueue.front()));
-            m_eventQueue.pop();
-        }
-
-        ArxWindow *win = static_cast<ArxWindow*>(glfwGetWindowUserPointer(glfwGetCurrentContext()));
-        win->Draw();
-    }
-    return 0;
 }
 
 
