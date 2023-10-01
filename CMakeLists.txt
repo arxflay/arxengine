@@ -37,9 +37,9 @@ target_include_directories(arxengine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 include(${CMAKE_CURRENT_SOURCE_DIR}/libs/ProjectLibs.cmake)
 
 if (WIN32)
-    target_link_libraries(arxengine PUBLIC glm glfw stb_image glad OpenGL::GL openal freetype)
+    target_link_libraries(arxengine PUBLIC glm glfw stb_image glad OpenGL::GL openal Freetype::Freetype)
 else()
-    target_link_libraries(arxengine PUBLIC glm glfw stb_image glad OpenGL::GL openal freetype m pthread)
+    target_link_libraries(arxengine PUBLIC glm glfw stb_image glad OpenGL::GL openal Freetype::Freetype m pthread)
 endif()
 
 if (${ARX_BUILD_TEST})
