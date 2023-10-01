@@ -5,13 +5,12 @@ ARX_NAMESPACE_BEGIN
 
 void TestHandler(SizeEvent &)
 {
-    std::cout << "Svete" << std::endl;
+    std::cout << "Ahoj" << std::endl;
 }
 
-void TestHandler2(SizeEvent &e)
+void CloseEventHandler(CloseEvent &e)
 {
-    e.Skip();
-    std::cout << "Ahoj" << std::endl;
+    delete e.GetCallingObject();
 }
 
 UIObject::UIObject(UIObject *parent, Size size, Position position)
@@ -22,25 +21,29 @@ UIObject::UIObject(UIObject *parent, Size size, Position position)
     , m_position(position)
     , m_color(defaults::WHITE_COLOR)
     , m_eventHandler(this)
+    , m_destroyCalled(false)
 {
     SetParent(parent);
+    GetEventHandler().Bind<CloseEvent>(CloseEventHandler);
     GetEventHandler().Bind(TestHandler);
-    GetEventHandler().Bind(TestHandler2);
 }
 
 void UIObject::SetParent(UIObject *parent)
 {
+    assert(parent == nullptr || !parent->m_destroyCalled);
+    
     if (m_parent)
         m_parent->RemoveChild(this); 
     m_parent = parent;
     if(parent)
-        m_parent->m_children.push_back(this);
+        parent->m_children.push_back(this);
 }
 
 UIObject::~UIObject()
 {
-    for (UIObject *obj : m_children)
-        delete obj;
+    if (!m_destroyCalled)
+        for (UIObject *obj : m_children)
+            obj->Destroy();
 }
 
 int UIObject::GetNewMinSizeParameter(int newParam, int maxSizeParam, int rectParam)
@@ -175,6 +178,7 @@ std::vector<UIObject*> &UIObject::GetChildren() noexcept
 
 void UIObject::RemoveChild(UIObject *child)
 {
+    assert(!m_destroyCalled);
     auto it = std::find_if(m_children.begin(), m_children.end(), [child](UIObject *o) { return child == o; });
     assert(it != m_children.end());
     m_children.erase(it);
@@ -188,6 +192,24 @@ EventHandler &UIObject::GetEventHandler() noexcept
 const EventHandler &UIObject::GetEventHandler() const noexcept
 {
     return m_eventHandler;
+}
+
+void UIObject::Destroy()
+{
+    if (!m_destroyCalled)
+    {
+        m_destroyCalled = true;
+        //All children should be also destroyed
+        for (UIObject *obj : GetChildren())
+            obj->Destroy(); //TODO exception could occur during Destruction
+        
+        std::cout << "test" << '\n';
+        //Raise CloseEvent
+        GetEventHandler().RaiseEvent<CloseEvent>(CloseEvent{});
+
+        //Seal event handler 
+        GetEventHandler().Seal();
+    }
 }
 
 ARX_NAMESPACE_END

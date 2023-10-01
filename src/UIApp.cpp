@@ -3,8 +3,39 @@
 #include <GLFW/glfw3.h>
 #include <memory>
 #include <functional>
+#include "ArxWindow.h"
 
 ARX_NAMESPACE_BEGIN
+
+void UIApp::TopLevelWindowManager::AddTopLevelWindow(ArxWindow *win)
+{
+    m_topLevelWindows.push_back(win);
+}
+
+void UIApp::TopLevelWindowManager::RemoveTopLevelWindow(ArxWindow *win)
+{
+    auto it = FindWindow(win);
+    m_topLevelWindows.erase(it);
+
+    if (HasTopLevelWindows())
+        m_topLevelWindows.back()->SetFocus(); //Focus last topLevelWindow
+    else
+        UIApp::GetInstance()->GetEventLoop().Exit(0); //No more windows available
+}
+
+bool UIApp::TopLevelWindowManager::HasTopLevelWindows()
+{
+    return !m_topLevelWindows.empty();
+}
+
+UIApp::TopLevelWindowManager::TopLevelWindowIterator UIApp::TopLevelWindowManager::FindWindow(ArxWindow *win)
+{
+    auto it = std::find_if(m_topLevelWindows.begin(), m_topLevelWindows.end(), [win](ArxWindow* w){ return win == w; });
+    assert(it != m_topLevelWindows.end());
+    return it;
+} 
+
+/*AppPart*/
 
 std::unique_ptr<UIApp> g_app;
 
@@ -57,12 +88,21 @@ EventLoop &UIApp::GetEventLoop()
     return m_evtLoop;
 }
 
+UIApp::TopLevelWindowManager &UIApp::GetTopLevelWindowManager()
+{
+    return m_topLevelWinManager;
+}
+
 void UIApp::OnExec()
 {
 }
 
 int UIApp::Exec()
 {
+    if (m_evtLoop.IsRunning())
+        return 0;
+
+    m_evtLoop = EventLoop{};
     OnExec();
     return m_evtLoop.Run();
 }

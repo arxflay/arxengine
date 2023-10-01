@@ -2,7 +2,6 @@
 #include "color.h"
 #include <ArxEngine.h>
 #include <ArxWindow.h>
-#include <GLFW/glfw3.h>
 #include <UIApp.h>
 
 int main(void)
@@ -25,13 +24,11 @@ TEST(Color, FromHexRGB)
 
 TEST(Window, ShowWindow)
 {
-    arx::ArxWindow *win = new arx::ArxWindow(nullptr, "1", arx::Size{100, 200});
-    arx::ArxWindow *win2 = new arx::ArxWindow(win, "2", arx::Size{100, 200});
-    arx::ArxWindow *win3 = new arx::ArxWindow(nullptr, "3", arx::Size{100, 200});
-    
-    win2->Show();
+    arx::ArxWindow *win = new arx::ArxWindow("1", arx::Size{0, 0});
+    arx::ArxWindow *win3 = new arx::ArxWindow("3", arx::Size{200, 100}); 
     win->Show();
     win3->Show();
+    win->SetSize(arx::Size{100, 200});
 
     int val = arx::UIApp::GetInstance()->Exec();
     ASSERT_EQ(val, 0);

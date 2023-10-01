@@ -4,8 +4,9 @@
 #include <iostream>
 ARX_NAMESPACE_BEGIN
 
-ArxWindow::ArxWindow(UIObject *parent, std::string_view title, Size size, Position position, int attributes)
-    : UIObject(parent, ArxWindow::GetRectSize() < size ? size : ArxWindow::GetRectSize(), position)
+
+ArxWindow::ArxWindow(std::string_view title, Size size, Position position, int attributes)
+    : UIObject(nullptr, ArxWindow::GetRectSize() < size ? size : ArxWindow::GetRectSize(), position)
     , m_title(title)
 {
     GLFWwindow *win = glfwCreateWindow(ArxWindow::GetSize().width, ArxWindow::GetSize().height, title.data(), nullptr, nullptr);
@@ -14,9 +15,20 @@ ArxWindow::ArxWindow(UIObject *parent, std::string_view title, Size size, Positi
     glfwSetWindowUserPointer(GetGLFWwindow(), this);
     glfwSetWindowPos(GetGLFWwindow(), position.x, position.y);
     InitGlfwCallbacks();
+    //if (parent == nullptr)
+    //TODO currently non TopLevelWindows aren't supported
+    ArxTheApp->GetTopLevelWindowManager().AddTopLevelWindow(this);
 
-    if (parent == nullptr)
-        TopLevelWindowManager::GetInstance().AddTopLevelWindow(this);
+    GetEventHandler().Bind<CloseEvent>(std::function<void(CloseEvent&)>([](CloseEvent&e) {
+        ArxWindow *arxWin = dynamic_cast<ArxWindow*>(e.GetCallingObject());
+        /*if (arxWin->GetParent())
+            arxWin->SetParent(nullptr);
+        else*/
+        
+        ArxTheApp->GetTopLevelWindowManager().RemoveTopLevelWindow(arxWin);
+        
+        e.Skip();
+    }));
 }
 
 void ArxWindow::InitGlfwCallbacks()
@@ -30,16 +42,7 @@ void ArxWindow::InitGlfwCallbacks()
 /*static*/ void ArxWindow::close_callback(GLFWwindow *win)
 {
     ArxWindow *arxWin = static_cast<ArxWindow*>(glfwGetWindowUserPointer(win));
-    std::cout << arxWin->GetTitle() << std::endl;
-    if (arxWin->GetParent())
-        arxWin->SetParent(nullptr);
-    else
-        TopLevelWindowManager::GetInstance().RemoveTopLevelWindow(arxWin);
-    
-    if (TopLevelWindowManager::GetInstance().HasTopLevelWindows())
-        TopLevelWindowManager::GetInstance().GetCurrentTopLevelWindow()->SetFocus();
-
-    delete arxWin;
+    arxWin->Destroy();
 }
 
 /*static*/ void ArxWindow::focus_callback(GLFWwindow *win, int focused)
@@ -145,11 +148,6 @@ GLFWwindow *ArxWindow::GetGLFWwindow()
 void ArxWindow::SetGLFWwindow(::GLFWwindow *window)
 {
     m_win = decltype(m_win)(window, &glfwDestroyWindow);
-}
-
-ArxWindow::~ArxWindow()
-{
-    UIObject::~UIObject();
 }
 
 ARX_NAMESPACE_END

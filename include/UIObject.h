@@ -13,6 +13,16 @@ class SizeEvent : public Event
 
 };
 
+class DrawEvent : public Event
+{
+
+};
+
+class CloseEvent : public Event
+{
+
+};
+
 class ARX_EXPORTS UIObject : public IEventHandlable 
 {
 public:
@@ -49,8 +59,17 @@ public:
 
     EventHandler &GetEventHandler() noexcept override;
     const EventHandler &GetEventHandler() const noexcept override;
+    
+    /**
+     * @brief Destroys function in preferable way
+     * @details Use this function instead of delete keyword to avoid dangling events.
+     * Raises close event to this object and children
+     */
+    void Destroy();
 
 private:
+
+
     UIObject *m_parent;
     Size m_minSize;
     Size m_maxSize;
@@ -59,6 +78,7 @@ private:
     Color m_color;
     std::vector<UIObject*> m_children;
     EventHandler m_eventHandler;
+    bool m_destroyCalled;
 
     /*event part*/
 };

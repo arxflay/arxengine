@@ -26,6 +26,8 @@ static inline constexpr bool is_event_type_v = is_event_type<EventType>::value;
 class ARX_EXPORTS IEventHandlable
 {
 public:
+    virtual ~IEventHandlable() = default;
+protected:
     virtual EventHandler &GetEventHandler() noexcept = 0;
     virtual const EventHandler &GetEventHandler() const noexcept = 0;
 };

@@ -19,7 +19,7 @@ public:
         DISPLAY_ON_TOP = 0x04
     };
 
-    ArxWindow(UIObject *parent, std::string_view title, Size size = defaults::DEFAULT_SIZE, Position position = defaults::DEFAULT_POSITION, int attributes = WindowAttributes::RESIZABLE | WindowAttributes::DECORATED );
+    ArxWindow(std::string_view title, Size size = defaults::DEFAULT_SIZE, Position position = defaults::DEFAULT_POSITION, int attributes = WindowAttributes::RESIZABLE | WindowAttributes::DECORATED );
     
     Size GetRectSize() override;
 
@@ -33,7 +33,6 @@ public:
     void Draw() override;
     void SetFocus(bool focus = true) override;
     void SetWindowAttributes(int attributes);
-    ~ArxWindow() override;
 
     std::string_view GetTitle();
     void SetTitle(std::string_view title);
@@ -51,68 +50,5 @@ private:
     std::string m_title;
 };
 
-class TopLevelWindowManager
-{
-
-public:
-    static TopLevelWindowManager &GetInstance()
-    {
-        static TopLevelWindowManager manager;
-        return manager;
-    }
-
-    ArxWindow *GetCurrentTopLevelWindow()
-    {
-        return m_currentWindow;
-    }
-
-    void SetCurrentTopLevelWindow(ArxWindow *win)
-    {
-        (void)FindWindow(win); 
-        m_currentWindow = win;
-    }
-
-    void AddTopLevelWindow(ArxWindow *win)
-    {
-        if (m_currentWindow == nullptr)
-            m_currentWindow = win;
-
-        m_topLevelWindows.push_back(win);
-    }
-
-    void RemoveCurrentTopLevelWindow()
-    {
-        RemoveTopLevelWindow(m_currentWindow);
-    }
-
-    void RemoveTopLevelWindow(ArxWindow *win)
-    {
-        auto it = FindWindow(win);
-        m_topLevelWindows.erase(it);
-        if (m_currentWindow == win)
-            m_currentWindow = m_topLevelWindows.empty() ? nullptr : m_topLevelWindows.back();
-    }
-
-    void DestroyCurrentTopLevelWindow()
-    {
-        delete m_currentWindow;
-        RemoveTopLevelWindow(m_currentWindow);
-    }
-
-    bool HasTopLevelWindows()
-    {
-        return !m_topLevelWindows.empty();
-    }
-private:
-    std::vector<ArxWindow*> m_topLevelWindows;
-    using topLevelWindowIterator = decltype(m_topLevelWindows)::iterator;
-    decltype(m_topLevelWindows)::iterator FindWindow(ArxWindow *win)
-    {
-        auto it = std::find_if(m_topLevelWindows.begin(), m_topLevelWindows.end(), [win](ArxWindow* w){ return win == w; });
-        assert(it != m_topLevelWindows.end());
-        return it;
-    }    
-    ArxWindow *m_currentWindow;
-};
 
 ARX_NAMESPACE_END

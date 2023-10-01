@@ -88,6 +88,9 @@ public:
     template<typename EventType>
     std::enable_if_t<is_event_type_v<EventType>> RaiseEvent(EventType &&event)
     {
+        if (m_sealed)
+            return; //ignore all incoming events when sealed
+
         auto evtHandlers = m_handlers.find(typeid(EventType));
         assert(evtHandlers != m_handlers.end());
         auto &evtHandlersVec = evtHandlers->second; 
@@ -100,7 +103,14 @@ public:
 
     IEventHandlable *GetEventHandlable() { return m_eventHandlable; }
 
+    /**
+     * @brief Seals EventHandler
+     * @description Seals EventHandler forever. Every new raised event is ignored
+     */
+    void Seal() { m_sealed = true; }
+
 private:
+    bool m_sealed;
     IEventHandlable *m_eventHandlable;
     std::map<ComparableTypeInfo, Event::EventFunctionWrapperVec> m_handlers;
 };
