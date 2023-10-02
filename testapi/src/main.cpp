@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 #include "color.h"
-#include <ArxEngine.h>
 #include <ArxWindow.h>
 #include <UIApp.h>
 

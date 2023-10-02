@@ -26,7 +26,6 @@ ArxWindow::ArxWindow(std::string_view title, Size size, Position position, int a
         else*/
         
         ArxTheApp->GetTopLevelWindowManager().RemoveTopLevelWindow(arxWin);
-        
         e.Skip();
     }));
 }

@@ -39,7 +39,7 @@ public:
      * @param[in] evtHandlable EventHandler parent 
      */
     EventHandler(IEventHandlable *evtHandlable)
-        : m_eventHandlable(evtHandlable)
+        : m_sealed(false), m_eventHandlable(evtHandlable)
     {
         assert(evtHandlable != nullptr);
     }

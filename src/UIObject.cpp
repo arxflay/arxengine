@@ -203,7 +203,6 @@ void UIObject::Destroy()
         for (UIObject *obj : GetChildren())
             obj->Destroy(); //TODO exception could occur during Destruction
         
-        std::cout << "test" << '\n';
         //Raise CloseEvent
         GetEventHandler().RaiseEvent<CloseEvent>(CloseEvent{});
 

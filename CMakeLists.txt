@@ -13,7 +13,6 @@ list(APPEND SOURCES
     ${SOURCE_PATH}/ArxException.cpp
     ${SOURCE_PATH}/ArxWindow.cpp
     ${SOURCE_PATH}/UIObject.cpp
-    ${SOURCE_PATH}/ArxEngine.cpp
     ${SOURCE_PATH}/UIApp.cpp
     ${SOURCE_PATH}/Event.cpp
     ${SOURCE_PATH}/EventLoop.cpp
