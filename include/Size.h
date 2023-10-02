@@ -4,10 +4,18 @@
 #include <limits>
 ARX_NAMESPACE_BEGIN
 
+/**
+ * @class Size
+ * @brief struct that represents Size
+ */
 struct ARX_EXPORTS Size
 {
     int width;
     int height;
+
+    /**
+     * @brief Returns clamped size that varies from -1(defaults::IGNORE) to INT_MAX
+     */
     constexpr Size GetClampedSize() const noexcept 
     {
         return Size {

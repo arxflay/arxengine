@@ -5,6 +5,10 @@ ARX_NAMESPACE_BEGIN
 
 //Probably should consider using float for smooth transition
 
+/**
+ * @class Position
+ * @brief struct that represents position
+ */
 struct ARX_EXPORTS Position 
 {
     int x;
