@@ -48,6 +48,7 @@ int EventLoop::Run()
     VariableRestoreGuard<bool> guard(&m_running, false);
     VariableRestoreGuard<bool> shouldExitGuard(&m_shouldExit, false);
     EventProcessor evtProcessor;
+    int x = 0;
     while(!m_shouldExit)
     {
         PollEvents();
