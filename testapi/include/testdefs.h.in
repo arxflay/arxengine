@@ -1,0 +1,4 @@
+#pragma once
+#include <filesystem>
+
+const std::filesystem::path TEST_DATA_PATH = "@TEST_DATA_PATH@";

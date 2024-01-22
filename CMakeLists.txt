@@ -8,7 +8,8 @@ option(ARX_BUILD_TEST "Build testapi" OFF)
 set(SOURCE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 list(APPEND SOURCES
-
+    src/Image.cpp
+    src/Utils.cpp
 )
 set(CMAKE_EXPORT_COMPILE_COMMANDS True)
 set(gcc_like_cxx "$<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang,GNU,LCC>")
