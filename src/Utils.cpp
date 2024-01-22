@@ -20,9 +20,10 @@ constexpr uint8_t Base64CharToByte(char base64Char)
         return static_cast<uint8_t>(static_cast<uint8_t>(base64Char - '0') + sizeof("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz") - 1);
     else if (base64Char == '+')
         return 62;
-    else if (base64Char == '-')
+    else if (base64Char == '/')
         return 63;
 
+    std::cout << (int)base64Char << '\n';
     throw std::runtime_error("Invalid base64 string");
 }
 
@@ -48,6 +49,7 @@ static inline Utils::Base64DecodeErrCode Base64DecodeInternal(std::string_view e
     try
     {
         size_t len = Base64ApproximateLenWithoutPadding(encData);
+
         for (size_t i = 0; i < len; i++)
         {
             size_t bytePos = (i + 1) % ENCODED_SEQUENCE_LEN;
@@ -71,6 +73,8 @@ static inline Utils::Base64DecodeErrCode Base64DecodeInternal(std::string_view e
     }
     catch(...)
     {
+
+        std::cout << encData.size() << '\n'; 
         return Utils::Base64DecodeErrCode::InvalidBase64String; //error during conversion
     }
 
@@ -124,7 +128,7 @@ static inline Utils::Base64DecodeErrCode Base64DecodeInternal(std::string_view e
         return {};
 
     std::string encryptedData;
-    encryptedData.resize(ENCODED_SEQUENCE_LEN + ((size / ENCODED_SEQUENCE_LEN) << 2));
+    encryptedData.resize(ENCODED_SEQUENCE_LEN * !!(size % DECODED_SEQUENCE_LEN) + ((size / DECODED_SEQUENCE_LEN) << 2));
     for (size_t i = 0; i < size; i++)
     {
         size_t bytePos = (i + 1) % DECODED_SEQUENCE_LEN;

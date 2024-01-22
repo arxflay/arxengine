@@ -43,6 +43,26 @@ TEST(Base64, PositiveBase64Decode4)
     ASSERT_STREQ(str.c_str(), "ManMan");
 }
 
+TEST(Base64, PositiveBase64DecEncDecode)
+{
+    std::filesystem::path testJpgPath(TEST_DATA_PATH / std::filesystem::path("test_jpg.jpg"));
+    std::string jpegFileContent;
+    {
+        std::ifstream f;
+        f.exceptions(std::ifstream::badbit | std::ifstream::failbit);
+        f.open(testJpgPath, std::ifstream::binary | std::ifstream::in);
+        std::stringstream ss;
+        ss << f.rdbuf();
+        f.close();
+        jpegFileContent = ss.str();
+    }
+    auto str = Utils::Base64Encode(jpegFileContent);
+    std::vector<uint8_t> vec;
+    Utils::Base64Decode(str, vec);
+    Image img2 = Image::LoadFromBinary(vec);
+    ASSERT_FALSE(img2.IsInvalid());
+}
+
 TEST(Base64, NegativeBase64Decode1)
 {
     std::string str;
