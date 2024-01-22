@@ -23,7 +23,6 @@ constexpr uint8_t Base64CharToByte(char base64Char)
     else if (base64Char == '/')
         return 63;
 
-    std::cout << (int)base64Char << '\n';
     throw std::runtime_error("Invalid base64 string");
 }
 
@@ -73,8 +72,6 @@ static inline Utils::Base64DecodeErrCode Base64DecodeInternal(std::string_view e
     }
     catch(...)
     {
-
-        std::cout << encData.size() << '\n'; 
         return Utils::Base64DecodeErrCode::InvalidBase64String; //error during conversion
     }
 
