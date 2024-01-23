@@ -5,6 +5,7 @@
 #include <fstream>
 #include <sstream>
 #include "testdefs.h"
+#include <Sound.h>
 
 ARX_NAMESPACE_USE;
 
@@ -168,4 +169,34 @@ TEST(Image, NegativeLoadImageFile)
     ASSERT_EQ(img.GetSize().y, 0);
     ASSERT_EQ(img.GetColorChannels(), 0);
     ASSERT_EQ(img.GetGLColorChannels(), GL_INVALID_VALUE);
+}
+
+TEST(Sound, PositiveLoadFromFile1)
+{
+    std::filesystem::path testWavPath(TEST_DATA_PATH / std::filesystem::path("test_wav_8bit_44khz.wav"));
+    Sound snd(Sound::LoadFromFile(testWavPath.native(), Sound::Format::UncompressedWAV));
+    ASSERT_FALSE(snd.IsInvalid());
+    ASSERT_EQ(snd.GetBitDepth(), 8);
+    ASSERT_EQ(snd.GetSampleFrequency(), 44100);
+    ASSERT_EQ(snd.GetSoundReproductionType(), Sound::SoundReproductionType::Mono);
+}
+
+TEST(Sound, PositiveLoadFromFile2)
+{
+    std::filesystem::path testWavPath(TEST_DATA_PATH / std::filesystem::path("test_wav_16bit_11khz.wav"));
+    Sound snd(Sound::LoadFromFile(testWavPath.native(), Sound::Format::UncompressedWAV));
+    ASSERT_FALSE(snd.IsInvalid());
+    ASSERT_EQ(snd.GetBitDepth(), 16);
+    ASSERT_EQ(snd.GetSampleFrequency(), 11025);
+    ASSERT_EQ(snd.GetSoundReproductionType(), Sound::SoundReproductionType::Mono);
+}
+
+TEST(Sound, NegativeLoadFromFile)
+{
+    std::filesystem::path testWavPath(TEST_DATA_PATH);
+    Sound snd(Sound::LoadFromFile(testWavPath.native(), Sound::Format::UncompressedWAV));
+    ASSERT_TRUE(snd.IsInvalid());
+    ASSERT_EQ(snd.GetBitDepth(), 0);
+    ASSERT_EQ(snd.GetSampleFrequency(), 0);
+    ASSERT_EQ(snd.GetSoundReproductionType(), Sound::SoundReproductionType::Mono);
 }

@@ -19,6 +19,7 @@ public:
     int GetGLColorChannels() const;
     bool IsInvalid() const;
     
+    //jpeg, png, gif
     static Image LoadFromFile(std::string_view filename, bool flipVerticaly = true);
     static Image LoadFromBinary(const std::vector<uint8_t> &binaryData, bool flipVerticaly = true);
 private:
