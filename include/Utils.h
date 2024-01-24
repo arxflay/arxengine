@@ -3,7 +3,7 @@
 #include <vector>
 #include <string_view>
 #include <string>
-
+#include <cstdio>
 ARX_NAMESPACE_BEGIN
 
 class Utils
@@ -21,6 +21,23 @@ public:
     static std::string Base64Encode(std::string_view data);
     static std::string Base64Encode(const std::vector<uint8_t> &data);
     static std::string Base64Encode(const uint8_t *data, size_t size);
+
+    //return empty string on error
+    template<typename ...Args>
+    static std::string Format(const char *format, Args&& ...args)
+    {
+        std::string out;
+        //https://en.cppreference.com/w/cpp/io/c/fprintf
+        //Calling std::snprintf with zero buf_size and null pointer for buffer is useful 
+        //(when the overhead of double-call is acceptable) to determine the necessary buffer size to contain the output
+        int len = snprintf(nullptr, 0, format, std::forward<Args&&>(args)...);
+        if (len != -1)
+        {
+            out.resize(static_cast<size_t>(len));
+            sprintf(out.data(), format, std::forward<Args&&>(args)...);
+        }
+        return out;
+    }
 };
 
 ARX_NAMESPACE_END
