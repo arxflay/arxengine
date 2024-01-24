@@ -36,8 +36,8 @@
 /*if enum is nested in namespace or class*/
 
 
-#define ENUM_FROM_STRING_DECLARE_NESTED(Scope, EnumName) Scope::EnumName StringTo##EnumName(std::string_view str)
-#define ENUM_FROM_STRING_DEFINE_NESTED(Scope, EnumName, ...) Scope::EnumName StringTo##EnumName(std::string_view str)\
+#define ENUM_FROM_STRING_DECLARE_NESTED(Scope, EnumName) Scope::EnumName Scope::StringTo##EnumName(std::string_view str)
+#define ENUM_FROM_STRING_DEFINE_NESTED(Scope, EnumName, ...) Scope::EnumName Scope::StringTo##EnumName(std::string_view str)\
 {\
     static const char *conversions[]{ __VA_ARGS__ };\
     auto it = std::find(std::begin(conversions), std::end(conversions), str);\
@@ -46,8 +46,8 @@
     return static_cast<Scope::EnumName>(it - std::begin(conversions));\
 }
 
-#define ENUM_TO_STRING_DECLARE_NESTED(Scope, EnumName) const char *StringFrom##EnumName(Scope, EnumName ourEnum)
-#define ENUM_TO_STRING_DEFINE_NESTED(Scope, EnumName, ...) const char *StringFrom##EnumName(Scope::EnumName ourEnum)\
+#define ENUM_TO_STRING_DECLARE_NESTED(Scope, EnumName) const char *Scope::StringFrom##EnumName(Scope, EnumName ourEnum)
+#define ENUM_TO_STRING_DEFINE_NESTED(Scope, EnumName, ...) const char *Scope::StringFrom##EnumName(Scope::EnumName ourEnum)\
 {\
     static const char *conversions[]{ __VA_ARGS__ };\
     if (static_cast<size_t>(ourEnum) > (sizeof(conversions) / sizeof(char*)))\
