@@ -13,6 +13,8 @@ list(APPEND SOURCES
     ${SOURCE_PATH}/Sound.cpp
     ${SOURCE_PATH}/internal/WavLoader.cpp
     ${SOURCE_PATH}/ArxException.cpp
+    ${SOURCE_PATH}/logging/Logger.cpp
+    ${SOURCE_PATH}/logging/FileLogger.cpp
 )
 set(CMAKE_EXPORT_COMPILE_COMMANDS True)
 set(gcc_like_cxx "$<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang,GNU,LCC>")

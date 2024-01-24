@@ -6,11 +6,18 @@
 #include <sstream>
 #include "testdefs.h"
 #include <Sound.h>
-
+#include <logging/FileLogger.h>
 ARX_NAMESPACE_USE;
+
+void InitLogging()
+{
+    std::unique_ptr<FileLogger> logger(std::make_unique<FileLogger>(Logger::LoggingLevel::Debug, "/tmp/log.txt"));
+    Logger::SetGlobalLogger(std::move(logger));
+}
 
 int main(int argc, char **argv)
 {
+    InitLogging();
     ::testing::InitGoogleTest(&argc, argv);
     int ret = RUN_ALL_TESTS();
     return ret;
