@@ -104,7 +104,28 @@ private:
     LoggingCallbacks m_callbacks;
 };
 
+namespace
+{
+    class FnLogGuard final
+    {
+    public:
+        FnLogGuard(std::string_view functionName)
+            : m_functionName(functionName)
+        {
+            GLOG->Info("Entered function %s", functionName.data());
+        }
+        
+        ~FnLogGuard()
+        {
+            GLOG->Info("Exited function %s", m_functionName.data());
+        }
 
-#define EMPTY_LOGGER Logger{}
+    private:
+        std::string_view m_functionName;
+    };
+}
+
+//strange name for collision avoidance
+#define FUNC_LOG_ENTER FnLogGuard fn_14f1f341zvxt431af0a94(__FUNCTION__)
 
 ARX_NAMESPACE_END
