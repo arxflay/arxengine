@@ -12,6 +12,7 @@ list(APPEND SOURCES
     ${SOURCE_PATH}/Utils.cpp
     ${SOURCE_PATH}/Sound.cpp
     ${SOURCE_PATH}/internal/WavLoader.cpp
+    ${SOURCE_PATH}/ArxException.cpp
 )
 set(CMAKE_EXPORT_COMPILE_COMMANDS True)
 set(gcc_like_cxx "$<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang,GNU,LCC>")
@@ -28,6 +29,7 @@ endif()
 
 target_compile_options(arxengine PRIVATE "$<${gcc_like_cxx}:-Wall;-Wextra;-Wconversion;-std=c++17>"  
                                                         "$<${msvc_cxx}:/W3;/std:c++17>")
+
 target_include_directories(arxengine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 include(${CMAKE_CURRENT_SOURCE_DIR}/libs/ProjectLibs.cmake)
 
