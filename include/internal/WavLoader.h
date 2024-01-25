@@ -3,7 +3,8 @@
 #include <optional>
 #include <vector>
 #include <string_view>
-#include "../ArxDefines.h"
+#include "ArxDefines.h"
+#include "EnumHelpers.h"
 
 ARX_NAMESPACE_BEGIN
 
@@ -13,7 +14,7 @@ struct WavFormatData
 {
     uint16_t monoStereoFlag;
     uint32_t sampleFreq; //Per second. Also known as sample rate. Freq that is highier than sampleFreq / 2.5 (Nyquist rate) is cutted
-    uint32_t bytePerSec; // (bitsPerSample / 8) * sampleFreq
+    uint32_t bytePerSec; // (bitsPerSample / 8) * sampleFreq * monoStereoFlag
     uint16_t blockAlignment;
     uint16_t bitsPerSample; 
     std::optional<std::vector<uint8_t>> extendedData;
@@ -58,14 +59,23 @@ class WavLoader
 public:
     enum class WavLoadCode
     {
-        NoError,
-        FailedToOpenFile,
-        EmptyFile,
-        MissingHeader,
-        InvalidData,
-        UnsupportedFeature,
-        FailedToExtractData
+        NoError = 0,
+        FailedToOpenFile = 1,
+        EmptyFile = 2,
+        MissingHeader = 3,
+        UnsupportedFeature = 4,
+        FailedToExtractData = 5,
+        InvalidData = 6,
+        InvalidFormatData = 7,
+        InvalidCueData = 8,
+        InvalidPlaylistData = 9,
+        InvalidFactData = 10
     };
+    
+    static ENUM_FROM_STRING_DECLARE(WavLoadCode);
+    static ENUM_TO_STRING_DECLARE(WavLoadCode);
+    
+
     static WavLoadCode LoadWAVFile(std::string_view filename, WavData &wavData);
     static WavLoadCode LoadWAVBinary(const std::vector<uint8_t> &data, WavData &wavData);
     WavLoader() = delete;

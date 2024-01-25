@@ -3,7 +3,17 @@
 #include <sstream>
 #include "internal/DataExtractor.h"
 #include <filesystem>
+#include <logging/Logger.h>
 ARX_NAMESPACE_BEGIN
+
+ENUM_FROM_TO_STRING_DEFINE_NESTED(WavLoader, WavLoadCode, 
+        "NoError", "FailedToOpenFile", "EmptyFile", "MissingHeader", "UnsupportedFeature", 
+        "FailedToExtractData", "InvalidData", "InvalidFormatData", "InvalidCueData", "InvalidPlaylistData", "InvalidFactData");
+
+uint32_t CalculateBytePerSec(uint16_t bitsPerSample, uint16_t monoStereoFlag, uint32_t sampleFreq)
+{
+    return (bitsPerSample >> 3) * sampleFreq * monoStereoFlag;
+}
 
 constexpr std::string_view FMT_HEADER("fmt ");
 constexpr size_t UNCOMPRESSED_WAV_FORMAT = 0x0001;
@@ -17,7 +27,7 @@ WavLoader::WavLoadCode GetFormatData(DataExtractor &extractor, WavFormatData &fo
     
     uint32_t formatLen = extractor.Extract<uint32_t>();
     if (formatLen < MIN_FMT_LIN)
-        return WavLoader::WavLoadCode::InvalidData;
+        return WavLoader::WavLoadCode::InvalidFormatData;
     
     uint16_t wavType = extractor.Extract<uint16_t>();
     if (wavType != UNCOMPRESSED_WAV_FORMAT) //Accept only MICROSOFT UNCOMPRESSED PCM
@@ -25,17 +35,21 @@ WavLoader::WavLoadCode GetFormatData(DataExtractor &extractor, WavFormatData &fo
     
     formatData.monoStereoFlag = extractor.Extract<uint16_t>();
     if (formatData.monoStereoFlag != MONO && formatData.monoStereoFlag != STEREO)
-        return WavLoader::WavLoadCode::InvalidData;
-    
+        return WavLoader::WavLoadCode::InvalidFormatData;
+
     formatData.sampleFreq = extractor.Extract<uint32_t>();
     if (formatData.sampleFreq == 0)
-        return WavLoader::WavLoadCode::InvalidData;
+        return WavLoader::WavLoadCode::InvalidFormatData;
     
     formatData.bytePerSec = extractor.Extract<uint32_t>();
     formatData.blockAlignment = extractor.Extract<uint16_t>();
     formatData.bitsPerSample = extractor.Extract<uint16_t>();
-    if (formatData.bytePerSec == 0 || formatData.bytePerSec != (formatData.bitsPerSample >> 3) * formatData.sampleFreq)
-        return WavLoader::WavLoadCode::InvalidData; 
+    uint32_t expectedBytePerSec = CalculateBytePerSec(formatData.bitsPerSample, formatData.monoStereoFlag, formatData.sampleFreq);
+    if (formatData.bytePerSec == 0 || formatData.bytePerSec != expectedBytePerSec)
+    {
+        GLOG->Debug("invalid bytePerSec, expected %d but got %d", formatData.sampleFreq, formatData.bytePerSec);
+        return WavLoader::WavLoadCode::InvalidFormatData;
+    }
     if (formatLen > MIN_FMT_LIN) 
     {
         uint16_t extraFormatLen = extractor.Extract<uint16_t>();
@@ -51,12 +65,26 @@ WavLoader::WavLoadCode GetFact(DataExtractor &extractor, std::optional<std::vect
 {
     if (extractor.Peek(FACT_HEADER.size()).compare(FACT_HEADER) != 0)
         return WavLoader::WavLoadCode::MissingHeader;
-    
+    extractor.Skip(FACT_HEADER.size()); 
+
     uint32_t factSize = extractor.Extract<uint32_t>();
     if (factSize == 0)
-        return WavLoader::WavLoadCode::InvalidData;
+        return WavLoader::WavLoadCode::InvalidFactData;
     
     factData = extractor.Extract<uint8_t>(factSize);
+    return WavLoader::WavLoadCode::NoError;
+}
+
+constexpr std::string_view LIST_HEADER("LIST");
+WavLoader::WavLoadCode SkipListChunk(DataExtractor &extractor)
+{
+    if (extractor.Peek(LIST_HEADER.size()).compare(LIST_HEADER) != 0)
+        return WavLoader::WavLoadCode::MissingHeader;
+    extractor.Extract<std::string_view>(LIST_HEADER.size()); 
+
+    uint32_t listSize = extractor.Extract<uint32_t>();
+    extractor.Skip(listSize);
+
     return WavLoader::WavLoadCode::NoError;
 }
 
@@ -67,16 +95,17 @@ WavLoader::WavLoadCode GetCues(DataExtractor &extractor, std::optional<std::vect
 {
     if (extractor.Peek(CUE_HEADER.size()).compare(CUE_HEADER) != 0)
         return WavLoader::WavLoadCode::MissingHeader;
+    extractor.Skip(CUE_HEADER.size()); 
 
     uint32_t cuesSize = extractor.Extract<uint32_t>();
     if (cuesSize == 0)
-        return WavLoader::WavLoadCode::InvalidData;
+        return WavLoader::WavLoadCode::InvalidCueData;
 
     uint32_t cuesCount = extractor.Extract<uint32_t>();
     if (cuesCount == 0)
         return (cuesSize == 4) ? WavLoader::WavLoadCode::NoError : WavLoader::WavLoadCode::InvalidData;
     else if (cuesSize - sizeof(cuesCount) != cuesCount * sizeof(WavCue))
-        return WavLoader::WavLoadCode::InvalidData;
+        return WavLoader::WavLoadCode::InvalidCueData;
     
     cues.emplace(cuesCount);
     for (uint32_t i = 0; i < cuesCount; i++)
@@ -90,7 +119,7 @@ WavLoader::WavLoadCode GetCues(DataExtractor &extractor, std::optional<std::vect
         else if (dataChunkIdStr.compare(CUE_DATA_CHUNK_ID_SILENT) == 0)
             cue.dataChunkId = DataChunkId::Silent;
         else
-            return WavLoader::WavLoadCode::InvalidData;
+            return WavLoader::WavLoadCode::InvalidCueData;
        
         cue.chunkStart = extractor.Extract<uint32_t>();
         cue.blockStart = extractor.Extract<uint32_t>();
@@ -106,16 +135,17 @@ WavLoader::WavLoadCode GetPlaylistData(DataExtractor &extractor, std::optional<s
 {
     if (extractor.Peek(PLAYLIST_HEADER.size()).compare(PLAYLIST_HEADER) != 0)
         return WavLoader::WavLoadCode::MissingHeader;
+    extractor.Skip(PLAYLIST_HEADER.size()); 
     
     uint32_t playlistSize = extractor.Extract<uint32_t>();
     if (playlistSize == 0)
-        return WavLoader::WavLoadCode::InvalidData;
+        return WavLoader::WavLoadCode::InvalidPlaylistData;
 
     uint32_t segmentsCount = extractor.Extract<uint32_t>();
     if (segmentsCount == 0)
         return (playlistSize == 4) ? WavLoader::WavLoadCode::NoError : WavLoader::WavLoadCode::InvalidData;
     else if (playlistSize - sizeof(segmentsCount) != segmentsCount * sizeof(PlaylistSegment))
-        return WavLoader::WavLoadCode::InvalidData;
+        return WavLoader::WavLoadCode::InvalidPlaylistData;
 
     segments.emplace(segmentsCount);
     for (uint32_t i = 0; i < segmentsCount; i++)
@@ -183,8 +213,12 @@ constexpr std::string_view WAVE_HEADER("WAVE");
         WavLoadCode st = GetFormatData(extractor, wavData.formatData);
         if (st != WavLoadCode::NoError)
             return st;
-
+        
         st = GetFact(extractor, wavData.factData);
+        if (st != WavLoadCode::NoError && st != WavLoadCode::MissingHeader)
+            return st;
+    
+        st = SkipListChunk(extractor);
         if (st != WavLoadCode::NoError && st != WavLoadCode::MissingHeader)
             return st;
 

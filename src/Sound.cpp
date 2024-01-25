@@ -2,6 +2,7 @@
 
 #include "internal/WavLoader.h"
 #include <AL/al.h>
+#include <logging/Logger.h>
 ARX_NAMESPACE_BEGIN
 
 Sound::SoundReproductionType Sound::GetSoundReproductionType() const { return m_soundReproductionType; }
@@ -19,9 +20,13 @@ bool Sound::IsInvalid() const
     (void)format; //reserved for future
     
     Sound sound;
-    WavData wavData; 
-    if(WavLoader::LoadWAVFile(filename, wavData) != WavLoader::WavLoadCode::NoError)
+    WavData wavData;
+    auto res = WavLoader::LoadWAVFile(filename, wavData);
+    if(res != WavLoader::WavLoadCode::NoError)
+    {
+        GLOG->Error("Failed to load wav file, %s", WavLoader::StringFromWavLoadCode(res));
         return {};
+    }
 
     sound.m_soundReproductionType = (wavData.formatData.monoStereoFlag == (uint16_t)Sound::SoundReproductionType::Mono) ? SoundReproductionType::Mono : SoundReproductionType::Stereo;
     sound.m_sampleFreq = wavData.formatData.sampleFreq;
@@ -36,9 +41,13 @@ bool Sound::IsInvalid() const
     (void)format; //reserved for future
 
     Sound sound;
-    WavData wavData; 
-    if(WavLoader::LoadWAVBinary(data, wavData) != WavLoader::WavLoadCode::NoError)
+    WavData wavData;
+    auto res = WavLoader::LoadWAVBinary(data, wavData);
+    if(res != WavLoader::WavLoadCode::NoError)
+    {
+        GLOG->Error("Failed to load wav file, %s", WavLoader::StringFromWavLoadCode(res));
         return {};
+    }
 
     sound.m_soundReproductionType = (wavData.formatData.monoStereoFlag == (uint16_t)Sound::SoundReproductionType::Mono) ? SoundReproductionType::Mono : SoundReproductionType::Stereo;
     sound.m_sampleFreq = wavData.formatData.sampleFreq;
