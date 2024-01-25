@@ -34,7 +34,7 @@ ENUM_FROM_TO_STRING_DEFINE_NESTED(Logger, LoggingLevel, "Error", "Warn", "Info",
 void Logger::SetSingleCallbackForAll(LoggingCallback callback)
 {
     Logger::LoggingCallback *callbacks = reinterpret_cast<Logger::LoggingCallback*>(&m_callbacks);
-    std::fill(callbacks, callbacks + sizeof(LoggingCallback), callback); 
+    std::fill(callbacks, callbacks + (sizeof(Logger::LoggingCallbacks) / sizeof(Logger::LoggingCallback)), callback); 
 }
 
 void Logger::SetCallbacks(const Logger::LoggingCallbacks &callbacks) { m_callbacks = callbacks; }

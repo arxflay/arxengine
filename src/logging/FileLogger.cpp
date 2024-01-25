@@ -10,9 +10,9 @@ constexpr size_t MAX_LOGGING_ATTEMPTS = 10;
 FileLogger::FileLogger(LoggingLevel maxLogLevel, std::string_view filename)
     : m_filename(filename)
 {
-    LoggingCallbacks callbacks;
+    LoggingCallbacks callbacks{};
     LoggingCallback *callbackArray = reinterpret_cast<Logger::LoggingCallback*>(&callbacks);
-    for (size_t i = 0; i < static_cast<size_t>(maxLogLevel); i++)
+    for (size_t i = 0; i <= static_cast<size_t>(maxLogLevel); i++)
         callbackArray[i] = &FileLogger::WriteToFile;
     SetCallbacks(callbacks);
     Info("++BEGIN LOGGING");
