@@ -15,6 +15,8 @@ list(APPEND SOURCES
     ${SOURCE_PATH}/ArxException.cpp
     ${SOURCE_PATH}/logging/Logger.cpp
     ${SOURCE_PATH}/logging/FileLogger.cpp
+    ${SOURCE_PATH}/SoundPlayer.cpp
+    ${SOURCE_PATH}/UIApp.cpp
 )
 set(CMAKE_EXPORT_COMPILE_COMMANDS True)
 set(gcc_like_cxx "$<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang,GNU,LCC>")

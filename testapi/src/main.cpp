@@ -7,6 +7,8 @@
 #include "testdefs.h"
 #include <Sound.h>
 #include <logging/FileLogger.h>
+#include <UIApp.h>
+#include <SoundPlayer.h>
 ARX_NAMESPACE_USE;
 
 void InitLogging()
@@ -15,8 +17,15 @@ void InitLogging()
     Logger::SetGlobalLogger(std::move(logger));
 }
 
+void InitApp()
+{
+    UIApp::SetAppAsGlobal(std::make_unique<UIApp>());
+    UIApp::GetGlobalApp()->Init();
+}
+
 int main(int argc, char **argv)
 {
+    InitApp();
     InitLogging();
     ::testing::InitGoogleTest(&argc, argv);
     int ret = RUN_ALL_TESTS();
@@ -206,4 +215,14 @@ TEST(Sound, NegativeLoadFromFile)
     ASSERT_EQ(snd.GetBitDepth(), 0);
     ASSERT_EQ(snd.GetSampleFrequency(), 0);
     ASSERT_EQ(snd.GetSoundReproductionType(), Sound::SoundReproductionType::Mono);
+}
+
+TEST(SoundPlayer, PositivePlay)
+{
+    std::filesystem::path testWavPath(TEST_DATA_PATH / std::filesystem::path("test_wav_8bit_44khz.wav"));
+    Sound snd(Sound::LoadFromFile(testWavPath.native(), Sound::Format::UncompressedWAV));
+
+    SoundPlayer player;
+    player.LoadSound(snd);
+    player.Play(SoundPlayer::PlayMode::Sync, false);
 }
