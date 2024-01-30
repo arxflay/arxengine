@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
-#include <Image.h>
 #include <Utils.h>
+
+#include <Image.h>
 #include <glad/glad.h>
 #include <fstream>
 #include <sstream>
@@ -25,8 +26,8 @@ void InitApp()
 
 int main(int argc, char **argv)
 {
-    InitApp();
     InitLogging();
+    InitApp();
     ::testing::InitGoogleTest(&argc, argv);
     int ret = RUN_ALL_TESTS();
     return ret;
@@ -225,4 +226,20 @@ TEST(SoundPlayer, PositivePlay)
     SoundPlayer player;
     player.LoadSound(snd);
     player.Play(SoundPlayer::PlayMode::Sync, false);
+}
+
+TEST(SoundPlayer, DISABLED_PositivePlayMultiple)
+{
+    std::filesystem::path testWavPath(TEST_DATA_PATH / std::filesystem::path("test_wav_8bit_44khz.wav"));
+    Sound snd(Sound::LoadFromFile(testWavPath.native(), Sound::Format::UncompressedWAV));
+
+    SoundPlayer player;
+    player.LoadSound(snd);
+    player.Play(SoundPlayer::PlayMode::Sync, false);
+    
+    SoundDeviceContextPair *pair = nullptr;
+    EXPECT_NO_THROW(pair = CreateSoundDeviceContextPair("HyperX 7.1 Audio Analog Stereo"));
+    SoundPlayer player2(pair);
+    player2.LoadSound(snd);
+    player2.Play(SoundPlayer::PlayMode::Sync, false);
 }
