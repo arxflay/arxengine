@@ -4,26 +4,35 @@
 #include <string>
 #include <iostream>
 #include <algorithm>
+#include <array>
+#include <numeric>
+#include <cstring>
 ARX_NAMESPACE_BEGIN
 constexpr std::string_view BASE64_CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 constexpr char BASE64_PADDING_CHAR = '=';
 constexpr size_t DECODED_SEQUENCE_LEN = 3;
 constexpr size_t ENCODED_SEQUENCE_LEN = 4;
 
-constexpr uint8_t Base64CharToByte(char base64Char)
+constexpr uint8_t INVALID_BASE64_SYMBOL = 255;
+std::array<uint8_t, 256> CreateBase64DecodingTable()
 {
-    if (base64Char >= 'A' && base64Char <= 'Z')
-        return static_cast<uint8_t>(base64Char - 'A');
-    else if (base64Char >= 'a' && base64Char <= 'z')
-        return static_cast<uint8_t>(static_cast<uint8_t>(base64Char - 'a') + sizeof("ABCDEFGHIJKLMNOPQRSTUVWXYZ") - 1);
-    else if (base64Char >= '0' && base64Char <= '9')
-        return static_cast<uint8_t>(static_cast<uint8_t>(base64Char - '0') + sizeof("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz") - 1);
-    else if (base64Char == '+')
-        return 62;
-    else if (base64Char == '/')
-        return 63;
+    std::array<uint8_t, 256> out{};
+    std::fill(out.begin(), out.end(), INVALID_BASE64_SYMBOL);
+    std::iota(out.begin() + static_cast<size_t>('A'), out.begin() + static_cast<size_t>('Z') + 1, 0);
+    std::iota(out.begin() + static_cast<size_t>('a'), out.begin() + static_cast<size_t>('z') + 1, sizeof("ABCDEFGHIJKLMNOPQRSTUVWXYZ") - 1);
+    std::iota(out.begin() + static_cast<size_t>('0'), out.begin() + static_cast<size_t>('9') + 1, sizeof("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz") - 1);
+    out['+'] = 62;
+    out['/'] = 63;
 
-    throw std::runtime_error("Invalid base64 string");
+    return out;
+}
+
+uint8_t Base64CharToByte(char base64Char)
+{
+    static auto decodingTable = CreateBase64DecodingTable();
+    uint8_t decoded = decodingTable[static_cast<uint8_t>(base64Char)];
+
+    return decoded;
 }
 
 /*unsafe*/
@@ -45,37 +54,36 @@ static inline size_t Base64ApproximateDecodedSize(std::string_view encData)
 
 static inline Utils::Base64DecodeErrCode Base64DecodeInternal(std::string_view encData, uint8_t *out)
 {
-    try
+    size_t len = Base64ApproximateLenWithoutPadding(encData);
+    Utils::Base64DecodeErrCode errCode = Utils::Base64DecodeErrCode::NoError;
+    for (size_t i = 0; i < len; i++)
     {
-        size_t len = Base64ApproximateLenWithoutPadding(encData);
-
-        for (size_t i = 0; i < len; i++)
+        size_t bytePos = (i + 1) % ENCODED_SEQUENCE_LEN;
+        size_t sequencePos = (i / ENCODED_SEQUENCE_LEN) * DECODED_SEQUENCE_LEN;
+        uint8_t base64Byte = Base64CharToByte(encData[i]);
+        if (base64Byte == INVALID_BASE64_SYMBOL)
         {
-            size_t bytePos = (i + 1) % ENCODED_SEQUENCE_LEN;
-            size_t sequencePos = (i / ENCODED_SEQUENCE_LEN) * DECODED_SEQUENCE_LEN;
-            uint8_t base64Byte = Base64CharToByte(encData[i]);
-            if (bytePos == 1)
-               out[sequencePos] = static_cast<uint8_t>(base64Byte << 2);
-            else if (bytePos == 2)
-            {
-                out[sequencePos] |= (base64Byte & 0x30) >> 4;
-                out[sequencePos + 1] = static_cast<uint8_t>((base64Byte & 0x0F) << 4);
-            }
-            else if (bytePos == 3)
-            {
-                out[sequencePos + 1] |= (base64Byte & 0x3C) >> 2;
-                out[sequencePos + 2] = static_cast<uint8_t>((base64Byte & 0x03) << 6);
-            }
-            else
-                out[sequencePos + 2] |= base64Byte;
+            errCode = Utils::Base64DecodeErrCode::InvalidBase64String;
+            break;
         }
-    }
-    catch(...)
-    {
-        return Utils::Base64DecodeErrCode::InvalidBase64String; //error during conversion
+
+        if (bytePos == 1)
+           out[sequencePos] = static_cast<uint8_t>(base64Byte << 2);
+        else if (bytePos == 2)
+        {
+            out[sequencePos] |= (base64Byte & 0x30) >> 4;
+            out[sequencePos + 1] = static_cast<uint8_t>((base64Byte & 0x0F) << 4);
+        }
+        else if (bytePos == 3)
+        {
+            out[sequencePos + 1] |= (base64Byte & 0x3C) >> 2;
+            out[sequencePos + 2] = static_cast<uint8_t>((base64Byte & 0x03) << 6);
+        }
+        else
+            out[sequencePos + 2] |= base64Byte;
     }
 
-    return Utils::Base64DecodeErrCode::NoError; 
+    return errCode;
 }
 
 /*static*/ Utils::Base64DecodeErrCode Utils::Base64Decode(std::string_view encData, std::string &out)
