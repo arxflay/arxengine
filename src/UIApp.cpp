@@ -3,6 +3,7 @@
 #include "SoundPlayer.h"
 #include "Font.h"
 #include "logging/Logger.h"
+#include "EventLoop.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -86,6 +87,8 @@ int UIApp::Init()
         internal::InitGlad();
         m_soundDeviceContextPair.reset(internal::InitAL());
         m_fontLibrary.reset(internal::InitFT());
+        m_eventLoop = std::make_unique<UIEventLoop>();
+        OnAfterInit();
         m_initialized = true;
         GLOG->Info("Initialization done");
     }
@@ -97,7 +100,14 @@ int UIApp::Init()
         m_fontLibrary.reset();
         glfwTerminate();
     }
+
     return code;
+}
+
+int UIApp::Run()
+{
+    OnRun();
+    return m_eventLoop->Run();
 }
 
 SoundDeviceContextPair &UIApp::GetSoundDeviceContextPair()
@@ -122,5 +132,6 @@ bool UIApp::IsInitialized() const
 UIApp::~UIApp()
 {
 }
+
 
 ARX_NAMESPACE_END

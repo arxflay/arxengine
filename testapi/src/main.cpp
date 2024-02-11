@@ -18,16 +18,10 @@ void InitLogging()
     Logger::SetGlobalLogger(std::move(logger));
 }
 
-void InitApp()
-{
-    UIApp::SetAppAsGlobal(std::make_unique<UIApp>());
-    UIApp::GetGlobalApp()->Init();
-}
-
 int main(int argc, char **argv)
 {
     InitLogging();
-    InitApp();
+    IMPLEMENT_UIAPP_NO_MAIN(UIApp);
     ::testing::InitGoogleTest(&argc, argv);
     int ret = RUN_ALL_TESTS();
     return ret;
