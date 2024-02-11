@@ -69,7 +69,7 @@ WavLoader::WavLoadCode SkipNonDataChunks(DataExtractor &extractor)
     {
         foundNonDataChunk = false;
         std::string_view chunkName = extractor.Peek(4);
-        if (!std::all_of(chunkName.begin(), chunkName.end(), isalnum))
+        if (!std::all_of(chunkName.begin(), chunkName.end(), [](char c){ return isalnum(c) || c == ' '; }))
             return WavLoader::WavLoadCode::FailedToExtractData;
         
         if (chunkName.compare(DATA_HEADER) != 0)
@@ -115,7 +115,6 @@ WavLoader::WavLoadCode GetData(DataExtractor &extractor, std::vector<uint8_t> &o
 
     return WavLoader::LoadWAVBinary(binaryData, wavData);
 }
-
 
 constexpr std::string_view RIFF_HEADER("RIFF");
 constexpr std::string_view WAVE_HEADER("WAVE");
