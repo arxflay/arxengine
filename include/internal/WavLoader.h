@@ -7,7 +7,6 @@
 #include "EnumHelpers.h"
 
 ARX_NAMESPACE_BEGIN
-
     
 //format descibed in https://www.lim.di.unimi.it/IEEE/VROS/RIFF.HTM
 struct WavFormatData
@@ -20,37 +19,9 @@ struct WavFormatData
     std::optional<std::vector<uint8_t>> extendedData;
 };
 
-enum class DataChunkId : uint32_t
-{
-    Data,
-    Silent
-};
-
-//https://www.recordingblogs.com/wiki/cue-chunk-of-a-wave-file
-struct WavCue //The cue chunk specifies cues / markers in the wave file, such as the beginning of a verse or the end of a solo.
-{
-    uint32_t id;
-    uint32_t position;
-    DataChunkId dataChunkId;
-    uint32_t chunkStart;
-    uint32_t blockStart;
-    uint32_t sampleStart;
-};
-
-//https://www.recordingblogs.com/wiki/playlist-chunk-of-a-wave-file
-struct PlaylistSegment //defines in what order the segments should be played 
-{
-    uint32_t cueId;
-    uint32_t length;
-    uint32_t repeats;
-};
-
 struct WavData
 {
     WavFormatData formatData;
-    std::optional<std::vector<uint8_t>> factData; //Fact chunks exist in all wave files that are compressed or that have a wave list chunk
-    std::optional<std::vector<WavCue>> cues;
-    std::optional<std::vector<PlaylistSegment>> playlistData;
     std::vector<uint8_t> soundData;
 };
 
@@ -66,10 +37,7 @@ public:
         UnsupportedFeature = 4,
         FailedToExtractData = 5,
         InvalidData = 6,
-        InvalidFormatData = 7,
-        InvalidCueData = 8,
-        InvalidPlaylistData = 9,
-        InvalidFactData = 10
+        InvalidFormatData = 7
     };
     
     static ENUM_FROM_STRING_DECLARE(WavLoadCode);
