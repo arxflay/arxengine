@@ -10,6 +10,7 @@
 #include <logging/FileLogger.h>
 #include <UIApp.h>
 #include <SoundPlayer.h>
+#include <Color.h>
 ARX_NAMESPACE_USE;
 
 void InitLogging()
@@ -262,4 +263,28 @@ TEST(Hex, NegativeHexToString)
     auto errCode = Utils::HexStrToBin("#68656c6cHJ", reinterpret_cast<uint8_t*>(helloString.data()), helloString.size());
     ASSERT_EQ(errCode, Utils::HexConversionErrorCode::InvalidHexString);
     ASSERT_STRNE(helloString.data(), "hello");
+}
+
+TEST(Color, PositiveHexToColor1)
+{
+    Color c("#FFC310");
+    ASSERT_EQ(c.r, 0xFF);
+    ASSERT_EQ(c.g, 0xC3);
+    ASSERT_EQ(c.b, 0x10);
+    ASSERT_EQ(c.a, 0xFF);
+}
+
+TEST(Color, PositiveHexToColor2)
+{
+    Color c("#FFC310C0");
+    ASSERT_EQ(c.r, 0xFF);
+    ASSERT_EQ(c.g, 0xC3);
+    ASSERT_EQ(c.b, 0x10);
+    ASSERT_EQ(c.a, 0xC0);
+}
+
+TEST(Color, PositiveColorToNormalizedColor)
+{
+    Color c(128, 255, 30, 11);
+    ASSERT_EQ(c.GetNormalizedColorRGBA(), glm::vec4(c.r / 255.0, c.g / 255.0, c.b / 255.0, c.a / 255.0));
 }

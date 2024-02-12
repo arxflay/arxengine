@@ -21,6 +21,7 @@ list(APPEND SOURCES
     ${SOURCE_PATH}/Font.cpp
     ${SOURCE_PATH}/Event.cpp
     ${SOURCE_PATH}/EventLoop.cpp
+    ${SOURCE_PATH}/Color.cpp
 )
 set(CMAKE_EXPORT_COMPILE_COMMANDS True)
 set(gcc_like_cxx "$<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang,GNU,LCC>")
