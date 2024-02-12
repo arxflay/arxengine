@@ -38,6 +38,15 @@ public:
         }
         return out;
     }
+   
+    enum class HexConversionErrorCode
+    {
+        NoError,
+        InvalidHexString
+    };
+
+    static HexConversionErrorCode GetByteFromHexStr(std::string_view hexStr, uint8_t &byte);
+    static HexConversionErrorCode HexStrToBin(std::string_view hexStr, uint8_t *data, size_t len);
 };
 
 ARX_NAMESPACE_END

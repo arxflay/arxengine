@@ -7,6 +7,7 @@
 #include <array>
 #include <numeric>
 #include <cstring>
+#include <charconv>
 ARX_NAMESPACE_BEGIN
 constexpr std::string_view BASE64_CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 constexpr char BASE64_PADDING_CHAR = '=';
@@ -161,6 +162,32 @@ static inline Utils::Base64DecodeErrCode Base64DecodeInternal(std::string_view e
     std::fill(encryptedData.rbegin(), encryptedData.rbegin() + static_cast<long>(paddingLen), BASE64_PADDING_CHAR);
 
     return encryptedData;
+}
+
+/*static*/ Utils::HexConversionErrorCode Utils::GetByteFromHexStr(std::string_view hexStr, uint8_t &byte)
+{
+    if (std::from_chars(hexStr.begin(), hexStr.begin() + 2, byte, 16).ec != std::errc{})
+        return Utils::HexConversionErrorCode::InvalidHexString;
+    
+    return Utils::HexConversionErrorCode::NoError;
+}
+
+/*static*/ Utils::HexConversionErrorCode Utils::HexStrToBin(std::string_view hexStr, uint8_t *data, size_t len)
+{
+    if (hexStr.empty())
+        return {};
+    
+    size_t i = 0;
+    if (hexStr[0] == '#')
+        i = 1;
+    
+    size_t minLen = std::min(((hexStr.size() - i) >> 1), len) << 1;
+
+    Utils::HexConversionErrorCode err = Utils::HexConversionErrorCode::NoError;
+    for (; i < minLen && err == HexConversionErrorCode::NoError; i+= 2)
+        err = GetByteFromHexStr(hexStr.substr(i), data[i >> 1]);
+
+    return err;
 }
 
 ARX_NAMESPACE_END

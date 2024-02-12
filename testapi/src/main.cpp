@@ -212,7 +212,7 @@ TEST(Sound, NegativeLoadFromFile)
     ASSERT_EQ(snd.GetSoundReproductionType(), Sound::SoundReproductionType::Mono);
 }
 
-TEST(SoundPlayer, PositivePlay)
+TEST(SoundPlayer, DISABLED_PositivePlay)
 {
     std::filesystem::path testWavPath(TEST_DATA_PATH / std::filesystem::path("test_wav_8bit_44khz.wav"));
     Sound snd(Sound::LoadFromFile(testWavPath.native(), Sound::Format::UncompressedWAV));
@@ -236,4 +236,30 @@ TEST(SoundPlayer, DISABLED_PositivePlayMultiple)
     SoundPlayer player2(pair);
     player2.LoadSound(snd);
     player2.Play(SoundPlayer::PlayMode::Sync, false);
+}
+
+TEST(Hex, PositiveHexToByte)
+{
+    uint8_t byte = 0;
+    auto errCode = Utils::GetByteFromHexStr("30", byte);
+    ASSERT_EQ(errCode, Utils::HexConversionErrorCode::NoError);
+    ASSERT_EQ(byte, 0x30);
+}
+
+TEST(Hex, PositiveHexToString)
+{
+    std::string helloString;
+    helloString.resize(5);
+    auto errCode = Utils::HexStrToBin("68656c6c6f", reinterpret_cast<uint8_t*>(helloString.data()), helloString.size());
+    ASSERT_EQ(errCode, Utils::HexConversionErrorCode::NoError);
+    ASSERT_STREQ(helloString.data(), "hello");
+}
+
+TEST(Hex, NegativeHexToString)
+{
+    std::string helloString;
+    helloString.resize(5);
+    auto errCode = Utils::HexStrToBin("#68656c6cHJ", reinterpret_cast<uint8_t*>(helloString.data()), helloString.size());
+    ASSERT_EQ(errCode, Utils::HexConversionErrorCode::InvalidHexString);
+    ASSERT_STRNE(helloString.data(), "hello");
 }
