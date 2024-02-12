@@ -11,19 +11,19 @@ class ARX_EXPORTS ArxException
 public:
     enum class ErrorCode : int
     {
-        NoError = 0,
-        GenericError = 1,
-        EnumToStringError = 2,
-        EnumFromStringError = 3,
-        FailedToInitializeGLFW = 4,
-        FailedToInitializeGlad = 5,
-        FailedToInitializeOpenAL = 6,
-        FailedToInitializeFreetype = 7,
-        UIAppAlreadyInitialized = 8,
-        UIAppNotSetAsGlobal = 9,
-        UIAppNotInitialized = 10,
-        CaughtStdException = 11,
-        Uknown             = 12
+        NoError                     = 0,
+        GenericError                = 1,
+        EnumToStringError           = 2,
+        EnumFromStringError         = 3,
+        FailedToInitializeGLFW      = 4,
+        FailedToInitializeGlad      = 5,
+        FailedToInitializeOpenAL    = 6,
+        FailedToInitializeFreetype  = 7,
+        UIAppAlreadyInitialized     = 8,
+        UIAppNotSetAsGlobal         = 9,
+        UIAppNotInitialized         = 10,
+        CaughtStdException          = 11,
+        Unknown                     = 12
     };
 
     ArxException();
