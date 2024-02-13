@@ -10,14 +10,17 @@ void ProcessEvent(Event &evt, const bool &shouldExit)
     if (!evt.m_eventHandlersPtr.has_value())
     {
         evt.HandleEvent();
+        
         return;
     }
 
-    bool shouldContinueProcessing = false;
+    bool shouldContinueProcessing = true;
+    evt.Skip(false);
     typename std::vector<int>::difference_type evtHandlerIndex = 0;
     
-    while(!shouldContinueProcessing && !shouldExit)
+    while(shouldContinueProcessing && !shouldExit)
     {
+
         if(evtHandlerIndex < static_cast<decltype(evtHandlerIndex)>(evt.m_eventHandlersPtr->get().size()))
         {
             auto handler = *(evt.m_eventHandlersPtr->get().rbegin() + evtHandlerIndex);
@@ -29,7 +32,7 @@ void ProcessEvent(Event &evt, const bool &shouldExit)
         else
         {
             evt.HandleEvent();
-            shouldContinueProcessing = true; //ignore Skip to avoid loop
+            shouldContinueProcessing = false; //ignore Skip to avoid loop
         }
     }
 }
@@ -50,6 +53,7 @@ int EventLoop::Run()
                 std::unique_ptr<Event> evt = std::move(m_eventQueue.front());
                 CallBeforeProcessing(*evt.get());
                 ProcessEvent(*evt.get(), m_stopEventProcessing);
+                m_eventQueue.pop();
             }
         }
         catch(...)

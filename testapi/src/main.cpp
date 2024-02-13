@@ -188,7 +188,8 @@ TEST(Color, PositiveColorToNormalizedColor)
 
 TEST(ArxWindow, PositiveShowWin)
 {
-    ArxWindow win("test", Size(300, 300), Position(30, 300));
-    win.Show();
+    ArxWindow *win = new ArxWindow("test", Size(300, 300));
+    win->Show();
+    UIApp::GetGlobalApp()->Run();
 }
 

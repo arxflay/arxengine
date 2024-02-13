@@ -41,7 +41,7 @@ namespace internal
         if (err != GLFW_TRUE)
             throw ArxException(ArxException::ErrorCode::FailedToInitializeFreetype, Utils::Format("Failed to initialize glfw library, glfw_error_code='%d'", err));
 
-        glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE);
+        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
         glfwWindowHint(GLFW_FOCUS_ON_SHOW, GLFW_TRUE);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, defaults::GL_VERSION_MAJOR);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, defaults::GL_VERSION_MINOR);
@@ -131,6 +131,14 @@ bool UIApp::IsInitialized() const
 
 UIApp::~UIApp()
 {
+}
+
+UIEventLoop &UIApp::GetEventLoop()
+{
+    if(!UIApp::GetGlobalApp() || !UIApp::GetGlobalApp()->IsInitialized())
+        throw ArxException(ArxException::ErrorCode::UIAppNotInitialized, "UIApp is not initialized");
+    
+    return *m_eventLoop.get();
 }
 
 

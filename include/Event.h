@@ -89,10 +89,9 @@ public:
     bool WasSkipCalled(); 
     ArxObject *GetSender();
     void SetSender(ArxObject *sender);
-protected:
+private:
     //DO NOT CALL DIRECTLY
     virtual void HandleEvent() = 0; //default event handler
-private:
     bool m_skipped;
     std::optional<EventHandlersVectorRef> m_eventHandlersPtr;
     ArxObject *m_sender;

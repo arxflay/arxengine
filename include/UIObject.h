@@ -13,6 +13,22 @@ class ArxWindow;
 class UIObject;
 using ChildrenList = std::list<UIObject*>;
 
+class DestroyEvent : public Event
+{
+public:
+    DestroyEvent(UIObject *sender);
+private:
+    void HandleEvent() override;
+};
+
+class DrawEvent : public Event
+{
+public:
+    DrawEvent(UIObject *sender);
+private:
+    void HandleEvent() override {};
+};
+
 class UIObject : public ArxObject
 {
 public:
@@ -33,7 +49,12 @@ public:
     virtual void Show(bool visible = true) = 0;
     virtual void Hide();
 
+
     ChildrenList &GetChildren();
+
+    void Draw();
+    void Destroy();
+    EventManager GetEventManager();
 
     //void Draw(); //TODO
 private:
@@ -44,7 +65,7 @@ private:
 
     Color m_backgroundColor;
     ChildrenList m_children;
-    std::unique_ptr<EventManager> m_eventHandler;
+    EventManager m_eventManager;
 };
 
 ARX_NAMESPACE_END

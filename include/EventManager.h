@@ -39,6 +39,7 @@ public:
     std::enable_if_t<is_event_type_v<EventType>, std::optional<EventHandlersVectorRef>> FindOrCreateEventHandlers()
     {
         std::optional<EventHandlersVectorRef> eventHandlers = FindEventHandlers<EventType>();
+
         if (!eventHandlers.has_value())
         {
             auto createdEventHandlersPair = emplace(std::make_pair(ComparableTypeInfo(typeid(EventType)), EventHandlersVector{}));
@@ -76,7 +77,7 @@ public:
             return wrapper.GetOriginalFuncParams() == funcParams;
         });
 
-        if (evtHandlerIt == eventHandlers->get().end())
+        if (evtHandlerIt == eventHandlers->get().rend())
             return false;
 
         eventHandlers->get().erase(evtHandlerIt);
