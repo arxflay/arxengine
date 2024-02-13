@@ -23,7 +23,8 @@ public:
         UIAppNotSetAsGlobal         = 9,
         UIAppNotInitialized         = 10,
         CaughtStdException          = 11,
-        Unknown                     = 12
+        FailedToConstructUIObject   = 12,
+        FailedToConstructArxWindow  = 13
     };
 
     ArxException();

@@ -8,7 +8,7 @@
 #include "logging/Logger.h"
 #include "Event.h"
 #include "UIApp.h"
-#include "EventLoop.h"
+#include "UIEventLoop.h"
 
 ARX_NAMESPACE_BEGIN
 

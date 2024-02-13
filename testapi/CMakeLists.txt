@@ -6,6 +6,7 @@ set(TEST_DATA_PATH ${CMAKE_CURRENT_SOURCE_DIR}/testdata)
 
 list(APPEND TEST_SOURCES
     ${SOURCE_FOLDER}/main.cpp
+    ${SOURCE_FOLDER}/base64tests.cpp
 )
 
 add_executable(testapi ${TEST_SOURCES})

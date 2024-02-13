@@ -1,6 +1,6 @@
 #pragma once 
 #include "ArxDefines.h"
-#include <ArxException.h>
+#include "ArxException.h"
 #include <memory>
 
 ARX_NAMESPACE_BEGIN
@@ -41,13 +41,36 @@ private:
 #define MAIN_ENTRY_POINT int main(int, const char **)
 #endif
 
-#define IMPLEMENT_UIAPP_NO_MAIN(App)\
-    UIApp::SetAppAsGlobal(std::make_unique<App>());\
-    UIApp::GetGlobalApp()->Init()
+#define IMPLEMENT_UIAPP_NO_MAIN(App, errCodeVariableName)\
+    ARX_NAMESPACE::UIApp::SetAppAsGlobal(std::make_unique<App>());\
+    int errCodeVariableName = ARX_NAMESPACE::UIApp::GetGlobalApp()->Init()
+
+#define IMPLEMENT_UIAPP_NO_MAIN_WITH_LOGGER(App, errCodeVariableName, LoggerClass)\
+    ARX_NAMESPACE::Logger::SetGlobalLogger(std::make_unique<LoggerClass>());\
+    ARX_NAMESPACE::UIApp::SetAppAsGlobal(std::make_unique<App>());\
+    int errCodeVariableName = ARX_NAMESPACE::UIApp::GetGlobalApp()->Init()
+
+#define IMPLEMENT_UIAPP_NO_MAIN_WITH_LOGGER_INSTANCE(App, errCodeVariableName, LoggerInstanceUniquePtr)\
+    ARX_NAMESPACE::Logger::SetGlobalLogger(LoggerInstanceUniquePtr);\
+    ARX_NAMESPACE::UIApp::SetAppAsGlobal(std::make_unique<App>());\
+    int errCodeVariableName = ARX_NAMESPACE::UIApp::GetGlobalApp()->Init()
+    
 
 #define IMPLEMENT_UIAPP(App) MAIN_ENTRY_POINT { \
-    IMPLEMENT_UIAPP_NO_MAIN(App);\
-    return UIApp::GetGlobalApp()->Run();\
+    ARX_NAMESPACE::UIApp::SetAppAsGlobal(std::make_unique<App>());\
+    int err = ARX_NAMESPACE::UIApp::GetGlobalApp()->Init();\
+    if (err != static_cast<int>(ARX_NAMESPACE::ArxException::ErrorCode::NoError))\
+        return err;\
+    return ARX_NAMESPACE::UIApp::GetGlobalApp()->Run();\
+}
+
+#define IMPLEMENT_UIAPP_WITH_LOGGER(App, LoggerClass) MAIN_ENTRY_POINT { \
+    ARX_NAMESPACE::Logger::SetGlobalLogger(std::make_unique<LoggerClass>()); \
+    ARX_NAMESPACE::UIApp::SetAppAsGlobal(std::make_unique<App>());\
+    int err = ARX_NAMESPACE::UIApp::GetGlobalApp()->Init();\
+    if (err != static_cast<int>(ARX_NAMESPACE::ArxException::ErrorCode::NoError))\
+        return err;\
+    return ARX_NAMESPACE::UIApp::GetGlobalApp()->Run();\
 }
 
 ARX_NAMESPACE_END

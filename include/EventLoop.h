@@ -4,8 +4,8 @@
 #include <memory>
 #include "Event.h"
 
-ARX_NAMESPACE_BEGIN
 
+ARX_NAMESPACE_BEGIN
 class EventLoop
 {
 public:
@@ -37,11 +37,5 @@ private:
     bool m_running;
 };
 
-class UIEventLoop final : public EventLoop
-{
-public:
-    void CallBeforeLoopIteration() override; //TODO
-    void CallBeforeProcessing(Event &evt) override; //TODO
-};
 
 ARX_NAMESPACE_END

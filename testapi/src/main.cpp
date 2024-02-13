@@ -11,124 +11,21 @@
 #include <UIApp.h>
 #include <SoundPlayer.h>
 #include <Color.h>
+#include <ArxWindow.h>
+#include <internal/UniversalExceptionHandler.h>
 ARX_NAMESPACE_USE;
-
-void InitLogging()
-{
-    std::unique_ptr<FileLogger> logger(std::make_unique<FileLogger>(Logger::LoggingLevel::Debug, "/tmp/log.txt"));
-    Logger::SetGlobalLogger(std::move(logger));
-}
 
 int main(int argc, char **argv)
 {
-    InitLogging();
-    IMPLEMENT_UIAPP_NO_MAIN(UIApp);
+    IMPLEMENT_UIAPP_NO_MAIN_WITH_LOGGER_INSTANCE(UIApp, ret, std::make_unique<FileLogger>(Logger::LoggingLevel::Debug, "/tmp/log.txt")); 
+    if (ret != static_cast<int>(ArxException::ErrorCode::NoError))
+        return ret;
+    
     ::testing::InitGoogleTest(&argc, argv);
-    int ret = RUN_ALL_TESTS();
+    ret = RUN_ALL_TESTS();
     return ret;
 }
 
-TEST(Base64, PositiveBase64Decode1)
-{
-    std::string str;
-    ASSERT_EQ(Utils::Base64Decode("TWFu", str), Utils::Base64DecodeErrCode::NoError);
-    ASSERT_STREQ(str.c_str(), "Man");
-}
-
-TEST(Base64, PositiveBase64Decode2)
-{
-    std::string str;
-    ASSERT_EQ(Utils::Base64Decode("TWE=", str), Utils::Base64DecodeErrCode::NoError);
-    ASSERT_STREQ(str.c_str(), "Ma");
-}
-
-TEST(Base64, PositiveBase64Decode3)
-{
-    std::string str;
-    ASSERT_EQ(Utils::Base64Decode("TQ==", str), Utils::Base64DecodeErrCode::NoError);
-    ASSERT_STREQ(str.c_str(), "M");
-}
-
-TEST(Base64, PositiveBase64Decode4)
-{
-    std::string str;
-    ASSERT_EQ(Utils::Base64Decode("TWFuTWFu", str), Utils::Base64DecodeErrCode::NoError);
-    ASSERT_STREQ(str.c_str(), "ManMan");
-}
-
-TEST(Base64, PositiveBase64DecEncDecode)
-{
-    std::filesystem::path testJpgPath(TEST_DATA_PATH / std::filesystem::path("test_jpg.jpg"));
-    std::string jpegFileContent;
-    {
-        std::ifstream f;
-        f.exceptions(std::ifstream::badbit | std::ifstream::failbit);
-        f.open(testJpgPath, std::ifstream::binary | std::ifstream::in);
-        std::stringstream ss;
-        ss << f.rdbuf();
-        f.close();
-        jpegFileContent = ss.str();
-    }
-    auto str = Utils::Base64Encode(jpegFileContent);
-    std::vector<uint8_t> vec;
-    Utils::Base64Decode(str, vec);
-    Image img2 = Image::LoadFromBinary(vec);
-    ASSERT_FALSE(img2.IsInvalid());
-}
-
-TEST(Base64, NegativeBase64Decode1)
-{
-    std::string str;
-    ASSERT_EQ(arx::Utils::Base64Decode("", str), Utils::Base64DecodeErrCode::EmptyString);    
-}
-
-TEST(Base64, NegativeBase64Decode2)
-{
-    std::string str;
-    ASSERT_EQ(arx::Utils::Base64Decode("xxxxx", str), Utils::Base64DecodeErrCode::InvalidSize);    
-}
-
-TEST(Base64, NegativeBase64Decode3)
-{
-    std::string str;
-    ASSERT_EQ(arx::Utils::Base64Decode("x===", str), Utils::Base64DecodeErrCode::InvalidBase64String);    
-}
-
-TEST(Base64, PositiveBase64Encode1)
-{
-    auto enc = Utils::Base64Encode({0x4d, 0x61, 0x6e});
-    ASSERT_STREQ(enc.c_str(), "TWFu");
-}
-
-TEST(Base64, PositiveBase64Encode2)
-{
-    auto enc = Utils::Base64Encode("Ma");
-    ASSERT_STREQ(enc.c_str(), "TWE=");
-}
-
-TEST(Base64, PositiveBase64Encode3)
-{
-    auto enc = Utils::Base64Encode({0x4d});
-    ASSERT_STREQ(enc.c_str(), "TQ==");
-}
-
-TEST(Base64, PositiveBase64Encode4)
-{
-    auto enc = Utils::Base64Encode({0x4d, 0x61, 0x6e, 0x4d, 0x61, 0x6e});
-    ASSERT_STREQ(enc.c_str(), "TWFuTWFu");
-}
-
-TEST(Base64, NegativeBase64Encode1)
-{
-    auto enc = Utils::Base64Encode("");
-    ASSERT_STREQ(enc.c_str(), "");
-}
-
-TEST(Base64, NegativeBase64Encode2)
-{
-    auto enc = Utils::Base64Encode(nullptr, 1);
-    ASSERT_STREQ(enc.c_str(), "");
-}
 
 TEST(Image, PositiveLoadImageFilePNG)
 {
@@ -288,3 +185,10 @@ TEST(Color, PositiveColorToNormalizedColor)
     Color c(128, 255, 30, 11);
     ASSERT_EQ(c.GetNormalizedColorRGBA(), glm::vec4(c.r / 255.0, c.g / 255.0, c.b / 255.0, c.a / 255.0));
 }
+
+TEST(ArxWindow, PositiveShowWin)
+{
+    ArxWindow win("test", Size(300, 300), Position(30, 300));
+    win.Show();
+}
+

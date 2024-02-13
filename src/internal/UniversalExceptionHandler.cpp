@@ -23,7 +23,7 @@ ARX_NAMESPACE_BEGIN
     catch(...)
     {
         GLOG->Error("unknown error");
-        code = ArxException::ErrorCode::Unknown;
+        code = ArxException::ErrorCode::GenericError;
     }
 
     return code;

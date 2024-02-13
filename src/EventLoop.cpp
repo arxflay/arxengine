@@ -1,6 +1,7 @@
 #include "EventLoop.h"
 #include "internal/UniversalExceptionHandler.h"
-#include "GLFW/glfw3.h"
+#include <GLFW/glfw3.h>
+#include "UIObject.h"
 ARX_NAMESPACE_BEGIN
 
 //unfancy
@@ -94,16 +95,6 @@ void EventLoop::CleanUp()
 void EventLoop::EnqueueEvent(std::unique_ptr<Event> &&event)
 {
     m_eventQueue.emplace(std::move(event));
-}
-
-void UIEventLoop::CallBeforeLoopIteration()
-{
-    glfwPollEvents();
-}
-
-void UIEventLoop::CallBeforeProcessing(Event &)
-{
-       
 }
 
 ARX_NAMESPACE_END

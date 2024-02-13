@@ -22,6 +22,9 @@ list(APPEND SOURCES
     ${SOURCE_PATH}/Event.cpp
     ${SOURCE_PATH}/EventLoop.cpp
     ${SOURCE_PATH}/Color.cpp
+    ${SOURCE_PATH}/UIObject.cpp
+    ${SOURCE_PATH}/ArxWindow.cpp
+    ${SOURCE_PATH}/UIEventLoop.cpp
 )
 set(CMAKE_EXPORT_COMPILE_COMMANDS True)
 set(gcc_like_cxx "$<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang,GNU,LCC>")
@@ -43,9 +46,11 @@ target_include_directories(arxengine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 include(${CMAKE_CURRENT_SOURCE_DIR}/libs/ProjectLibs.cmake)
 
 if (WIN32)
-    target_link_libraries(arxengine PUBLIC glm glfw stb_image glad OpenGL::GL openal Freetype::Freetype)
+    target_link_libraries(arxengine PRIVATE glfw stb_image openal Freetype::Freetype)
+    target_link_libraries(arxengine PUBLIC glm glad OpenGL::GL)
 else()
-    target_link_libraries(arxengine PUBLIC glm glfw stb_image glad OpenGL::GL openal Freetype::Freetype m pthread)
+    target_link_libraries(arxengine PRIVATE glfw stb_image openal Freetype::Freetype)
+    target_link_libraries(arxengine PUBLIC glm glad OpenGL::GL openal m pthread)
 endif()
 
 if (${ARX_BUILD_TEST})
