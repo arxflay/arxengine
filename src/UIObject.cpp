@@ -4,28 +4,12 @@
 
 ARX_NAMESPACE_BEGIN
 
-
 UIObject::UIObject(UIObject *parent, Size size, Position pos)
-    : m_parent(parent)
-    , m_size(size)
+    : m_size(size)
     , m_position(pos)
     , m_backgroundColor(defaults::COLOR_WHITE)
 {
-    if (m_parent == this)
-        throw ArxException(ArxException::ErrorCode::FailedToConstructUIObject, "m_parent points to self");
-
-    if (m_parent)
-    {
-        if (m_parent->GetOwnerWindow())
-            m_ownerWindow = m_parent->GetOwnerWindow();
-        else
-        {
-            ArxWindow *win = dynamic_cast<ArxWindow*>(parent);
-            if (win == nullptr)
-                throw ArxException(ArxException::ErrorCode::FailedToConstructUIObject, "m_parent has null owner window but m_parent is not a window");
-        m_ownerWindow = win;
-        }
-    }
+    Reparent(parent);
 }
 
 void UIObject::SetBackgroundColor(Color c) { m_backgroundColor = c; }
@@ -38,52 +22,60 @@ void UIObject::SetPosition(Position pos) { m_position = pos; }
 Position UIObject::GetPosition() const { return m_position; }
 
 ArxWindow *UIObject::GetOwnerWindow() { return m_ownerWindow; }
-UIObject *UIObject::GetParent() { return m_parent; }
+
+void UIObject::Reparent(ArxObject *parent)
+{
+    if (!parent)
+        throw ArxException(ArxException::ErrorCode::GenericError, "parent must be not null");
+    
+    UIObject *uiobjParent = dynamic_cast<UIObject*>(parent);
+    if (uiobjParent)
+        throw ArxException(ArxException::ErrorCode::GenericError, "parent is not uiobject");
+
+    ArxObject::Reparent(parent);
+     
+    if (!uiobjParent->GetOwnerWindow())
+    {
+        ArxWindow *win = dynamic_cast<ArxWindow*>(parent);
+        if (win)
+            throw ArxException(ArxException::ErrorCode::GenericError, "Parent is not a window but doesn't have owner window");
+
+        m_ownerWindow = win;
+    }
+    else
+        m_ownerWindow = uiobjParent->GetOwnerWindow();
+}
 
 void UIObject::Hide()
 {
     Show(false);
 }
 
-ChildrenList &UIObject::GetChildren()
+UIObject::UIObject()
+    : m_size(defaults::DEFAULT_SIZE)
+    , m_position(defaults::DEFAULT_POSITION)
+    , m_ownerWindow(nullptr)
+    , m_backgroundColor(defaults::COLOR_WHITE)
 {
-    return m_children;
-}
-
-EventManager UIObject::GetEventManager()
-{
-    return m_eventManager;
-}
-
-void UIObject::Destroy()
-{
-    for (UIObject *child : m_children)
-        child->Destroy();
-
-    m_eventManager.QueueEvent<DestroyEvent>(std::make_unique<DestroyEvent>(this));
 }
 
 void UIObject::Draw()
 {
-    m_eventManager.QueueEvent<DrawEvent>(std::make_unique<DrawEvent>(this));
-    for (UIObject *child : m_children)
-        child->Draw();
+    std::unique_ptr<DrawEvent> evt(std::make_unique<DrawEvent>());
+    evt->SetSender(this);
+    GetEventManager().QueueEvent<DrawEvent>(std::move(evt));
+
+    for (ArxObject *obj : const_cast<ArxObjectList&>(GetChildren()))
+    {
+        UIObject *uiobject = dynamic_cast<UIObject*>(obj);
+        if (uiobject)
+            uiobject->Draw();
+    }
 }
 
-DestroyEvent::DestroyEvent(UIObject *sender)
-    : Event(sender)
+void DrawEvent::HandleEvent()
 {
-}
 
-void DestroyEvent::HandleEvent()
-{
-    delete GetSender();
 }
-
-DrawEvent::DrawEvent(UIObject *sender)
-    : Event(sender)
-{
-}
-
 
 ARX_NAMESPACE_END

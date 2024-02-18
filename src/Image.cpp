@@ -1,6 +1,17 @@
 #include "Image.h"
 #define STB_IMAGE_IMPLEMENTATION
+
+#include "WarningSupressionHelpers.h"
+
+WARNING_PUSH
+#ifdef _MSC_VER
+    WARNING_DISABLE(4244)
+#else
+    WARNING_DISABLE(-Wconversion)
+#endif
 #include <stb_image.h>
+WARNING_POP
+
 #include <memory>
 #include <glad/glad.h>
 

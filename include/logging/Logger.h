@@ -4,7 +4,6 @@
 #include <Utils.h>
 #include <memory>
 #include "EnumHelpers.h"
-#include <iostream>
 ARX_NAMESPACE_BEGIN
 #define GLOG Logger::GetGlobalLogger()
 

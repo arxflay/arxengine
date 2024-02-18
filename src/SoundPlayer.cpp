@@ -4,7 +4,7 @@
 #include "logging/Logger.h"
 #include <AL/alc.h>
 #include <memory>
-#include <UIApp.h>
+#include "GameApp.h"
 
 ARX_NAMESPACE_BEGIN
 
@@ -107,7 +107,7 @@ SoundDeviceContextPair *CreateSoundDeviceContextPair(std::string_view deviceName
 SoundPlayer::SoundPlayer(SoundDeviceContextPair *pair)
 {
     if(pair == nullptr)
-        m_pair = &UIApp::GetGlobalApp()->GetSoundDeviceContextPair();
+        m_pair = &GameApp::GetGlobalApp()->GetSoundDeviceContextPair();
     else
         m_pair = pair;
 

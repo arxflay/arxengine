@@ -8,7 +8,7 @@
 #include "testdefs.h"
 #include <Sound.h>
 #include <logging/FileLogger.h>
-#include <UIApp.h>
+#include "GameApp.h"
 #include <SoundPlayer.h>
 #include <Color.h>
 #include <ArxWindow.h>
@@ -17,7 +17,7 @@ ARX_NAMESPACE_USE;
 
 int main(int argc, char **argv)
 {
-    IMPLEMENT_UIAPP_NO_MAIN_WITH_LOGGER_INSTANCE(UIApp, ret, std::make_unique<FileLogger>(Logger::LoggingLevel::Debug, "/tmp/log.txt")); 
+    IMPLEMENT_GAMEAPP_NO_MAIN_WITH_LOGGER_INSTANCE(GameApp, ret, std::make_unique<FileLogger>(Logger::LoggingLevel::Debug, "/tmp/log.txt")); 
     if (ret != static_cast<int>(ArxException::ErrorCode::NoError))
         return ret;
     
@@ -25,7 +25,6 @@ int main(int argc, char **argv)
     ret = RUN_ALL_TESTS();
     return ret;
 }
-
 
 TEST(Image, PositiveLoadImageFilePNG)
 {
@@ -190,6 +189,6 @@ TEST(ArxWindow, PositiveShowWin)
 {
     ArxWindow *win = new ArxWindow("test", Size(300, 300));
     win->Show();
-    UIApp::GetGlobalApp()->Run();
+    GameApp::GetGlobalApp()->Run();
 }
 

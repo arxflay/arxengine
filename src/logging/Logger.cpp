@@ -2,7 +2,6 @@
 #include <memory>
 #include <cstring>
 #include <memory>
-#include <iostream>
 ARX_NAMESPACE_BEGIN
 
 std::unique_ptr<Logger> g_Logger = std::make_unique<Logger>();

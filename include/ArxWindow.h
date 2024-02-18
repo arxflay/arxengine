@@ -8,6 +8,7 @@ struct GLFWwindow;
 
 ARX_NAMESPACE_BEGIN
 
+
 class ArxWindow : public UIObject
 {
 public:
@@ -30,8 +31,9 @@ public:
     std::string_view GetTitle();
     void SetTitle(std::string_view title);
 
-    virtual void SetSize(Size s) override;
-    virtual void SetPosition(Position pos) override;
+    void SetSize(Size s) override;
+    void SetPosition(Position pos) override;
+    void Reparent(ArxObject *parent) override;
 
     void SetAsCurrentContext();
 
@@ -39,8 +41,10 @@ public:
     virtual void RemoveFixedViewport();*/
 
     //virtual const glm::mat4 &GetViewport();
+    virtual ~ArxWindow();
 private:
     std::unique_ptr<GLFWwindow, void(*)(GLFWwindow*)> m_win;
+
     int m_attributes;
     std::string m_title;
     //glm::mat4 m_viewport;

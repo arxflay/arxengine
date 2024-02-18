@@ -1,23 +1,18 @@
-#include "UIEventLoop.h"
+#include "UIEventProcessor.h"
 #include <GLFW/glfw3.h>
 #include "ArxWindow.h"
 
 ARX_NAMESPACE_BEGIN
 
-void UIEventLoop::CallBeforeLoopIteration() //TODO
-{
-    glfwPollEvents();
-}
-
-void UIEventLoop::CallBeforeProcessing(Event &evt) //TODO
+void UIEventProcessor::CallBeforeProcessing(Event &evt) 
 {
     UIObject *obj = dynamic_cast<UIObject*>(evt.GetSender());
     if (obj)
     {
         if (obj->GetOwnerWindow())
-            dynamic_cast<ArxWindow*>(obj)->SetAsCurrentContext();
-        else
             obj->GetOwnerWindow()->SetAsCurrentContext();
+        else
+            dynamic_cast<ArxWindow*>(obj)->SetAsCurrentContext();
     }
 }
 

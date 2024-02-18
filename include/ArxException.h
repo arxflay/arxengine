@@ -19,12 +19,14 @@ public:
         FailedToInitializeGlad      = 5,
         FailedToInitializeOpenAL    = 6,
         FailedToInitializeFreetype  = 7,
-        UIAppAlreadyInitialized     = 8,
-        UIAppNotSetAsGlobal         = 9,
-        UIAppNotInitialized         = 10,
+        GameAppAlreadyInitialized   = 8,
+        GameAppNotSetAsGlobal       = 9,
+        GameAppNotInitialized       = 10,
         CaughtStdException          = 11,
         FailedToConstructUIObject   = 12,
-        FailedToConstructArxWindow  = 13
+        FailedToConstructArxWindow  = 13,
+        GameAppIsRunning            = 14,
+        GameAppAlreadyScheduledExit = 15
     };
 
     ArxException();

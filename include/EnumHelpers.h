@@ -11,7 +11,7 @@
     static const char *conversions[]{ __VA_ARGS__ };\
     auto it = std::find(std::begin(conversions), std::end(conversions), str);\
     if (it == std::end(conversions))\
-        throw ARX_NAMESPACE::ArxException((ARX_NAMESPACE::ArxException::ErrorCode::EnumFromStringError, "Failed to convert string to enum " #EnumName);\
+        throw ::ARX_NAMESPACE::ArxException(::ARX_NAMESPACE::ArxException::ErrorCode::EnumFromStringError, "Failed to convert string to enum " #EnumName);\
     return static_cast<EnumName>(it - std::begin(conversions));\
 }
 
@@ -20,7 +20,7 @@
 {\
     static const char *conversions[]{ __VA_ARGS__ };\
     if (static_cast<int>(ourEnum) > (sizeof(conversions) / sizeof(char*)))\
-        throw ARX_NAMESPACE::ArxException(ARX_NAMESPACE::ArxException::ErrorCode::EnumToStringError, "Failed to convert enum " #EnumName " to string"); \
+        throw ::ARX_NAMESPACE::ArxException(::ARX_NAMESPACE::ArxException::ErrorCode::EnumToStringError, "Failed to convert enum " #EnumName " to string"); \
     return conversions[static_cast<int>(ourEnum)];\
 }
 
@@ -42,7 +42,7 @@
     static const char *conversions[]{ __VA_ARGS__ };\
     auto it = std::find(std::begin(conversions), std::end(conversions), str);\
     if (it == std::end(conversions))\
-        throw ARX_NAMESPACE::ArxException(ARX_NAMESPACE::ArxException::ErrorCode::EnumFromStringError, "Failed to convert string to enum " #Scope "::" #EnumName);\
+        throw ::ARX_NAMESPACE::ArxException(::ARX_NAMESPACE::ArxException::ErrorCode::EnumFromStringError, "Failed to convert string to enum " #Scope "::" #EnumName);\
     return static_cast<Scope::EnumName>(it - std::begin(conversions));\
 }
 
@@ -51,7 +51,7 @@
 {\
     static const char *conversions[]{ __VA_ARGS__ };\
     if (static_cast<size_t>(ourEnum) > (sizeof(conversions) / sizeof(char*)))\
-        throw ARX_NAMESPACE::ArxException(ARX_NAMESPACE::ArxException::ErrorCode::EnumToStringError, "Failed to convert enum " #Scope "::" #EnumName " to string"); \
+        throw ::ARX_NAMESPACE::ArxException(::ARX_NAMESPACE::ArxException::ErrorCode::EnumToStringError, "Failed to convert enum " #Scope "::" #EnumName " to string"); \
     return conversions[static_cast<size_t>(ourEnum)];\
 }
 

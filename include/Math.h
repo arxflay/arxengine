@@ -1,3 +1,4 @@
+#pragma once
 #include "ArxDefines.h"
 #include <cmath>
 #include <type_traits>

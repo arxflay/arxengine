@@ -2,13 +2,22 @@
 #include "ArxDefines.h"
 #include <queue>
 #include <memory>
-#include "Event.h"
-
 
 ARX_NAMESPACE_BEGIN
-class EventLoop
+
+class Event;
+class ArxObject;
+
+class EventProcessor 
 {
+friend class DeleteEvent;
 public:
+    EventProcessor() = default; 
+    EventProcessor(EventProcessor&&) = delete;
+    EventProcessor(const EventProcessor&) = delete;
+    EventProcessor &operator=(EventProcessor&&) = delete;
+    EventProcessor &operator=(const EventProcessor&) = delete;
+
     enum EventLoopErrorCode
     {
         NoError = 0,
@@ -16,25 +25,20 @@ public:
         EventLoopIsNotRunning = 2,
         EventLoopExitAlreadyCalled = 3
     };
-    int Run(); //TODO
-    int Exit(int code); //TODO
-    int ScheduleExit(int code); //TODO
 
-    //void GenerateIdleEvent(); //TODO
-    void CleanUp();
-
+    //ignores exceptions
+    void ProcessEvents(); //TODO
     void EnqueueEvent(std::unique_ptr<Event> &&event);
+    void Interrupt();
+    void RemoveEvents();
+
+    virtual ~EventProcessor() = default;
 
 protected:
-    virtual void CallBeforeLoopIteration() = 0;
     virtual void CallBeforeProcessing(Event &evt) = 0;
-
 private:
-    int m_exitCode;
     std::queue<std::unique_ptr<Event>> m_eventQueue;
-    bool m_shouldExit;
     bool m_stopEventProcessing;
-    bool m_running;
 };
 
 

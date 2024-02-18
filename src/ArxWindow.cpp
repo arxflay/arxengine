@@ -17,18 +17,15 @@ namespace
     void CloseCallback(GLFWwindow *win)
     {
         ArxWindow *arxWin = static_cast<ArxWindow*>(glfwGetWindowUserPointer(win));
-        arxWin->Destroy();
+        arxWin->RequestDelete();
     }
-    
-    void FocusCallback(GLFWwindow *win, int focused)
+
+    void RefreshCallback(GLFWwindow *win)
     {
-        if (focused)
-        {
-            ArxWindow *arxWin = static_cast<ArxWindow*>(glfwGetWindowUserPointer(win));
-            arxWin->SetAsCurrentContext();
-            glViewport(0, 0, static_cast<GLsizei>(arxWin->GetSize().width), static_cast<GLsizei>(arxWin->GetSize().height));
-            arxWin->Draw();
-        }
+        ArxWindow *arxWin = static_cast<ArxWindow*>(glfwGetWindowUserPointer(win));
+        arxWin->SetAsCurrentContext();
+        glViewport(0, 0, static_cast<GLsizei>(arxWin->GetSize().width), static_cast<GLsizei>(arxWin->GetSize().height));
+        arxWin->Draw();
     }
 
     void SizeCallback(GLFWwindow *win, int width, int height)
@@ -46,15 +43,18 @@ namespace
     void SetGlfwCallbacks(GLFWwindow *win)
     {
         glfwSetWindowCloseCallback(win, CloseCallback); 
-        glfwSetWindowFocusCallback(win, FocusCallback);
         glfwSetWindowSizeCallback(win,  SizeCallback);
         glfwSetWindowPosCallback(win, PositionCallback);
+        glfwSetWindowRefreshCallback(win, RefreshCallback);
     }
+
+    using ArxWindowList = std::list<ArxWindow*>;
+
 }
 
 //uncompelte fullscreen
 ArxWindow::ArxWindow(std::string_view title, Size size , Position position, int attributes) //, bool isFullScreen)
-    : UIObject(nullptr, size, position), m_win(nullptr, glfwDestroyWindow), m_attributes(attributes), m_title(title)
+    : m_win(nullptr, glfwDestroyWindow), m_attributes(attributes), m_title(title)
 {
     /*if (isFullScreen) //TODO fullscreen
     {
@@ -68,6 +68,7 @@ ArxWindow::ArxWindow(std::string_view title, Size size , Position position, int 
     else
     {*/
         UIObject::SetSize(MakeSizeValid(size));
+        UIObject::SetPosition(position);
         m_win.reset(glfwCreateWindow(static_cast<int>(GetSize().width), static_cast<int>(GetSize().height), m_title.c_str(), nullptr, nullptr));
     //}
     if (!m_win)
@@ -77,11 +78,13 @@ ArxWindow::ArxWindow(std::string_view title, Size size , Position position, int 
     glfwSetWindowUserPointer(m_win.get(), this);
     SetWindowAttributes(m_attributes);
     SetGlfwCallbacks(m_win.get());
-    GetEventManager().Bind<DrawEvent>(std::function<void(DrawEvent&)>([](DrawEvent &){ 
-
-        std::cout << 10 << '\n';
-                glClearColor(1.0f, 1.0f, 1.0f, 1.0f); glClear(GL_COLOR_BUFFER_BIT); }));
-    //SetAsCurrentContext();
+    GetEventManager().Bind<DrawEvent>(std::function<void(DrawEvent&)>([this](DrawEvent &){ 
+        glm::vec4 normalizedColor = GetColor().GetNormalizedColorRGBA();
+        glClearColor(normalizedColor.r, normalizedColor.g, normalizedColor.b, normalizedColor.a); 
+        glClear(GL_COLOR_BUFFER_BIT);
+        glfwSwapBuffers(m_win.get());
+    }));
+    const_cast<ArxWindowSet&>(GameApp::GetGlobalApp()->GetWindowSet()).insert(this); 
     //m_viewport = glm::ortho(0.0f, size.width, 0.0f, size.height);
 }
 
@@ -164,5 +167,17 @@ const glm::mat4 &ArxWindow::GetViewport()
     return m_viewport;
 }
 */
+
+ArxWindow::~ArxWindow()
+{
+    const_cast<ArxWindowSet&>(GameApp::GetGlobalApp()->GetWindowSet()).erase(this);
+    if (GameApp::GetGlobalApp()->GetWindowSet().empty())
+        GameApp::GetGlobalApp()->Exit(0);
+}
+
+void ArxWindow::Reparent(ArxObject*)
+{
+    //for now ArxWindow can't have parents
+}
 
 ARX_NAMESPACE_END
