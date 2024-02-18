@@ -123,7 +123,7 @@ int GameApp::Run()
     OnRun();
     
     double m_past = glfwGetTime();
-    double m_now = glfwGetTime();
+    double m_now = 0; 
     
     while(!m_shouldExit)
     {
