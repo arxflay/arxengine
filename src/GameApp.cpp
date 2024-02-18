@@ -122,8 +122,13 @@ int GameApp::Run()
     m_running = true;
     OnRun();
     
+    double m_past = glfwGetTime();
+    double m_now = glfwGetTime();
+    
     while(!m_shouldExit)
     {
+        m_now = glfwGetTime();
+        m_deltaTime = m_now - m_past;
         glfwPollEvents();
         m_eventProcessor->ProcessEvents();
         try
@@ -158,6 +163,7 @@ void GameApp::CleanUp()
     m_shouldExit = false;
     m_exitCode = 0;
     m_running = false;
+    m_deltaTime = 0;
 }
 
 const ArxWindowSet &GameApp::GetWindowSet()
@@ -203,6 +209,11 @@ GameApp::~GameApp()
         glfwTerminate();
         CleanUp();
     }
+}
+
+double GameApp::GetDeltaTime() const
+{
+    return m_deltaTime;
 }
 
 EventProcessor &GameApp::GetEventProcessor()

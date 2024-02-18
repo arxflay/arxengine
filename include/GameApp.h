@@ -45,6 +45,9 @@ public:
     EventProcessor &GetEventProcessor();
     const ArxWindowSet &GetWindowSet();
     virtual ~GameApp();
+
+    //delta time is calculated in Run()
+    double GetDeltaTime() const;
 protected:
     virtual void OnRun() {};
     virtual void OnAfterInit() {};
@@ -54,6 +57,7 @@ private:
     bool m_running;
     bool m_shouldExit;
     int m_exitCode;
+    double m_deltaTime;
     ArxWindowSet m_windows;
     std::queue<ArxObject*> m_deleteQueue;
     std::unique_ptr<EventProcessor> m_eventProcessor;
