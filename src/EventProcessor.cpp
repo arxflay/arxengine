@@ -7,6 +7,7 @@ ARX_NAMESPACE_BEGIN
 
 void EventProcessor::ProcessEvents()
 {
+    MoveScheduledEventsToEventQueue();
     while(!m_eventQueue.empty() && !m_stopEventProcessing)
     {
         try
@@ -51,9 +52,23 @@ void EventProcessor::ProcessEvents()
     m_stopEventProcessing = false;
 }
 
+void EventProcessor::MoveScheduledEventsToEventQueue()
+{
+    while(!m_scheduledEvents.empty())
+    {
+        m_eventQueue.emplace(std::move(m_scheduledEvents.back()));
+        m_scheduledEvents.pop();
+    }
+}
+
 void EventProcessor::EnqueueEvent(std::unique_ptr<Event> &&event)
 {
     m_eventQueue.emplace(std::move(event));
+}
+
+void EventProcessor::ScheduleEvent(std::unique_ptr<Event> &&event)
+{
+    m_scheduledEvents.emplace(std::move(event));
 }
 
 void EventProcessor::Interrupt()

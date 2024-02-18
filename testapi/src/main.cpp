@@ -13,6 +13,8 @@
 #include <Color.h>
 #include <ArxWindow.h>
 #include <internal/UniversalExceptionHandler.h>
+#include <Timer.h>
+
 ARX_NAMESPACE_USE;
 
 int main(int argc, char **argv)
@@ -189,6 +191,11 @@ TEST(ArxWindow, PositiveShowWin)
 {
     ArxWindow *win = new ArxWindow("test", Size(300, 300));
     win->Show();
+    Timer *t = new Timer(win);
+    t->GetEventManager().Bind<TimerEvent>([win](TimerEvent &){win->SetBackgroundColor(arx::Color(rand() % 255, rand() % 255, rand() % 255)); win->Draw(); });
+    t->SetInterval(std::chrono::milliseconds(2000));
+    t->Start(Timer::TimerType::SINGLE_FIRE);
+
     GameApp::GetGlobalApp()->Run();
 }
 

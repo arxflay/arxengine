@@ -218,6 +218,13 @@ public:
         GameApp::GetGlobalApp()->GetEventProcessor().EnqueueEvent(std::move(event));
     }
 
+    template<typename EventType>
+    std::enable_if_t<is_event_type_v<EventType>> ScheduleEvent(std::unique_ptr<Event> &&event)
+    {
+        event->m_eventHandlersPtr = m_eventsHandlersMap.FindOrCreateEventHandlers<EventType>();
+        GameApp::GetGlobalApp()->GetEventProcessor().ScheduleEvent(std::move(event));
+    }
+
 private:
     EventsHandlersMap m_eventsHandlersMap;
 };

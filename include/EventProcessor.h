@@ -29,6 +29,7 @@ public:
     //ignores exceptions
     void ProcessEvents(); //TODO
     void EnqueueEvent(std::unique_ptr<Event> &&event);
+    void ScheduleEvent(std::unique_ptr<Event> &&event);
     void Interrupt();
     void RemoveEvents();
 
@@ -37,7 +38,9 @@ public:
 protected:
     virtual void CallBeforeProcessing(Event &evt) = 0;
 private:
+    void MoveScheduledEventsToEventQueue();
     std::queue<std::unique_ptr<Event>> m_eventQueue;
+    std::queue<std::unique_ptr<Event>> m_scheduledEvents;
     bool m_stopEventProcessing;
 };
 

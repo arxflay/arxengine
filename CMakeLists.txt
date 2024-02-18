@@ -26,6 +26,7 @@ list(APPEND SOURCES
     ${SOURCE_PATH}/ArxWindow.cpp
     ${SOURCE_PATH}/ArxObject.cpp
     ${SOURCE_PATH}/UIEventProcessor.cpp
+    ${SOURCE_PATH}/Timer.cpp
 )
 set(CMAKE_EXPORT_COMPILE_COMMANDS True)
 set(gcc_like_cxx "$<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang,GNU,LCC>")
