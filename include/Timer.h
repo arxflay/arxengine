@@ -35,7 +35,7 @@ public:
     template<typename T>
     void SetInterval(T interval)
     {
-        m_interval = std::chrono::duration_cast<std::chrono::milliseconds>(interval);
+        m_interval = std::chrono::duration_cast<std::chrono::nanoseconds>(interval);
 
         if (IsRunning())
         {
@@ -48,7 +48,7 @@ private:
     friend class TimerCheckEvent;
     TimerTime m_past;
     TimerTime m_whenStartWasCalled;
-    std::chrono::milliseconds m_interval;
+    std::chrono::nanoseconds m_interval;
     TimerType m_timerType;
     bool m_isRunning;
 };

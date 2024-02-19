@@ -159,8 +159,12 @@ void GameApp::CleanUp()
 {
     if (m_eventProcessor)
         m_eventProcessor->RemoveEvents();
-    for (ArxWindow *win : m_windows)
+    while(!m_windows.empty())
+    {
+        ArxWindow *win = *m_windows.begin();
+        m_windows.erase(m_windows.begin());
         delete win;
+    }
     m_shouldExit = false;
     m_exitCode = 0;
     m_running = false;

@@ -6,13 +6,13 @@
 
 ARX_NAMESPACE_BEGIN
 
-
 class ArxObject;
 using ArxObjectList = UnmovableList<ArxObject*>;
 
 class ArxObject
 {
 public:
+
     virtual ~ArxObject();
     
     ArxObject(ArxObject *parent = nullptr);

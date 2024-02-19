@@ -2,12 +2,12 @@
 #include "internal/UniversalExceptionHandler.h"
 #include "Event.h"
 #include "EventManager.h"
+#include "ArxObject.h"
 
 ARX_NAMESPACE_BEGIN
 
 void EventProcessor::ProcessEvents()
 {
-    MoveScheduledEventsToEventQueue();
     while(!m_eventQueue.empty() && !m_stopEventProcessing)
     {
         try
@@ -42,6 +42,12 @@ void EventProcessor::ProcessEvents()
                     shouldContinueProcessing = false; //ignore Skip to avoid loop
                 }
             }
+            
+            if (evt->IsScheduledAfterProcessing())
+            {
+                evt->ScheduleAfterProcessing(false);
+                m_scheduledEvents.push(std::move(evt));
+            }
         }
         catch(...)
         {
@@ -49,6 +55,7 @@ void EventProcessor::ProcessEvents()
             UniversalExceptionHandler::HandleException();
         }
     }
+    MoveScheduledEventsToEventQueue();
     m_stopEventProcessing = false;
 }
 
@@ -56,7 +63,10 @@ void EventProcessor::MoveScheduledEventsToEventQueue()
 {
     while(!m_scheduledEvents.empty())
     {
-        m_eventQueue.emplace(std::move(m_scheduledEvents.back()));
+        auto evt = std::move(m_scheduledEvents.back());
+        if (!(evt->GetSender() && evt->GetSender()->IsDestroyCalled()))
+            m_eventQueue.emplace(std::move(evt));
+
         m_scheduledEvents.pop();
     }
 }
@@ -69,6 +79,17 @@ void EventProcessor::EnqueueEvent(std::unique_ptr<Event> &&event)
 void EventProcessor::ScheduleEvent(std::unique_ptr<Event> &&event)
 {
     m_scheduledEvents.emplace(std::move(event));
+}
+
+void EventProcessor::RemoveScheduledEvents()
+{
+    m_scheduledEvents = {};
+}
+
+void EventProcessor::RemoveAllEvents()
+{
+    RemoveEvents();
+    RemoveScheduledEvents();
 }
 
 void EventProcessor::Interrupt()

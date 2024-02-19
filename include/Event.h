@@ -40,11 +40,14 @@ public:
     bool WasSkipCalled(); 
     ArxObject *GetSender();
     void SetSender(ArxObject *sender);
+    void ScheduleAfterProcessing(bool schedule);
+    bool IsScheduledAfterProcessing() const; //TODO
     virtual ~Event() = default;
 private:
     //DO NOT CALL DIRECTLY
     virtual void HandleEvent() = 0; //default event handler
     bool m_skipped;
+    bool m_scheduleAfterProcessing; 
     std::optional<EventHandlersVectorRef> m_eventHandlersPtr;
     ArxObject *m_sender;
 };

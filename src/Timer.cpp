@@ -37,12 +37,7 @@ private:
         }
 
         if (timer->IsRunning())
-        {
-            std::unique_ptr<TimerCheckEvent> evt = std::make_unique<TimerCheckEvent>();
-            evt->SetSender(timer);
-            evt->SetWhenStartWasCalled(m_whenStartWasCalled);
-            timer->GetEventManager().ScheduleEvent<TimerCheckEvent>(std::move(evt));
-        }
+            ScheduleAfterProcessing(true);
     }
 
     TimerTime m_whenStartWasCalled;

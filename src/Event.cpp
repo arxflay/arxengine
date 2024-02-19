@@ -9,6 +9,7 @@ Event::Event()
 
 Event::Event(ArxObject *sender)
     : m_skipped(false)
+    , m_scheduleAfterProcessing(false)
     , m_sender(sender)
 {
 }
@@ -31,6 +32,16 @@ ArxObject *Event::GetSender()
 void Event::SetSender(ArxObject *sender)
 {
     m_sender = sender;
+}
+
+void Event::ScheduleAfterProcessing(bool reschedule)
+{
+    m_scheduleAfterProcessing = reschedule;
+}
+
+bool Event::IsScheduledAfterProcessing() const //TODO
+{
+    return m_scheduleAfterProcessing;
 }
 
 ARX_NAMESPACE_END

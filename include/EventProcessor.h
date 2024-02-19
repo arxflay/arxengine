@@ -32,6 +32,8 @@ public:
     void ScheduleEvent(std::unique_ptr<Event> &&event);
     void Interrupt();
     void RemoveEvents();
+    void RemoveScheduledEvents();
+    void RemoveAllEvents();
 
     virtual ~EventProcessor() = default;
 

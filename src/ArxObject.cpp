@@ -38,6 +38,8 @@ void ArxObject::RequestDelete()
 {
     if (!IsDestroyCalled())
     {
+        m_destroyCalled = true;
+
         for (ArxObject *obj : m_children)
             obj->RequestDelete();
 
@@ -63,7 +65,7 @@ ArxObject::~ArxObject()
         m_parent->m_children.remove(this);
 
     for(ArxObject *obj : m_children)
-        if (obj->IsDestroyCalled())
+        if (!obj->IsDestroyCalled())
             delete obj;
 }
 
