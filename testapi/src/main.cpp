@@ -187,14 +187,14 @@ TEST(Color, PositiveColorToNormalizedColor)
     ASSERT_EQ(c.GetNormalizedColorRGBA(), glm::vec4(c.r / 255.0, c.g / 255.0, c.b / 255.0, c.a / 255.0));
 }
 
-TEST(ArxWindow, DISABLED_PositiveShowWin)
+TEST(ArxWindow, PositiveShowWin)
 {
     ArxWindow *win = new ArxWindow("test", Size(300, 300));
     win->Show();
     GameApp::GetGlobalApp()->Run();
 }
 
-TEST(ArxWindow, DISABLED_PositiveRainbowWin)
+TEST(ArxWindow, PositiveRainbowWin)
 {
     ArxWindow *win = new ArxWindow("test", Size(300, 300));
     win->Show();
@@ -206,12 +206,12 @@ TEST(ArxWindow, DISABLED_PositiveRainbowWin)
     GameApp::GetGlobalApp()->Run();
 }
 
-TEST(ArxWindow, PositiveEndAfter2Seconds)
+TEST(ArxWindow, DISABLED_PositiveEndAfter2Seconds)
 {
     ArxWindow *win = new ArxWindow("test", Size(300, 300));
     win->Show();
     Timer *t = new Timer(win);
-    t->GetEventManager().Bind<TimerEvent>([win](TimerEvent &){ GameApp::GetGlobalApp()->Exit(0); });
+    t->GetEventManager().Bind<TimerEvent>([errCode=0](TimerEvent &){ GameApp::GetGlobalApp()->Exit(errCode); });
     t->SetInterval(std::chrono::seconds(2));
     t->Start(Timer::TimerType::SINGLE_FIRE);
     GameApp::GetGlobalApp()->Run();

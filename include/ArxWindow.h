@@ -31,9 +31,16 @@ public:
     std::string_view GetTitle();
     void SetTitle(std::string_view title);
 
+    //result = size s + GetWindowBordersSize();
     void SetSize(Size s) override;
+
+    //returns size without window borders
+    Size GetClientSize() const override;
     void SetPosition(Position pos) override;
     void Reparent(ArxObject *parent) override;
+    int GetAttributes() const;
+    virtual Size GetWindowBordersSize() const;
+
 
     void SetAsCurrentContext();
 
@@ -43,8 +50,15 @@ public:
     //virtual const glm::mat4 &GetViewport();
     virtual ~ArxWindow();
 private:
-    std::unique_ptr<GLFWwindow, void(*)(GLFWwindow*)> m_win;
+    virtual void SetClientSize(Size s);
 
+    static void CloseCallback(GLFWwindow *win);
+    static void RefreshCallback(GLFWwindow *win);
+    static void PositionCallback(GLFWwindow *win, int x, int y);
+    static void SetGlfwCallbacks(GLFWwindow *win);
+private:
+    std::unique_ptr<GLFWwindow, void(*)(GLFWwindow*)> m_win;
+    Size m_clientSize;
     int m_attributes;
     std::string m_title;
     //glm::mat4 m_viewport;

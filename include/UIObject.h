@@ -29,6 +29,8 @@ public:
 
     virtual void SetSize(Size s);
     virtual Size GetSize() const;
+
+    virtual Size GetClientSize() const;
     
     virtual void SetPosition(Position pos);
     virtual Position GetPosition() const;

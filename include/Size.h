@@ -25,6 +25,11 @@ struct Size
         return s;
     }
 
+    friend Size operator+(Size s1, Size s2)
+    {
+        return Size(s1.width + s2.width, s1.height + s2.height);
+    }
+
     float width;
     float height;
 };

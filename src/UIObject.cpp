@@ -17,6 +17,7 @@ Color UIObject::GetColor() const { return m_backgroundColor; }
 
 void UIObject::SetSize(Size s) { m_size = s; }
 Size UIObject::GetSize() const { return m_size; }
+Size UIObject::GetClientSize() const { return m_size; }
 
 void UIObject::SetPosition(Position pos) { m_position = pos; }
 Position UIObject::GetPosition() const { return m_position; }
