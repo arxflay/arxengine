@@ -15,6 +15,17 @@ namespace
     }
 }
 
+/*static*/ void ArxWindow::PositionCallback(GLFWwindow *win, int x, int y)
+{
+    ArxWindow *arxWin = static_cast<ArxWindow*>(glfwGetWindowUserPointer(win));
+    int xOffset, yOffset;
+    glfwGetMonitorPos(glfwGetPrimaryMonitor(), &xOffset, &yOffset);
+    int leftBorder, topBorder = 0;
+    glfwGetWindowFrameSize(arxWin->m_win.get(), &leftBorder, &topBorder, nullptr, nullptr);
+    arxWin->UIObject::SetPosition(Position(static_cast<float>(x - xOffset - leftBorder), static_cast<float>(y - yOffset - topBorder)));
+}
+
+
 /*static*/ void ArxWindow::CloseCallback(GLFWwindow *win)
 {
     ArxWindow *arxWin = static_cast<ArxWindow*>(glfwGetWindowUserPointer(win));
@@ -27,16 +38,9 @@ namespace
     arxWin->SetAsCurrentContext();
     int width = 0, height = 0;
     glfwGetWindowSize(arxWin->m_win.get(), &width, &height);
-    arxWin->SetClientSize(Size(width, height));
-    arxWin->UIObject::SetSize(arxWin->GetClientSize() + arxWin->GetWindowBordersSize());
+    arxWin->RecalculateSizes(Size(width, height));
     glViewport(0, 0, static_cast<GLsizei>(arxWin->GetClientSize().width), static_cast<GLsizei>(arxWin->GetClientSize().height));
     arxWin->Draw();
-}
-
-/*static*/ void ArxWindow::PositionCallback(GLFWwindow *win, int x, int y)
-{
-    ArxWindow *arxWin = static_cast<ArxWindow*>(glfwGetWindowUserPointer(win));
-    arxWin->UIObject::SetPosition(Position(x, y));
 }
 
 /*static*/ void ArxWindow::SetGlfwCallbacks(GLFWwindow *win)
@@ -61,18 +65,16 @@ ArxWindow::ArxWindow(std::string_view title, Size size , Position position, int 
     }
     else
     {*/
-        UIObject::SetSize(MakeSizeValid(size));
-        UIObject::SetPosition(position);
-        SetClientSize(size);
-        m_win.reset(glfwCreateWindow(static_cast<int>(GetSize().width), static_cast<int>(GetSize().height), m_title.c_str(), nullptr, nullptr));
+        Size validSize = MakeSizeValid(size); 
+        m_win.reset(glfwCreateWindow(static_cast<int>(validSize.height), static_cast<int>(validSize.width), m_title.c_str(), nullptr, nullptr));
     //}
     if (!m_win)
         throw ArxException(ArxException::ErrorCode::FailedToConstructArxWindow, "failed to create opengl context");
-
-    UIObject::SetSize(GetSize() + GetWindowBordersSize());
-    glfwSetWindowPos(m_win.get(), static_cast<int>(position.x) , static_cast<int>(position.y + GetSize().height));
     glfwSetWindowUserPointer(m_win.get(), this);
+
     SetWindowAttributes(m_attributes);
+    RecalculateSizes(validSize);
+    SetPosition(position);
     SetGlfwCallbacks(m_win.get());
     GetEventManager().Bind<DrawEvent>(std::function<void(DrawEvent&)>([this](DrawEvent &){ 
         glm::vec4 normalizedColor = GetColor().GetNormalizedColorRGBA();
@@ -80,9 +82,10 @@ ArxWindow::ArxWindow(std::string_view title, Size size , Position position, int 
         glClear(GL_COLOR_BUFFER_BIT);
         glfwSwapBuffers(m_win.get());
     }));
-    const_cast<ArxWindowSet&>(GameApp::GetGlobalApp()->GetWindowSet()).insert(this);
+
     //TODO SET CLIENT_SIZE
     //m_viewport = glm::ortho(0.0f, size.width, 0.0f, size.height);
+    RegisterWindowFromWindowList();
 }
 
 class ShowWindowEvent : public Event
@@ -135,8 +138,27 @@ void ArxWindow::SetTitle(std::string_view title)
 
 void ArxWindow::SetSize(Size s)
 {
-    Size newSize = MakeSizeValid(s);
-    glfwSetWindowSize(m_win.get(), static_cast<int>(newSize.height), static_cast<int>(newSize.width));
+    RecalculateSizes(s);
+    glfwSetWindowSize(m_win.get(), static_cast<int>(GetSize().height), static_cast<int>(GetSize().width));
+}
+
+void ArxWindow::RecalculateSizes(Size s)
+{
+    Size newClientSize = MakeSizeValid(s);
+    m_clientSize = newClientSize;
+    WindowBorders borders = GetWindowBorders();
+    Size newSize = Size(newClientSize.width + static_cast<float>(borders.left + borders.right), newClientSize.height + static_cast<float>(borders.bottom + borders.top));
+    UIObject::SetSize(newSize);
+}
+
+void ArxWindow::RegisterWindowFromWindowList()
+{
+    const_cast<ArxWindowSet&>(GameApp::GetGlobalApp()->GetWindowSet()).insert(this);
+}
+
+void ArxWindow::UnregisterWindowFromWindowList()
+{
+    const_cast<ArxWindowSet&>(GameApp::GetGlobalApp()->GetWindowSet()).erase(this);
 }
 
 Size ArxWindow::GetClientSize() const
@@ -144,26 +166,30 @@ Size ArxWindow::GetClientSize() const
     return m_clientSize;
 }
 
-Size ArxWindow::GetWindowBordersSize() const
+ArxWindow::WindowBorders ArxWindow::GetWindowBorders() const
 {
-    int left, top, right, bottom;
-    glfwGetWindowFrameSize(m_win.get(), &left, &top, &right, &bottom);
-    return Size(right + left, bottom + top);
+    ArxWindow::WindowBorders borders;
+    glfwGetWindowFrameSize(m_win.get(), &borders.left, &borders.top, &borders.right, &borders.bottom);
+    return borders;
 }
-
 void ArxWindow::SetPosition(Position pos)
 {
-    glfwSetWindowPos(m_win.get(), static_cast<int>(pos.x), static_cast<int>(pos.y + GetSize().width));
+    UIObject::SetPosition(pos);
+    int xOffset, yOffset;
+    glfwGetMonitorPos(glfwGetPrimaryMonitor(), &xOffset, &yOffset);
+    glfwSetWindowPos(m_win.get(), static_cast<int>(pos.x) + xOffset, static_cast<int>(pos.y) + yOffset);
+}
+
+Position ArxWindow::GetRealPosition()
+{
+    int x, y;
+    glfwGetWindowPos(m_win.get(), &x, &y);
+    return Position(x, y);
 }
 
 void ArxWindow::SetAsCurrentContext()
 {
     glfwMakeContextCurrent(m_win.get());
-}
-
-void ArxWindow::SetClientSize(Size s)
-{
-    m_clientSize = s;
 }
 
 /*
@@ -189,7 +215,7 @@ const glm::mat4 &ArxWindow::GetViewport()
 
 ArxWindow::~ArxWindow()
 {
-    const_cast<ArxWindowSet&>(GameApp::GetGlobalApp()->GetWindowSet()).erase(this);
+    UnregisterWindowFromWindowList();
     if (GameApp::GetGlobalApp()->GetWindowSet().empty())
         GameApp::GetGlobalApp()->Exit(0);
 }

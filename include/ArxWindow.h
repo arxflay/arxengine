@@ -18,6 +18,14 @@ public:
         DECORATED = 0x02, //window will have window decorations if set
         DISPLAY_ON_TOP = 0x04 //display window on top of all window
     };
+
+    struct WindowBorders
+    {
+        int top;
+        int left;
+        int right;
+        int bottom;
+    };
     
     ArxWindow(std::string_view title, Size size = defaults::DEFAULT_SIZE, Position position = defaults::DEFAULT_POSITION, int attributes = WindowAttributes::RESIZABLE | WindowAttributes::DECORATED); //, bool isFullScreen= false);
     
@@ -31,16 +39,21 @@ public:
     std::string_view GetTitle();
     void SetTitle(std::string_view title);
 
-    //result = size s + GetWindowBordersSize();
+    //Sets ClientSize and calculates size with win borders 
     void SetSize(Size s) override;
 
     //returns size without window borders
     Size GetClientSize() const override;
+
+    //position is relative to main monitor
     void SetPosition(Position pos) override;
+
+    //non relative window position (multimonitor position)
+    Position GetRealPosition();
+
     void Reparent(ArxObject *parent) override;
     int GetAttributes() const;
-    virtual Size GetWindowBordersSize() const;
-
+    virtual WindowBorders GetWindowBorders() const;
 
     void SetAsCurrentContext();
 
@@ -50,11 +63,13 @@ public:
     //virtual const glm::mat4 &GetViewport();
     virtual ~ArxWindow();
 private:
-    virtual void SetClientSize(Size s);
+    void RecalculateSizes(Size s);
+    void RegisterWindowFromWindowList();
+    void UnregisterWindowFromWindowList();
 
+    static void PositionCallback(GLFWwindow *win, int x, int y);
     static void CloseCallback(GLFWwindow *win);
     static void RefreshCallback(GLFWwindow *win);
-    static void PositionCallback(GLFWwindow *win, int x, int y);
     static void SetGlfwCallbacks(GLFWwindow *win);
 private:
     std::unique_ptr<GLFWwindow, void(*)(GLFWwindow*)> m_win;

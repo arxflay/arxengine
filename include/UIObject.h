@@ -11,8 +11,6 @@ ARX_NAMESPACE_BEGIN
 class ArxWindow;
 class UIObject;
 
-
-
 class DrawEvent : public Event
 {
 private:
@@ -28,8 +26,11 @@ public:
     virtual Color GetColor() const;
 
     virtual void SetSize(Size s);
+    
+    //size with borders (limits)
     virtual Size GetSize() const;
 
+    //size available for client
     virtual Size GetClientSize() const;
     
     virtual void SetPosition(Position pos);

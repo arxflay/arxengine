@@ -189,7 +189,7 @@ TEST(Color, PositiveColorToNormalizedColor)
 
 TEST(ArxWindow, PositiveShowWin)
 {
-    ArxWindow *win = new ArxWindow("test", Size(300, 300));
+    ArxWindow *win = new ArxWindow("test", Size(300, 300), Position(8, 6));
     win->Show();
     GameApp::GetGlobalApp()->Run();
 }
