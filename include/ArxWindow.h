@@ -57,10 +57,10 @@ public:
 
     void SetAsCurrentContext();
 
-    /*virtual void SetFixedViewport(float width, float height);
-    virtual void RemoveFixedViewport();*/
+    virtual void SetFixedViewport(float width, float height);
+    virtual void RemoveFixedViewport();
 
-    //virtual const glm::mat4 &GetViewport();
+    virtual const glm::mat4 &GetViewport();
     virtual ~ArxWindow();
 private:
     void RecalculateSizes(Size s);
@@ -76,7 +76,7 @@ private:
     Size m_clientSize;
     int m_attributes;
     std::string m_title;
-    //glm::mat4 m_viewport;
+    glm::mat4 m_viewport;
     bool m_useFixedViewport;
 };
 

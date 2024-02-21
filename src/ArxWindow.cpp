@@ -50,7 +50,10 @@ namespace
 
 //uncompelte fullscreen
 ArxWindow::ArxWindow(std::string_view title, Size size , Position position, int attributes) //, bool isFullScreen)
-    : m_win(nullptr, glfwDestroyWindow), m_attributes(attributes), m_title(title)
+    : m_win(nullptr, glfwDestroyWindow)
+    , m_attributes(attributes)
+    , m_title(title)
+    , m_useFixedViewport(false)
 {
     /*if (isFullScreen) //TODO fullscreen
     {
@@ -81,8 +84,7 @@ ArxWindow::ArxWindow(std::string_view title, Size size , Position position, int 
         glfwSwapBuffers(m_win.get());
     }));
 
-    //TODO SET CLIENT_SIZE
-    //m_viewport = glm::ortho(0.0f, size.width, 0.0f, size.height);
+    m_viewport = glm::ortho(0.0f, size.width, 0.0f, size.height);
     RegisterWindowFromWindowList();
 }
 
@@ -144,6 +146,8 @@ void ArxWindow::RecalculateSizes(Size s)
 {
     Size newClientSize = MakeSizeValid(s);
     m_clientSize = newClientSize;
+    if (!m_useFixedViewport)
+        m_viewport = glm::ortho(0.0f, m_clientSize.width, 0.0f, m_clientSize.height);
     WindowBorders borders = GetWindowBorders();
     Size newSize = Size(newClientSize.width + static_cast<float>(borders.left + borders.right), newClientSize.height + static_cast<float>(borders.bottom + borders.top));
     UIObject::SetSize(newSize);
@@ -191,7 +195,7 @@ void ArxWindow::SetAsCurrentContext()
     glfwMakeContextCurrent(m_win.get());
 }
 
-/*
+
 void ArxWindow::SetFixedViewport(float width, float height)
 {
     m_useFixedViewport = true;
@@ -202,7 +206,7 @@ void ArxWindow::SetFixedViewport(float width, float height)
 void ArxWindow::RemoveFixedViewport()
 {
     m_useFixedViewport = false;
-    m_viewport = glm::ortho(0.0f, GetSize().width, 0.0f, GetSize().height);
+    m_viewport = glm::ortho(0.0f, GetClientSize().width, 0.0f, GetClientSize().height);
     Draw();
 }
 
@@ -210,7 +214,6 @@ const glm::mat4 &ArxWindow::GetViewport()
 {
     return m_viewport;
 }
-*/
 
 ArxWindow::~ArxWindow()
 {
