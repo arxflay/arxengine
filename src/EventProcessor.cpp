@@ -3,11 +3,12 @@
 #include "Event.h"
 #include "EventManager.h"
 #include "ArxObject.h"
-
+#include <iostream>
 ARX_NAMESPACE_BEGIN
 
 void EventProcessor::ProcessEvents()
 {
+    m_stopEventProcessing = false;
     while(!m_eventQueue.empty() && !m_stopEventProcessing)
     {
         try
@@ -34,13 +35,13 @@ void EventProcessor::ProcessEvents()
                     handler(*evt);
                     shouldContinueProcessing = evt->WasSkipCalled();
                     evtHandlerIndex++;
-                    evt->Skip(false);
                 }
                 else
                 {
                     evt->HandleEvent();
                     shouldContinueProcessing = false; //ignore Skip to avoid loop
                 }
+                evt->Skip(false);
             }
             
             if (evt->IsScheduledAfterProcessing())
@@ -56,14 +57,13 @@ void EventProcessor::ProcessEvents()
         }
     }
     MoveScheduledEventsToEventQueue();
-    m_stopEventProcessing = false;
 }
 
 void EventProcessor::MoveScheduledEventsToEventQueue()
 {
     while(!m_scheduledEvents.empty())
     {
-        auto evt = std::move(m_scheduledEvents.back());
+        std::unique_ptr<Event> evt = std::move(m_scheduledEvents.front());
         if (!(evt->GetSender() && evt->GetSender()->IsDestroyCalled()))
             m_eventQueue.emplace(std::move(evt));
 

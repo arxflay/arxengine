@@ -20,11 +20,9 @@ namespace
     ArxWindow *arxWin = static_cast<ArxWindow*>(glfwGetWindowUserPointer(win));
     int xOffset, yOffset;
     glfwGetMonitorPos(glfwGetPrimaryMonitor(), &xOffset, &yOffset);
-    int leftBorder, topBorder = 0;
-    glfwGetWindowFrameSize(arxWin->m_win.get(), &leftBorder, &topBorder, nullptr, nullptr);
-    arxWin->UIObject::SetPosition(Position(static_cast<float>(x - xOffset - leftBorder), static_cast<float>(y - yOffset - topBorder)));
+    ArxWindow::WindowBorders borders = arxWin->GetWindowBorders(); 
+    arxWin->UIObject::SetPosition(Position(static_cast<float>(x - xOffset - borders.left), static_cast<float>(y - yOffset - borders.top)));
 }
-
 
 /*static*/ void ArxWindow::CloseCallback(GLFWwindow *win)
 {
@@ -177,7 +175,8 @@ void ArxWindow::SetPosition(Position pos)
     UIObject::SetPosition(pos);
     int xOffset, yOffset;
     glfwGetMonitorPos(glfwGetPrimaryMonitor(), &xOffset, &yOffset);
-    glfwSetWindowPos(m_win.get(), static_cast<int>(pos.x) + xOffset, static_cast<int>(pos.y) + yOffset);
+    WindowBorders borders = GetWindowBorders();
+    glfwSetWindowPos(m_win.get(), static_cast<int>(pos.x) + xOffset + borders.left, static_cast<int>(pos.y) + yOffset + borders.top);
 }
 
 Position ArxWindow::GetRealPosition()

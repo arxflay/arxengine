@@ -136,7 +136,7 @@ int GameApp::Run()
         {
             while(!m_deleteQueue.empty())
             {
-                ArxObject *obj = m_deleteQueue.back();
+                ArxObject *obj = m_deleteQueue.front();
                 m_deleteQueue.pop();
                 delete obj;
             }

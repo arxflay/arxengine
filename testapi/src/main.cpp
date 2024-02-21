@@ -187,14 +187,14 @@ TEST(Color, PositiveColorToNormalizedColor)
     ASSERT_EQ(c.GetNormalizedColorRGBA(), glm::vec4(c.r / 255.0, c.g / 255.0, c.b / 255.0, c.a / 255.0));
 }
 
-TEST(ArxWindow, PositiveShowWin)
+TEST(ArxWindow, DISABLED_PositiveShowWin)
 {
     ArxWindow *win = new ArxWindow("test", Size(300, 300), Position(8, 6));
     win->Show();
     GameApp::GetGlobalApp()->Run();
 }
 
-TEST(ArxWindow, PositiveRainbowWin)
+TEST(ArxWindow, DISABLED_PositiveRainbowWin)
 {
     ArxWindow *win = new ArxWindow("test", Size(300, 300));
     win->Show();
@@ -212,8 +212,31 @@ TEST(ArxWindow, DISABLED_PositiveEndAfter2Seconds)
     win->Show();
     Timer *t = new Timer(win);
     t->GetEventManager().Bind<TimerEvent>([errCode=0](TimerEvent &){ GameApp::GetGlobalApp()->Exit(errCode); });
-    t->SetInterval(std::chrono::seconds(2));
+    t->SetInterval(std::chrono::seconds(1));
     t->Start(Timer::TimerType::SINGLE_FIRE);
+    GameApp::GetGlobalApp()->Run();
+}
+
+TEST(ArxWindow, PositiveMultiWindow)
+{
+    ArxWindow *win = new ArxWindow("test", Size(300, 300));
+    win->Show();
+    Timer *t = new Timer(win);
+    t->GetEventManager().Bind<TimerEvent>([win](TimerEvent &){win->SetBackgroundColor(arx::Color((uint)rand() % 255, (uint)rand() % 255, (uint)rand() % 255)); win->Draw(); });
+    t->SetInterval(std::chrono::seconds(1));
+    t->Start(Timer::TimerType::CONTINUOUS);
+
+    ArxWindow *win2 = new ArxWindow("test", Size(300, 300), Position(300, 1));
+    win2->Show();
+    Timer *t2 = new Timer(win2);
+    t2->GetEventManager().Bind<TimerEvent>([win2](TimerEvent &){
+        win2->SetBackgroundColor(arx::Color((uint)rand() % 255, (uint)rand() % 255, (uint)rand() % 255)); 
+        win2->SetPosition(Position(win2->GetPosition().x + 10, win2->GetPosition().y)); 
+        win2->Draw(); 
+    });
+    t2->SetInterval(std::chrono::seconds(1));
+    t2->Start(Timer::TimerType::CONTINUOUS);
+
     GameApp::GetGlobalApp()->Run();
 }
 

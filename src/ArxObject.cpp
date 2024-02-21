@@ -3,9 +3,10 @@ ARX_NAMESPACE_BEGIN
 
 
 ArxObject::ArxObject(ArxObject *parent)
-    : m_parent(parent)
+    : m_parent(nullptr)
     , m_destroyCalled(false)
 {
+    Reparent(parent);
 }
 
 const ArxObjectList &ArxObject::GetChildren() const
@@ -61,7 +62,7 @@ EventManager &ArxObject::GetEventManager()
 
 ArxObject::~ArxObject()
 {
-    if (GetParent() && GetParent()->IsDestroyCalled())
+    if (GetParent() && !GetParent()->IsDestroyCalled())
         m_parent->m_children.remove(this);
 
     for(ArxObject *obj : m_children)
