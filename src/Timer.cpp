@@ -29,7 +29,6 @@ private:
         {
             timer->m_past = timeNow;
             std::unique_ptr<TimerEvent> evt = std::make_unique<TimerEvent>();
-            evt->SetSender(timer);
             timer->GetEventManager().QueueEvent<TimerEvent>(std::move(evt));
 
             if (timer->GetType() == Timer::TimerType::SINGLE_FIRE)
@@ -65,7 +64,6 @@ void Timer::Start(TimerType type)
         m_isRunning = true;
         m_timerType = type;
         std::unique_ptr<TimerCheckEvent> evt = std::make_unique<TimerCheckEvent>();
-        evt->SetSender(this);
         evt->SetWhenStartWasCalled(m_whenStartWasCalled);
         GetEventManager().ScheduleEvent<TimerCheckEvent>(std::move(evt));
     }

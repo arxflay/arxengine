@@ -63,7 +63,6 @@ UIObject::UIObject()
 void UIObject::Draw()
 {
     std::unique_ptr<DrawEvent> evt(std::make_unique<DrawEvent>());
-    evt->SetSender(this);
     GetEventManager().QueueEvent<DrawEvent>(std::move(evt));
 
     for (ArxObject *obj : const_cast<ArxObjectList&>(GetChildren()))

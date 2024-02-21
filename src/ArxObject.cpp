@@ -5,6 +5,7 @@ ARX_NAMESPACE_BEGIN
 ArxObject::ArxObject(ArxObject *parent)
     : m_parent(nullptr)
     , m_destroyCalled(false)
+    , m_eventManager(this)
 {
     Reparent(parent);
 }
@@ -44,8 +45,7 @@ void ArxObject::RequestDelete()
         for (ArxObject *obj : m_children)
             obj->RequestDelete();
 
-        auto evt = std::make_unique<DeleteEvent>();
-        evt->SetSender(this);
+        auto evt = std::unique_ptr<DeleteEvent>(new DeleteEvent{});
         m_eventManager.QueueEvent<DeleteEvent>(std::move(evt));
     }
 }

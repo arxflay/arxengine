@@ -16,6 +16,8 @@ class ArxWindow;
 class DeleteEvent : public Event
 {
 private:
+    friend class ArxObject;
+    DeleteEvent() = default;
     void HandleEvent() override;
 };
 

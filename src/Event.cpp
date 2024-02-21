@@ -2,15 +2,11 @@
 
 ARX_NAMESPACE_BEGIN
 
-Event::Event()
-    : Event(nullptr)
-{
-}
 
-Event::Event(ArxObject *sender)
+Event::Event()
     : m_skipped(false)
     , m_scheduleAfterProcessing(false)
-    , m_sender(sender)
+    , m_sender(nullptr)
 {
 }
 

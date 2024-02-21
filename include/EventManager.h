@@ -153,7 +153,10 @@ private:
         }
     };
 public:
-    EventManager() = default;
+    EventManager(ArxObject *owner)
+        : m_owner(owner)
+    {
+    }
     EventManager(const EventManager&) = delete;
     EventManager(EventManager&&) = delete;
     EventManager &operator=(const EventManager&) = delete;
@@ -215,6 +218,7 @@ public:
     std::enable_if_t<is_event_type_v<EventType>> QueueEvent(std::unique_ptr<Event> &&event)
     {
         event->m_eventHandlersPtr = m_eventsHandlersMap.FindOrCreateEventHandlers<EventType>();
+        event->SetSender(m_owner);
         GameApp::GetGlobalApp()->GetEventProcessor().EnqueueEvent(std::move(event));
     }
 
@@ -222,10 +226,12 @@ public:
     std::enable_if_t<is_event_type_v<EventType>> ScheduleEvent(std::unique_ptr<Event> &&event)
     {
         event->m_eventHandlersPtr = m_eventsHandlersMap.FindOrCreateEventHandlers<EventType>();
+        event->SetSender(m_owner);
         GameApp::GetGlobalApp()->GetEventProcessor().ScheduleEvent(std::move(event));
     }
 
 private:
+    ArxObject *m_owner;
     EventsHandlersMap m_eventsHandlersMap;
 };
 

@@ -34,17 +34,15 @@ public:
     friend class EventProcessor; 
     friend class EventManager;
     Event();
-    Event(ArxObject *sender);
 
     void Skip(bool skip = true);
     bool WasSkipCalled(); 
     ArxObject *GetSender();
-    void SetSender(ArxObject *sender);
     void ScheduleAfterProcessing(bool schedule);
     bool IsScheduledAfterProcessing() const; //TODO
     virtual ~Event() = default;
 private:
-    //DO NOT CALL DIRECTLY
+    void SetSender(ArxObject *sender);
     virtual void HandleEvent() = 0; //default event handler
     bool m_skipped;
     bool m_scheduleAfterProcessing; 
