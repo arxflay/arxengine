@@ -1,0 +1,50 @@
+ macro(arx_set_headers)
+    set(oneValueArgs TARGET INCLUDE_DIR_PATH PRIVATE_FOLDER_NAME)
+    cmake_parse_arguments(ARX_SET_HEADERS "" "${oneValueArgs}"
+                          "" ${ARGN})
+    
+    if (NOT DEFINED ARX_SET_HEADERS_TARGET)
+        message(ERROR "Target is not set or is empty")
+    endif()
+
+    if (NOT DEFINED ARX_SET_HEADERS_INCLUDE_DIR_PATH)
+        message(ERROR "Include dir path is not set or is empty")
+    endif()
+
+    if (NOT DEFINED ARX_SET_HEADERS_PRIVATE_FOLDER_NAME)
+        target_include_directories(${ARX_SET_HEADERS_TARGET} PUBLIC ${ARX_SET_HEADERS_INCLUDE_DIR_PATH})
+        return()
+    endif()
+    
+    set(HEADER_CACHE_FOLDER ${CMAKE_CURRENT_BINARY_DIR}/arx_header_cache)
+    set(HEADER_PRIVATE_FOLDER_NAME private_headers)
+    set(HEADER_PRIVATE_FOLDER ${HEADER_CACHE_FOLDER}/${HEADER_PRIVATE_FOLDER_NAME})
+    set(HEADER_PUBLIC_FOLDER_NAME public_headers)
+    set(HEADER_PUBLIC_FOLDER ${HEADER_CACHE_FOLDER}/${HEADER_PUBLIC_FOLDER_NAME})
+
+    get_filename_component(FOLDER_NAME ${ARX_SET_HEADERS_INCLUDE_DIR_PATH} NAME)
+    file(REMOVE_RECURSE ${HEADER_CACHE_FOLDER})
+    file(COPY ${ARX_SET_HEADERS_INCLUDE_DIR_PATH} DESTINATION ${HEADER_CACHE_FOLDER})
+    file(RENAME ${HEADER_CACHE_FOLDER}/${FOLDER_NAME} ${HEADER_CACHE_FOLDER}/${HEADER_PUBLIC_FOLDER_NAME})
+   
+    file(GLOB_RECURSE INCLUDE_DIR_FILES LIST_DIRECTORIES TRUE "${ARX_SET_HEADERS_INCLUDE_DIR_PATH}/*")
+    foreach (folder ${INCLUDE_DIR_FILES})
+        if (IS_DIRECTORY ${folder})
+            list(APPEND INCLUDE_DIR_DIRS ${folder})
+        endif()
+    endforeach()
+
+    foreach (folder ${INCLUDE_DIR_DIRS})
+        get_filename_component(FOLDER_NAME ${folder} NAME)
+        if (${ARX_SET_HEADERS_PRIVATE_FOLDER_NAME} STREQUAL ${FOLDER_NAME})
+            string(REPLACE ${ARX_SET_HEADERS_INCLUDE_DIR_PATH} ${HEADER_PUBLIC_FOLDER} PUBLIC_PATH_DEST ${folder})
+            string(REPLACE ${ARX_SET_HEADERS_INCLUDE_DIR_PATH} ${HEADER_PRIVATE_FOLDER} PRIVATE_PATH_DEST ${folder})
+            get_filename_component(PRIVATE_PATH_DEST_WITHOUT_NAME ${PRIVATE_PATH_DEST} DIRECTORY)
+            file(REMOVE_RECURSE ${PUBLIC_PATH_DEST})
+            file(COPY ${folder} DESTINATION ${PRIVATE_PATH_DEST_WITHOUT_NAME})
+        endif()
+    endforeach()
+
+    target_include_directories(${ARX_SET_HEADERS_TARGET} PUBLIC ${HEADER_PUBLIC_FOLDER})
+    target_include_directories(${ARX_SET_HEADERS_TARGET} PRIVATE ${HEADER_PRIVATE_FOLDER})
+endmacro()

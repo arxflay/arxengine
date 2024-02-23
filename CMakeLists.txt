@@ -44,7 +44,6 @@ endif()
 target_compile_options(arxengine PRIVATE "$<${gcc_like_cxx}:-Wall;-Wextra;-Wconversion;-std=c++17>"  
                                                         "$<${msvc_cxx}:/W3;/std:c++17>")
 
-target_include_directories(arxengine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 include(${CMAKE_CURRENT_SOURCE_DIR}/libs/ProjectLibs.cmake)
 
 if (WIN32)
@@ -59,4 +58,9 @@ if (${ARX_BUILD_TEST})
     enable_testing()
     add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/testapi)
 endif()
+
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/ArxBuild.cmake)
+arx_set_headers(TARGET arxengine INCLUDE_DIR_PATH ${CMAKE_CURRENT_SOURCE_DIR}/include PRIVATE_FOLDER_NAME internal)
+
+
 

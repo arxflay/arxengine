@@ -3,7 +3,6 @@
 #include <memory>
 #include <queue>
 #include "Event.h"
-#include "internal/UniversalExceptionHandler.h"
 #include <set>
 
 ARX_NAMESPACE_BEGIN
@@ -100,7 +99,7 @@ private:
     }\
     catch(...)\
     {\
-        errCode = static_cast<int>(::ARX_NAMESPACE::UniversalExceptionHandler::HandleException());\
+        errCode = ::ARX_NAMESPACE::ArxException::ErrorCode::GenericError;\
     }\
     return errCode;\
 }
@@ -117,7 +116,7 @@ private:
     }\
     catch(...)\
     {\
-        errCode = static_cast<int>(::ARX_NAMESPACE::UniversalExceptionHandler::HandleException());\
+        errCode = ::ARX_NAMESPACE::ArxException::ErrorCode::GenericError;\
     }\
     return errCode;\
 }

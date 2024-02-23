@@ -12,7 +12,6 @@
 #include <SoundPlayer.h>
 #include <Color.h>
 #include <ArxWindow.h>
-#include <internal/UniversalExceptionHandler.h>
 #include <Timer.h>
 
 ARX_NAMESPACE_USE;

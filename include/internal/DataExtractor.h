@@ -1,5 +1,5 @@
 #pragma once
-#include "../ArxDefines.h"
+#include "ArxDefines.h"
 #include <cstddef>
 #include <type_traits>
 #include <stdexcept>
