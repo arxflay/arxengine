@@ -24,6 +24,18 @@ struct Position
         return p;
     }
 
+    Position &operator+=(Position pos)
+    {
+        x += pos.x;
+        y += pos.y;
+        return *this;
+    }
+
+    friend Position operator+(Position p1, Position p2)
+    {
+        return Position(p1.x + p2.x, p1.y + p2.y);
+    }
+
     float x;
     float y;
 };

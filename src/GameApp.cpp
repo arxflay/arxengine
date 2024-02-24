@@ -1,4 +1,6 @@
 #include "GameApp.h"
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 #include "internal/UniversalExceptionHandler.h"
 #include "SoundPlayer.h"
 #include "Font.h"
@@ -7,8 +9,6 @@
 #include "ArxObject.h"
 #include "ArxWindow.h"
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
 
 ARX_NAMESPACE_BEGIN
 
@@ -24,16 +24,6 @@ namespace internal
     {
         GLOG->Info("Initializing Freetype...");
         return CreateFontLibrary();
-    }
-
-    void InitGlad()
-    {
-        GLOG->Info("Initializing Glad...");
-        std::unique_ptr<GLFWwindow, void(*)(GLFWwindow*)> tempWin(glfwCreateWindow(1, 1, "", nullptr, nullptr), [](GLFWwindow *win) {
-            glfwMakeContextCurrent(nullptr);
-            glfwDestroyWindow(win);        
-        });
-        glfwMakeContextCurrent(tempWin.get());
     }
 
     void InitGLFW()
@@ -94,7 +84,6 @@ int GameApp::Init()
             throw ArxException(ArxException::ErrorCode::GameAppAlreadyInitialized, "App is already inititalized");
     
         internal::InitGLFW();
-        internal::InitGlad();
         m_soundDeviceContextPair.reset(internal::InitAL());
         m_fontLibrary.reset(internal::InitFT());
         m_eventProcessor = std::make_unique<UIEventProcessor>();

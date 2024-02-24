@@ -16,17 +16,16 @@ public:
         EnumToStringError           = 2,
         EnumFromStringError         = 3,
         FailedToInitializeGLFW      = 4,
-        FailedToInitializeGlad      = 5,
-        FailedToInitializeOpenAL    = 6,
-        FailedToInitializeFreetype  = 7,
-        GameAppAlreadyInitialized   = 8,
-        GameAppNotSetAsGlobal       = 9,
-        GameAppNotInitialized       = 10,
-        CaughtStdException          = 11,
-        FailedToConstructUIObject   = 12,
-        FailedToConstructArxWindow  = 13,
-        GameAppIsRunning            = 14,
-        GameAppAlreadyScheduledExit = 15
+        FailedToInitializeOpenAL    = 5,
+        FailedToInitializeFreetype  = 6,
+        GameAppAlreadyInitialized   = 7,
+        GameAppNotSetAsGlobal       = 8,
+        GameAppNotInitialized       = 9,
+        CaughtStdException          = 10,
+        FailedToConstructUIObject   = 11,
+        FailedToConstructArxWindow  = 12,
+        GameAppIsRunning            = 13,
+        GameAppAlreadyScheduledExit = 14
     };
 
     ArxException();

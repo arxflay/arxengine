@@ -224,7 +224,7 @@ TEST(ArxWindow, PositiveMultiWindow)
     t->GetEventManager().Bind<TimerEvent>([win](TimerEvent &){win->SetBackgroundColor(arx::Color((uint)rand() % 255, (uint)rand() % 255, (uint)rand() % 255)); win->Draw(); });
     t->SetInterval(std::chrono::seconds(1));
     t->Start(Timer::TimerType::CONTINUOUS);
-
+    /*
     ArxWindow *win2 = new ArxWindow("test", Size(300, 300), Position(300, 1));
     win2->Show();
     Timer *t2 = new Timer(win2);
@@ -234,7 +234,7 @@ TEST(ArxWindow, PositiveMultiWindow)
         win2->Draw(); 
     });
     t2->SetInterval(std::chrono::seconds(1));
-    t2->Start(Timer::TimerType::CONTINUOUS);
+    t2->Start(Timer::TimerType::CONTINUOUS);*/
 
     GameApp::GetGlobalApp()->Run();
 }

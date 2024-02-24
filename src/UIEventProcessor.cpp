@@ -1,5 +1,4 @@
 #include "UIEventProcessor.h"
-#include <GLFW/glfw3.h>
 #include "ArxWindow.h"
 
 ARX_NAMESPACE_BEGIN

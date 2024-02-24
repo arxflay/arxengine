@@ -1,4 +1,6 @@
 #include "ArxWindow.h"
+#include "ui/internal/UICache.h"
+#include "Painter.h"
 #include <GLFW/glfw3.h>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <iostream>
@@ -54,6 +56,7 @@ ArxWindow::ArxWindow(std::string_view title, Size size , Position position, int 
     , m_attributes(attributes)
     , m_title(title)
     , m_useFixedViewport(false)
+    , m_uiCache(std::make_unique<UICache>())
 {
     /*if (isFullScreen) //TODO fullscreen
     {
@@ -71,21 +74,32 @@ ArxWindow::ArxWindow(std::string_view title, Size size , Position position, int 
     //}
     if (!m_win)
         throw ArxException(ArxException::ErrorCode::FailedToConstructArxWindow, "failed to create opengl context");
+
+    SetAsCurrentContext();
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+        throw ArxException(ArxException::ErrorCode::FailedToConstructArxWindow, "failed to initialize glad");
+
     glfwSetWindowUserPointer(m_win.get(), this);
 
     SetWindowAttributes(m_attributes);
     RecalculateSizes(validSize);
     SetPosition(position);
     SetGlfwCallbacks(m_win.get());
-    GetEventManager().Bind<DrawEvent>(std::function<void(DrawEvent&)>([this](DrawEvent &){ 
+    GetEventManager().Bind<DrawEvent>(std::function<void(DrawEvent&)>([this](DrawEvent &evt){
         glm::vec4 normalizedColor = GetColor().GetNormalizedColorRGBA();
         glClearColor(normalizedColor.r, normalizedColor.g, normalizedColor.b, normalizedColor.a); 
         glClear(GL_COLOR_BUFFER_BIT);
+        Painter painter(evt);
+        painter.DrawRectangle(Position(60, 60), Size(40, 40));
+        painter.DrawRectangle(Position(0, 0), Size(40, 40));
+        painter.DrawRectangle(Position(150, 200), Size(60, 60));
         glfwSwapBuffers(m_win.get());
     }));
 
     m_viewport = glm::ortho(0.0f, size.width, 0.0f, size.height);
+    m_uiCache->Init();
     RegisterWindowFromWindowList();
+
 }
 
 class ShowWindowEvent : public Event
@@ -148,6 +162,7 @@ void ArxWindow::RecalculateSizes(Size s)
     m_clientSize = newClientSize;
     if (!m_useFixedViewport)
         m_viewport = glm::ortho(0.0f, m_clientSize.width, 0.0f, m_clientSize.height);
+
     WindowBorders borders = GetWindowBorders();
     Size newSize = Size(newClientSize.width + static_cast<float>(borders.left + borders.right), newClientSize.height + static_cast<float>(borders.bottom + borders.top));
     UIObject::SetSize(newSize);
@@ -195,7 +210,6 @@ void ArxWindow::SetAsCurrentContext()
     glfwMakeContextCurrent(m_win.get());
 }
 
-
 void ArxWindow::SetFixedViewport(float width, float height)
 {
     m_useFixedViewport = true;
@@ -217,6 +231,7 @@ const glm::mat4 &ArxWindow::GetViewport()
 
 ArxWindow::~ArxWindow()
 {
+    SetAsCurrentContext();
     UnregisterWindowFromWindowList();
     if (GameApp::GetGlobalApp()->GetWindowSet().empty())
         GameApp::GetGlobalApp()->Exit(0);
@@ -225,6 +240,11 @@ ArxWindow::~ArxWindow()
 void ArxWindow::Reparent(ArxObject*)
 {
     //for now ArxWindow can't have parents
+}
+
+UICache *ArxWindow::GetUICache()
+{
+    return m_uiCache.get();
 }
 
 ARX_NAMESPACE_END

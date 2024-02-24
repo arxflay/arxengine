@@ -27,6 +27,13 @@ list(APPEND SOURCES
     ${SOURCE_PATH}/ArxObject.cpp
     ${SOURCE_PATH}/UIEventProcessor.cpp
     ${SOURCE_PATH}/Timer.cpp
+
+    ${SOURCE_PATH}/internal/gl/Scissorbox.cpp
+    ${SOURCE_PATH}/internal/gl/Shader.cpp
+    ${SOURCE_PATH}/internal/gl/VBO.cpp
+    ${SOURCE_PATH}/internal/gl/VAO.cpp
+    ${SOURCE_PATH}/Painter.cpp
+    ${SOURCE_PATH}/ui/internal/UICache.cpp
 )
 set(CMAKE_EXPORT_COMPILE_COMMANDS True)
 set(gcc_like_cxx "$<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang,GNU,LCC>")
@@ -58,9 +65,6 @@ if (${ARX_BUILD_TEST})
     enable_testing()
     add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/testapi)
 endif()
-
+add_definitions(-DGLFW_INCLUDE_NONE)
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/ArxBuild.cmake)
 arx_set_headers(TARGET arxengine INCLUDE_DIR_PATH ${CMAKE_CURRENT_SOURCE_DIR}/include PRIVATE_FOLDER_NAME internal)
-
-
-
