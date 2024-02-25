@@ -1,9 +1,10 @@
-#pragma once
+#ifndef ARX_LOGGER_H
+#define ARX_LOGGER_H
 #include "ArxDefines.h"
 #include <string_view>
-#include <Utils.h>
+#include "misc/Utils.h"
 #include <memory>
-#include "EnumHelpers.h"
+#include "misc/EnumHelpers.h"
 ARX_NAMESPACE_BEGIN
 #define GLOG Logger::GetGlobalLogger()
 
@@ -128,3 +129,5 @@ namespace
 #define FUNC_LOG_ENTER FnLogGuard fn_14f1f341zvxt431af0a94(__FUNCTION__)
 
 ARX_NAMESPACE_END
+
+#endif

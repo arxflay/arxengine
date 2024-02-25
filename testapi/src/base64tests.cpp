@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
-#include <Utils.h>
-#include <Image.h>
+#include <misc/Utils.h>
+#include <media/Image.h>
 #include <filesystem>
 #include <fstream>
 #include "testdefs.h"

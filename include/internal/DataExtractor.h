@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ARX_DATAEXTRACTOR_H
+#define ARX_DATAEXTRACTOR_H
 #include "ArxDefines.h"
 #include <cstddef>
 #include <type_traits>
@@ -83,3 +84,5 @@ private:
 };
 
 ARX_NAMESPACE_END
+
+#endif

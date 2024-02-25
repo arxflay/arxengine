@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ARX_UICACHE_H
+#define ARX_UICACHE_H
 #include "ArxDefines.h"
 #include "internal/gl/VAO.h"
 #include "internal/gl/VBO.h"
@@ -64,3 +65,5 @@ private:
 };
 
 ARX_NAMESPACE_END
+
+#endif

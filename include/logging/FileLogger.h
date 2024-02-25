@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ARX_FILELOGGER_H
+#define ARX_FILELOGGER_H
 #include "logging/Logger.h"
 #include <string>
 
@@ -17,3 +18,5 @@ private:
 };
 
 ARX_NAMESPACE_END
+
+#endif

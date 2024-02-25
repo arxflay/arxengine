@@ -1,8 +1,10 @@
-#pragma once 
+#ifndef ARX_GAMEAPP_H
+#define ARX_GAMEAPP_H
+
 #include "ArxDefines.h"
 #include <memory>
 #include <queue>
-#include "Event.h"
+#include "evt/Event.h"
 #include <set>
 
 ARX_NAMESPACE_BEGIN
@@ -122,3 +124,5 @@ private:
 }
 
 ARX_NAMESPACE_END
+
+#endif

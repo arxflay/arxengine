@@ -7,16 +7,15 @@ UICache::UICache()
 {
 }
 
-
 constexpr std::string_view RECTANGLE_VERTEX_SHADER = R"(
     #version 330 core
     layout (location = 0) in vec2 Pos;
-    uniform mat4 modelMatrix;
-    uniform mat4 viewMatrix;
-    uniform mat4 projectionMatrix;
+    uniform mat4 )" MODEL_MATRIX_NAME R"(;
+    uniform mat4 )" VIEW_MATRIX_NAME R"(;
+    uniform mat4 )" PROJECTION_MATRIX_NAME R"(;
     void main()
     {
-        gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(Pos, 0.0f, 1.0f);
+        gl_Position = )" PROJECTION_MATRIX_NAME "*" VIEW_MATRIX_NAME "*" MODEL_MATRIX_NAME R"(* vec4(Pos, 0.0f, 1.0f);
     }
 )";
 

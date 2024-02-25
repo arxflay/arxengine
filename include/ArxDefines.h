@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ARX_ARXDEFINES_H
+#define ARX_ARXDEFINES_H
 #include <cstdint>
 
 #define ARX_NAMESPACE arx
@@ -23,3 +24,5 @@ namespace defaults
     static inline constexpr int IGNORE = -1;
 }
 ARX_NAMESPACE_END
+
+#endif

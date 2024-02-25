@@ -153,6 +153,13 @@ void Shader::SetUniformMat4(std::string_view name, const glm::mat4 &mat)
     glUniformMatrix4fv(glGetUniformLocation(m_programHandle, name.data()), 1, GL_FALSE, glm::value_ptr(mat));
 }
 
+void Shader::SetTransformMatrices(const glm::mat4 &modelMatrix, const glm::mat4 &viewMatrix, const glm::mat4 &projectionMatrix)
+{
+   SetUniformMat4(MODEL_MATRIX_NAME, modelMatrix);
+   SetUniformMat4(VIEW_MATRIX_NAME, viewMatrix);
+   SetUniformMat4(PROJECTION_MATRIX_NAME, projectionMatrix);
+}
+
 unsigned int Shader::GetProgramHandle()
 {
     return m_programHandle;

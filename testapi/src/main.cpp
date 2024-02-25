@@ -1,17 +1,17 @@
 #include <gtest/gtest.h>
-#include <Utils.h>
+#include <misc/Utils.h>
 
-#include <Image.h>
+#include <media/Image.h>
 #include <glad/glad.h>
 #include <fstream>
 #include <sstream>
 #include "testdefs.h"
-#include <Sound.h>
+#include <media/Sound.h>
 #include <logging/FileLogger.h>
-#include "GameApp.h"
-#include <SoundPlayer.h>
-#include <Color.h>
-#include <ArxWindow.h>
+#include <GameApp.h>
+#include <media/SoundPlayer.h>
+#include <ui/Color.h>
+#include <ui/ArxWindow.h>
 #include <Timer.h>
 
 ARX_NAMESPACE_USE;

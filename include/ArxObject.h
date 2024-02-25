@@ -1,7 +1,8 @@
-#pragma once
+#ifndef ARX_ARXOBJECT_H
+#define ARX_ARXOBJECT_H
 #include "ArxDefines.h"
-#include "EventManager.h"
-#include "UnmovableList.h"
+#include "evt/EventManager.h"
+#include "misc/UnmovableList.h"
 #include <list>
 
 ARX_NAMESPACE_BEGIN
@@ -37,3 +38,5 @@ private:
 
 
 ARX_NAMESPACE_END
+
+#endif

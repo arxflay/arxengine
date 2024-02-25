@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ARX_UNIVERSALEXCEPTIONHANDLER_H
+#define ARX_UNIVERSALEXCEPTIONHANDLER_H
 #include "ArxDefines.h"
 #include <string>
 #include "ArxException.h"
@@ -12,3 +13,5 @@ public:
 };
 
 ARX_NAMESPACE_END
+
+#endif

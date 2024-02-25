@@ -1,7 +1,8 @@
-#pragma once
+#ifndef ARX_SCISSORBOX_H
+#define ARX_SCISSORBOX_H
 #include "ArxDefines.h"
-#include "Position.h"
-#include "Size.h"
+#include "ui/Position.h"
+#include "ui/Size.h"
 #include <glad/glad.h>
 ARX_NAMESPACE_BEGIN
 
@@ -31,3 +32,5 @@ private:
 
 
 ARX_NAMESPACE_END
+
+#endif

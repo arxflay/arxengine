@@ -80,13 +80,13 @@ class Configurator:
     def AddBuildTest(self, buildTest : bool) -> None:
         self._cmd.append(["-DARX_BUILD_TEST=OFF", "-DARX_BUILD_TEST=ON"][int(buildTest)])
     def AddSourceFolder(self, sourcePath : os.path) -> None:
-        self._cmd.extend(["-S", str(sourcePath)])
+        self._cmd.extend(["-S", f'"{str(sourcePath)}"'])
     def AddLibBuildFolder(self, sourcePath : os.path, buildFolderName : str, libType : LibType, relType : ReleaseType) -> None:
-        self._cmd.extend(["-B", f'{str(sourcePath)}/{buildFolderName}/{str(libType)}_{str(relType)}'])
+        self._cmd.extend(["-B", f'"{str(sourcePath)}/{buildFolderName}/{str(libType)}_{str(relType)}"'])
     def AddExecBuildFolder(self, sourcePath : os.path, buildFolderName : str, relType : ReleaseType) -> None:
-        self._cmd.extend(["-B", f'{str(sourcePath)}/{buildFolderName}/Exec_{relType}'])
+        self._cmd.extend(["-B", f'"{str(sourcePath)}/{buildFolderName}/Exec_{relType}"'])
     def AddBuildProjectCommand(self, buildFolder : os.path, projName : str):
-        self._cmd.extend(["--build", f'{buildFolder}/{projName}'])
+        self._cmd.extend(["--build", f'"{buildFolder}/{projName}"'])
     def AddBuildReleaseType(self, relType : ReleaseType):
         self._cmd.extend(["--config",  ["Debug", "Release"][relType.value]])
     def GetCmd(self) -> str:
@@ -152,7 +152,7 @@ def Test(projType : ProjectType):
 
     folder = folders[SelectVariant("Projects", folders)]
     fullPath = os.path.join(buildFolder, folder)
-    os.system(f'sh -c "cd {fullPath} && ctest"')
+    os.system(f'sh -c "cd \"{fullPath}\" && ctest"')
 
 def SelectAction(projType : ProjectType):
     [Configure, Build, Test][SelectVariant("Commands",  AppOperations)](projType)

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ARX_ARXEXCEPTION_H
+#define ARX_ARXEXCEPTION_H
 #include "ArxDefines.h"
 #include <string_view>
 #include <string>
@@ -45,3 +46,5 @@ protected:
 };
 
 ARX_NAMESPACE_END
+
+#endif

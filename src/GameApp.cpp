@@ -2,12 +2,12 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "internal/UniversalExceptionHandler.h"
-#include "SoundPlayer.h"
-#include "Font.h"
+#include "media/SoundPlayer.h"
+#include "media/Font.h"
 #include "logging/Logger.h"
-#include "UIEventProcessor.h"
+#include "evt/UIEventProcessor.h"
 #include "ArxObject.h"
-#include "ArxWindow.h"
+#include "ui/ArxWindow.h"
 
 
 ARX_NAMESPACE_BEGIN

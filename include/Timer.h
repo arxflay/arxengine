@@ -1,7 +1,9 @@
-#pragma once
+#ifndef ARX_TIMER_H
+#define ARX_TIMER_H
+
 #include "ArxDefines.h"
 #include "ArxObject.h"
-#include "Event.h"
+#include "evt/Event.h"
 #include <chrono>
 
 ARX_NAMESPACE_BEGIN
@@ -54,3 +56,5 @@ private:
 };
 
 ARX_NAMESPACE_END
+
+#endif

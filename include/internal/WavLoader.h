@@ -1,10 +1,11 @@
-#pragma once
+#ifndef ARX_WAVLOADER_H
+#define ARX_WAVLOADER_H
 #include <cstdint>
 #include <optional>
 #include <vector>
 #include <string_view>
 #include "ArxDefines.h"
-#include "EnumHelpers.h"
+#include "misc/EnumHelpers.h"
 
 ARX_NAMESPACE_BEGIN
     
@@ -51,3 +52,5 @@ public:
 
 
 ARX_NAMESPACE_END
+
+#endif

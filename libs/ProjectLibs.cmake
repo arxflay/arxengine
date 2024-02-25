@@ -4,9 +4,9 @@ if(NOT WIN32)
     set(CPM_LOCAL_PACKAGES_ONLY True)
 endif()
 
-set(CPM_SOURCE_CACHE ${CMAKE_CURRENT_LIST_DIR}/third_party/CPM)
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/FetchCPM.cmake)
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/CPM/CPM.cmake)
+set(CPM_SOURCE_CACHE "${CMAKE_CURRENT_LIST_DIR}/third_party/CPM")
+include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/FetchCPM.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/CPM/CPM.cmake")
 CPMAddPackage("gh:g-truc/glm#0.9.9.8")
 CPMAddPackage(NAME glfw3
     GITHUB_REPOSITORY glfw/glfw
@@ -40,8 +40,8 @@ CPMAddPackage(NAME OpenAL
         "ALSOFT_NO_CONFIG_UTIL ON"
         "ALSOFT_EXAMPLES OFF")
 
-add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/third_party/glad)
-add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/third_party/stb_image)
+add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/third_party/glad")
+add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/third_party/stb_image")
 
 if (${ARX_BUILD_TEST})
     CPMAddPackage(NAME GTest

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ARX_VBO_H
+#define ARX_VBO_H
 #include "ArxDefines.h"
 #include <glad/glad.h>
 #include <vector>
@@ -65,3 +66,4 @@ private:
 
 
 ARX_NAMESPACE_END
+#endif

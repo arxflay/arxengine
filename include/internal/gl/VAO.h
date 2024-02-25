@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ARX_VAO_H
+#define ARX_VAO_H
 #include "ArxDefines.h"
 #include <glad/glad.h>
 #include <vector>
@@ -43,6 +44,6 @@ private:
     GLuint m_vao;
 };
 
-
-
 ARX_NAMESPACE_END
+
+#endif
