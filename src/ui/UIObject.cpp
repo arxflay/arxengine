@@ -60,19 +60,6 @@ UIObject::UIObject()
 {
 }
 
-void UIObject::Draw()
-{
-    std::unique_ptr<DrawEvent> evt(std::make_unique<DrawEvent>());
-    GetEventManager().QueueEvent<DrawEvent>(std::move(evt));
-
-    for (ArxObject *obj : const_cast<ArxObjectList&>(GetChildren()))
-    {
-        UIObject *uiobject = dynamic_cast<UIObject*>(obj);
-        if (uiobject)
-            uiobject->Draw();
-    }
-}
-
 void DrawEvent::HandleEvent()
 {
 

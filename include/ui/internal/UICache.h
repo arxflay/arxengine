@@ -16,20 +16,18 @@ public:
 
     enum class VAO_ID
     {
-        RECTANGLE,
-        IMAGE
+        RECTANGLE
     };
     
     enum class VBO_ID
     {
-        RECTANGLE,
-        IMAGE
+        RECTANGLE
     };
 
     enum class SHADER_PROGRAM_ID
     {
         RECTANGLE,
-        IMAGE
+        IMAGE /*RECT VAO AND VBO*/
     };
 
     using VAOMap = std::map<VAO_ID, VAO>;

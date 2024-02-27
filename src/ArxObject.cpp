@@ -62,7 +62,7 @@ EventManager &ArxObject::GetEventManager()
 
 ArxObject::~ArxObject()
 {
-    if (GetParent() && !GetParent()->IsDestroyCalled())
+    if (GetParent())
         m_parent->m_children.remove(this);
 
     for(ArxObject *obj : m_children)

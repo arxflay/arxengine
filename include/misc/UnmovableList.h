@@ -17,6 +17,8 @@ public:
     UnmovableList &operator=(const UnmovableList<T>&) = delete;
     UnmovableList &operator=(UnmovableList<T>&&) = delete;
 
+    virtual ~UnmovableList()  = default;
+
 };
 
 ARX_NAMESPACE_END

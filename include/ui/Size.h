@@ -1,7 +1,7 @@
 #ifndef ARX_SIZE_H
 #define ARX_SIZE_H
 #include "ArxDefines.h"
-#include <cmath>
+#include "misc/Math.h"
 #include <type_traits>
 
 ARX_NAMESPACE_BEGIN
@@ -30,7 +30,11 @@ struct Size
     {
         return Size(s1.width + s2.width, s1.height + s2.height);
     }
-
+    
+    bool operator==(Size size) const
+    {
+        return AreEqualFloat(width, size.width) && AreEqualFloat(height, size.height);
+    }
     float width;
     float height;
 };

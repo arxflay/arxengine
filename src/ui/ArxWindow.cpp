@@ -4,6 +4,8 @@
 #include <GLFW/glfw3.h>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <iostream>
+#include "gl/Texture2D.h"
+#include "media/Image.h"
 ARX_NAMESPACE_BEGIN
 
 namespace
@@ -85,16 +87,11 @@ ArxWindow::ArxWindow(std::string_view title, Size size , Position position, int 
     RecalculateSizes(validSize);
     SetPosition(position);
     SetGlfwCallbacks(m_win.get());
-    GetEventManager().Bind<DrawEvent>(std::function<void(DrawEvent&)>([this](DrawEvent &evt){
-        glm::vec4 normalizedColor = GetColor().GetNormalizedColorRGBA();
-        glClearColor(normalizedColor.r, normalizedColor.g, normalizedColor.b, normalizedColor.a); 
-        glClear(GL_COLOR_BUFFER_BIT);
+    GetEventManager().Bind<DrawEvent>([this](DrawEvent &evt){
+        void(this);
         Painter painter(evt);
-        painter.DrawRectangle(Position(60, 60), Size(40, 40));
-        painter.DrawRectangle(Position(0, 0), Size(40, 40));
-        painter.DrawRectangle(Position(150, 200), Size(60, 60));
-        glfwSwapBuffers(m_win.get());
-    }));
+        painter.Clear();
+    });
 
     m_viewport = glm::ortho(0.0f, size.width, 0.0f, size.height);
     m_uiCache->Init();
@@ -245,6 +242,40 @@ void ArxWindow::Reparent(ArxObject*)
 UICache *ArxWindow::GetUICache()
 {
     return m_uiCache.get();
+}
+
+/*static*/ void ArxWindow::DrawInternal(UIObject *obj)
+{
+    std::unique_ptr<DrawEvent> evt(std::make_unique<DrawEvent>());
+    obj->GetEventManager().QueueEvent<DrawEvent>(std::move(evt));
+    for (ArxObject *obj : const_cast<ArxObjectList&>(obj->GetChildren()))
+    {
+        UIObject *uiobject = dynamic_cast<UIObject*>(obj);
+        if (uiobject)
+            DrawInternal(uiobject);
+    }
+}
+
+class SwapBuffersEvent : public Event
+{
+public:
+    SwapBuffersEvent(GLFWwindow *win)
+        : m_win(win)
+    {
+    }
+private:
+    void HandleEvent()
+    {
+        glfwSwapBuffers(m_win);
+    }
+    GLFWwindow *m_win;
+};
+
+void ArxWindow::Draw()
+{
+    DrawInternal(this);
+    std::unique_ptr<SwapBuffersEvent> evt(std::make_unique<SwapBuffersEvent>(m_win.get()));
+    GetEventManager().QueueEvent<SwapBuffersEvent>(std::move(evt));
 }
 
 ARX_NAMESPACE_END

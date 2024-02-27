@@ -6,10 +6,9 @@
 
 ARX_NAMESPACE_BEGIN
 
-template<typename T>
-static inline constexpr std::enable_if_t<std::is_arithmetic_v<T>, T> AreNumbersEqual(float a, float b)
+static inline constexpr bool AreEqualFloat(float a, float b)
 {
-    return std::fabs(a - b) <= std::numeric_limits<T>::epsilon();
+    return std::fabs(a - b) <= std::numeric_limits<float>::epsilon();
 }
 
 ARX_NAMESPACE_END

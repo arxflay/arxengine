@@ -13,6 +13,8 @@
 #include <ui/Color.h>
 #include <ui/ArxWindow.h>
 #include <Timer.h>
+#include <ui/Painter.h>
+#include <gl/Texture2D.h>
 
 ARX_NAMESPACE_USE;
 
@@ -32,10 +34,9 @@ TEST(Image, PositiveLoadImageFilePNG)
     std::filesystem::path testPngPath(TEST_DATA_PATH / std::filesystem::path("test_png.png"));
     Image img(Image::LoadFromFile(testPngPath.native()));
     ASSERT_GT(img.GetData().size(), static_cast<size_t>(0));
-    ASSERT_EQ(img.GetSize().x, 32);
-    ASSERT_EQ(img.GetSize().y, 33);
+    ASSERT_EQ(img.GetSize(), Size(32, 33));
+    ASSERT_EQ(img.GetSize().height, 33);
     ASSERT_EQ(img.GetColorChannels(), 4);
-    ASSERT_EQ(img.GetGLColorChannels(), GL_RGBA);
 }
 
 TEST(Image, PositiveLoadImageFileJPEG)
@@ -43,10 +44,8 @@ TEST(Image, PositiveLoadImageFileJPEG)
     std::filesystem::path testJpgPath(TEST_DATA_PATH / std::filesystem::path("test_jpg.jpg"));
     Image img(Image::LoadFromFile(testJpgPath.native()));
     ASSERT_GT(img.GetData().size(), static_cast<size_t>(0));
-    ASSERT_EQ(img.GetSize().x, 32);
-    ASSERT_EQ(img.GetSize().y, 33);
+    ASSERT_EQ(img.GetSize(), Size(32, 33));
     ASSERT_EQ(img.GetColorChannels(), 3);
-    ASSERT_EQ(img.GetGLColorChannels(), GL_RGB);
 }
 
 TEST(Image, PositiveLoadImageBinary)
@@ -74,10 +73,8 @@ TEST(Image, NegativeLoadImageFile)
     std::filesystem::path testJpgPath(TEST_DATA_PATH);
     Image img(Image::LoadFromFile(testJpgPath.native()));
     ASSERT_EQ(img.GetData().size(), static_cast<size_t>(0));
-    ASSERT_EQ(img.GetSize().x, 0);
-    ASSERT_EQ(img.GetSize().y, 0);
+    ASSERT_EQ(img.GetSize(), Size(0, 0));
     ASSERT_EQ(img.GetColorChannels(), 0);
-    ASSERT_EQ(img.GetGLColorChannels(), GL_INVALID_VALUE);
 }
 
 TEST(Sound, PositiveLoadFromFile1)
@@ -216,7 +213,7 @@ TEST(ArxWindow, DISABLED_PositiveEndAfter2Seconds)
     GameApp::GetGlobalApp()->Run();
 }
 
-TEST(ArxWindow, PositiveMultiWindow)
+TEST(ArxWindow, DISABLED_PositiveMultiWindow)
 {
     ArxWindow *win = new ArxWindow("test", Size(300, 300));
     win->Show();
@@ -224,7 +221,7 @@ TEST(ArxWindow, PositiveMultiWindow)
     t->GetEventManager().Bind<TimerEvent>([win](TimerEvent &){win->SetBackgroundColor(arx::Color((uint)rand() % 255, (uint)rand() % 255, (uint)rand() % 255)); win->Draw(); });
     t->SetInterval(std::chrono::seconds(1));
     t->Start(Timer::TimerType::CONTINUOUS);
-    /*
+
     ArxWindow *win2 = new ArxWindow("test", Size(300, 300), Position(300, 1));
     win2->Show();
     Timer *t2 = new Timer(win2);
@@ -234,7 +231,30 @@ TEST(ArxWindow, PositiveMultiWindow)
         win2->Draw(); 
     });
     t2->SetInterval(std::chrono::seconds(1));
-    t2->Start(Timer::TimerType::CONTINUOUS);*/
+    t2->Start(Timer::TimerType::CONTINUOUS);
+
+    GameApp::GetGlobalApp()->Run();
+}
+
+TEST(ArxWindow, PositivePainterTest1)
+{
+    ArxWindow *win = new ArxWindow("test", Size(300, 300));
+    win->Show();
+    Texture2D *testTexture = new Texture2D(win);
+    std::filesystem::path testJpgPath(TEST_DATA_PATH / std::filesystem::path("test_jpg.jpg"));
+    testTexture->SetData(Image::LoadFromFile(testJpgPath.native()));
+    win->GetEventManager().Bind<DrawEvent>([win, testTexture](DrawEvent &e){
+        (void)win;
+        Painter painter(e);
+        painter.Clear();
+        painter.SetBrush(Brush(Color(100, 200, 100)));
+        painter.DrawRectangle(Position(60, 60), Size(100, 100));
+        painter.SetBrush(Brush(Color(10, 50, 100)));
+        painter.DrawRectangle(Position(0, 0), Size(40, 40));
+        painter.SetBrush(Brush(Color(0, 0, 0)));
+        painter.DrawRectangle(Position(150, 200), Size(60, 60));
+        painter.DrawTexture2D(Position(0, 0), Size(100, 100), testTexture);
+    });
 
     GameApp::GetGlobalApp()->Run();
 }

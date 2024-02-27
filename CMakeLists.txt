@@ -33,6 +33,9 @@ list(APPEND SOURCES
     ${SOURCE_PATH}/internal/gl/VAO.cpp
     ${SOURCE_PATH}/ui/Painter.cpp
     ${SOURCE_PATH}/ui/internal/UICache.cpp
+    ${SOURCE_PATH}/ui/Brush.cpp
+    ${SOURCE_PATH}/gl/Texture.cpp
+    ${SOURCE_PATH}/gl/Texture2D.cpp
 )
 set(CMAKE_EXPORT_COMPILE_COMMANDS True)
 set(gcc_like_cxx "$<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang,GNU,LCC>")

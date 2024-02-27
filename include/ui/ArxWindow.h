@@ -67,6 +67,9 @@ public:
     virtual ~ArxWindow();
 
     UICache *GetUICache();
+    
+    /* full redraw */
+    void Draw();
 
 private:
     void RecalculateSizes(Size s);
@@ -76,7 +79,9 @@ private:
     static void PositionCallback(GLFWwindow *win, int x, int y);
     static void CloseCallback(GLFWwindow *win);
     static void RefreshCallback(GLFWwindow *win);
-    static void SetGlfwCallbacks(GLFWwindow *win); 
+    static void SetGlfwCallbacks(GLFWwindow *win);
+
+    static void DrawInternal(UIObject *obj);
 private:
     std::unique_ptr<GLFWwindow, void(*)(GLFWwindow*)> m_win;
     Size m_clientSize;

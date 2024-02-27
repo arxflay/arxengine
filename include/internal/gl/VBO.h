@@ -37,7 +37,8 @@ public:
     std::enable_if_t<std::is_same_v<typename std::iterator_traits<It>::iterator_category, std::random_access_iterator_tag>>
     SetData(It begin, It end, BufferUsage usage = BufferUsage::Stream)
     {
-        OldVBOGuard guard; 
+        OldVBOGuard guard;
+        Bind();
         auto elementSize = sizeof(typename std::iterator_traits<It>::value_type);
         auto count = std::distance(begin, end);
         glBufferData(GL_ARRAY_BUFFER, elementSize * count, &(*begin), static_cast<GLenum>(usage)); 

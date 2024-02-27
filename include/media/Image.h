@@ -2,7 +2,7 @@
 #define ARX_IMAGE_H
 #include "ArxDefines.h"
 
-#include <glm/vec2.hpp>
+#include "ui/Size.h"
 #include <string_view>
 #include <vector>
 
@@ -13,11 +13,9 @@ class Image final
 public:
     bool operator==(const Image &img) const;
 
-    glm::ivec2 GetSize() const;
+    Size GetSize() const;
     int GetColorChannels() const;
     const std::vector<uint8_t> &GetData() const;
-    
-    int GetGLColorChannels() const;
     bool IsInvalid() const;
     
     //jpeg, png, gif
@@ -25,7 +23,7 @@ public:
     static Image LoadFromBinary(const std::vector<uint8_t> &binaryData, bool flipVerticaly = true);
 private:
     Image();
-    glm::ivec2 m_size;
+    Size m_size;
     int m_colorChannels;
     std::vector<uint8_t> m_data;
 };

@@ -42,7 +42,6 @@ public:
 
     virtual void Show(bool visible = true) = 0;
     virtual void Hide();
-    void Draw();
 
     //only UIObject can be parent
     void Reparent(ArxObject *parent) override;
@@ -51,6 +50,7 @@ protected:
     //this constructor is used for windows
     UIObject();
 private:
+
     Size m_size;
     Position m_position;
     ArxWindow *m_ownerWindow;
