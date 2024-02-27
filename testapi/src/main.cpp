@@ -245,6 +245,7 @@ TEST(ArxWindow, PositivePainterTest1)
     Image img(Image::LoadFromFile(testJpgPath.native()));
     win->SetIcon(img);
     testTexture->SetData(img);
+    win->SetFixedViewport(300, 300);
     win->GetEventManager().Bind<DrawEvent>([win, testTexture](DrawEvent &e){
         (void)win;
         Painter painter(e);

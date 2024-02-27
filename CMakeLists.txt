@@ -27,7 +27,7 @@ list(APPEND SOURCES
     ${SOURCE_PATH}/ArxObject.cpp
     ${SOURCE_PATH}/evt/UIEventProcessor.cpp
     ${SOURCE_PATH}/Timer.cpp
-    ${SOURCE_PATH}/internal/gl/Scissorbox.cpp
+    ${SOURCE_PATH}/internal/gl/ClippingArea.cpp
     ${SOURCE_PATH}/internal/gl/Shader.cpp
     ${SOURCE_PATH}/internal/gl/VBO.cpp
     ${SOURCE_PATH}/internal/gl/VAO.cpp

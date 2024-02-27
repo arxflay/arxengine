@@ -3,7 +3,7 @@
 
 #include "ArxDefines.h"
 #include "UIObject.h"
-#include <glm/mat4x4.hpp>
+#include "Viewport.h"
 #include <string_view>
 
 struct GLFWwindow;
@@ -64,7 +64,7 @@ public:
     virtual void SetFixedViewport(float width, float height);
     virtual void RemoveFixedViewport();
 
-    virtual const glm::mat4 &GetViewport();
+    virtual const Viewport &GetViewport();
     virtual ~ArxWindow();
 
     UICache *GetUICache();
@@ -75,6 +75,8 @@ public:
     
     /* full redraw */
     void Draw();
+
+    bool IsEnabledClipToBounds() const override;
 
 private:
     void RecalculateSizes(Size s);
@@ -92,7 +94,7 @@ private:
     Size m_clientSize;
     int m_attributes;
     std::string m_title;
-    glm::mat4 m_viewport;
+    Viewport m_viewport;
     bool m_useFixedViewport;
     std::unique_ptr<UICache> m_uiCache;
 };

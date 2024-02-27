@@ -1,7 +1,6 @@
 #include "ArxObject.h"
 ARX_NAMESPACE_BEGIN
 
-
 ArxObject::ArxObject(ArxObject *parent)
     : m_parent(nullptr)
     , m_destroyCalled(false)

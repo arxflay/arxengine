@@ -8,6 +8,7 @@ UIObject::UIObject(UIObject *parent, Size size, Position pos)
     : m_size(size)
     , m_position(pos)
     , m_backgroundColor(defaults::COLOR_WHITE)
+    , m_clippingEnabled(true)
 {
     Reparent(parent);
 }
@@ -63,6 +64,16 @@ UIObject::UIObject()
 void DrawEvent::HandleEvent()
 {
 
+}
+
+void UIObject::EnableClipToBounds(bool enable)
+{
+    m_clippingEnabled = enable;
+}
+
+bool UIObject::IsEnabledClipToBounds() const
+{
+    return m_clippingEnabled;
 }
 
 ARX_NAMESPACE_END

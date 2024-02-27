@@ -45,16 +45,18 @@ public:
 
     //only UIObject can be parent
     void Reparent(ArxObject *parent) override;
+    virtual void EnableClipToBounds(bool enable = true);
+    virtual bool IsEnabledClipToBounds() const;
 
 protected:
     //this constructor is used for windows
     UIObject();
 private:
-
     Size m_size;
     Position m_position;
     ArxWindow *m_ownerWindow;
     Color m_backgroundColor;
+    bool m_clippingEnabled;
 };
 
 ARX_NAMESPACE_END

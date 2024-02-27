@@ -91,7 +91,7 @@ ArxWindow::ArxWindow(std::string_view title, Size size , Position position, int 
         painter.Clear();
     });
 
-    m_viewport = glm::ortho(0.0f, size.width, 0.0f, size.height);
+    m_viewport = Viewport{glm::ortho(0.0f, size.width, 0.0f, size.height), size };
     m_uiCache->Init();
     RegisterWindowFromWindowList();
 
@@ -156,7 +156,7 @@ void ArxWindow::RecalculateSizes(Size s)
     Size newClientSize = MakeSizeValid(s);
     m_clientSize = newClientSize;
     if (!m_useFixedViewport)
-        m_viewport = glm::ortho(0.0f, m_clientSize.width, 0.0f, m_clientSize.height);
+        m_viewport = Viewport{ glm::ortho(0.0f, m_clientSize.width, 0.0f, m_clientSize.height), m_clientSize };
 
     WindowBorders borders = GetWindowBorders();
     Size newSize = Size(newClientSize.width + static_cast<float>(borders.left + borders.right), newClientSize.height + static_cast<float>(borders.bottom + borders.top));
@@ -208,18 +208,18 @@ void ArxWindow::SetAsCurrentContext()
 void ArxWindow::SetFixedViewport(float width, float height)
 {
     m_useFixedViewport = true;
-    m_viewport = glm::ortho(0.0f, width, 0.0f, height);
+    m_viewport = Viewport{glm::ortho(0.0f, width, 0.0f, height), Size(width, height)};
     Draw();
 }
 
 void ArxWindow::RemoveFixedViewport()
 {
     m_useFixedViewport = false;
-    m_viewport = glm::ortho(0.0f, GetClientSize().width, 0.0f, GetClientSize().height);
+    m_viewport = Viewport{glm::ortho(0.0f, GetClientSize().width, 0.0f, GetClientSize().height), GetClientSize() };
     Draw();
 }
 
-const glm::mat4 &ArxWindow::GetViewport()
+const Viewport &ArxWindow::GetViewport()
 {
     return m_viewport;
 }
@@ -296,6 +296,11 @@ bool ArxWindow::SetIcon(std::optional<std::reference_wrapper<const Image>> img)
     glfwSetWindowIcon(m_win.get(), 1, &glfwImg); 
     
     return true;
+}
+
+bool ArxWindow::IsEnabledClipToBounds() const
+{
+    return false;
 }
 
 ARX_NAMESPACE_END
