@@ -241,8 +241,10 @@ TEST(ArxWindow, PositivePainterTest1)
     ArxWindow *win = new ArxWindow("test", Size(300, 300));
     win->Show();
     Texture2D *testTexture = new Texture2D(win);
-    std::filesystem::path testJpgPath(TEST_DATA_PATH / std::filesystem::path("test_jpg.jpg"));
-    testTexture->SetData(Image::LoadFromFile(testJpgPath.native()));
+    std::filesystem::path testJpgPath(TEST_DATA_PATH / std::filesystem::path("test_png.png"));
+    Image img(Image::LoadFromFile(testJpgPath.native()));
+    win->SetIcon(img);
+    testTexture->SetData(img);
     win->GetEventManager().Bind<DrawEvent>([win, testTexture](DrawEvent &e){
         (void)win;
         Painter painter(e);

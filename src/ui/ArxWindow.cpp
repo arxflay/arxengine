@@ -3,8 +3,6 @@
 #include "ui/Painter.h"
 #include <GLFW/glfw3.h>
 #include <glm/ext/matrix_clip_space.hpp>
-#include <iostream>
-#include "gl/Texture2D.h"
 #include "media/Image.h"
 ARX_NAMESPACE_BEGIN
 
@@ -276,6 +274,28 @@ void ArxWindow::Draw()
     DrawInternal(this);
     std::unique_ptr<SwapBuffersEvent> evt(std::make_unique<SwapBuffersEvent>(m_win.get()));
     GetEventManager().QueueEvent<SwapBuffersEvent>(std::move(evt));
+}
+
+bool ArxWindow::SetIcon(std::optional<std::reference_wrapper<const Image>> img)
+{
+    if (!img.has_value())
+    {
+        glfwSetWindowIcon(m_win.get(), 1, nullptr);
+        return true;
+    }
+    
+    if (img->get().GetColorChannels() != 4) //accept only RGBA
+        return false;
+    
+    GLFWimage glfwImg;
+    glfwImg.height = static_cast<int>(img->get().GetSize().height);
+    glfwImg.width = static_cast<int>(img->get().GetSize().width);
+    
+    //glfw will not modify buffer so don't worry
+    glfwImg.pixels = const_cast<unsigned char*>(img->get().GetData().data()); 
+    glfwSetWindowIcon(m_win.get(), 1, &glfwImg); 
+    
+    return true;
 }
 
 ARX_NAMESPACE_END

@@ -11,6 +11,7 @@ struct GLFWwindow;
 ARX_NAMESPACE_BEGIN
 
 class UICache;
+class Image;
 
 class ArxWindow : public UIObject
 {
@@ -67,6 +68,10 @@ public:
     virtual ~ArxWindow();
 
     UICache *GetUICache();
+    
+    //accept only RGBA 8byte per channel images
+    //nullopt == unset icon
+    bool SetIcon(std::optional<std::reference_wrapper<const Image>> img);
     
     /* full redraw */
     void Draw();
