@@ -36,6 +36,7 @@ list(APPEND SOURCES
     ${SOURCE_PATH}/ui/Brush.cpp
     ${SOURCE_PATH}/gl/Texture.cpp
     ${SOURCE_PATH}/gl/Texture2D.cpp
+    ${SOURCE_PATH}/internal/al/SoundDevice.cpp
 )
 set(CMAKE_EXPORT_COMPILE_COMMANDS True)
 set(gcc_like_cxx "$<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang,GNU,LCC>")

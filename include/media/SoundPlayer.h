@@ -6,11 +6,7 @@
 ARX_NAMESPACE_BEGIN
 
 class Sound;
-class SoundDeviceContextPair;
-
-/*user is reponsible for cleanup*/
-SoundDeviceContextPair *CreateSoundDeviceContextPair(std::string_view deviceName); //throws on failure
-void DestroySoundDeviceContextPair(SoundDeviceContextPair *pair); //throws on failure
+class SoundContext;
 
 class SoundPlayer final
 {
@@ -20,15 +16,15 @@ public:
         Async, //runs in openal thread 
         Sync //runs in current thread
     };
-    
-    SoundPlayer(SoundDeviceContextPair *SoundDeviceContextPair = nullptr);
+    //for now accept only default device 
+    SoundPlayer();
     void LoadSound(const Sound &sound);
     void Play(PlayMode mode, bool loop = false);
     bool IsPlaying();
     void Stop();
     ~SoundPlayer();
 private:
-    SoundDeviceContextPair *m_pair;
+    SoundContext *m_soundContext;
     unsigned int m_buffer;
     unsigned int m_source;
 };

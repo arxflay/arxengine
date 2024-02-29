@@ -58,6 +58,11 @@ ArxWindow::ArxWindow(std::string_view title, Size size , Position position, int 
     , m_useFixedViewport(false)
     , m_uiCache(std::make_unique<UICache>())
 {
+    glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+    glfwWindowHint(GLFW_FOCUS_ON_SHOW, GLFW_TRUE);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, defaults::GL_VERSION_MAJOR);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, defaults::GL_VERSION_MINOR);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     /*if (isFullScreen) //TODO fullscreen
     {
         

@@ -125,12 +125,6 @@ TEST(SoundPlayer, DISABLED_PositivePlayMultiple)
     SoundPlayer player;
     player.LoadSound(snd);
     player.Play(SoundPlayer::PlayMode::Sync, false);
-    
-    SoundDeviceContextPair *pair = nullptr;
-    EXPECT_NO_THROW(pair = CreateSoundDeviceContextPair("HyperX 7.1 Audio Analog Stereo"));
-    SoundPlayer player2(pair);
-    player2.LoadSound(snd);
-    player2.Play(SoundPlayer::PlayMode::Sync, false);
 }
 
 TEST(Hex, PositiveHexToByte)

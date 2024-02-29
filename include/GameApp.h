@@ -10,7 +10,8 @@
 ARX_NAMESPACE_BEGIN
 
 class EventProcessor;
-class SoundDeviceContextPair;
+class SoundDevice;
+class SoundContext;
 class FontLibrary;
 class ArxWindow;
 
@@ -28,7 +29,6 @@ class GameApp
 {
 private:
     friend class DeleteEvent;
-
 public:
     static int SetAppAsGlobal(std::unique_ptr<GameApp> &&app);
     static GameApp *GetGlobalApp();
@@ -43,7 +43,7 @@ public:
     //all existed windows will closed and deleted 
     int Exit(int code);
    
-    SoundDeviceContextPair &GetSoundDeviceContextPair();
+    SoundContext &GetDefaultSoundDeviceContext();
     FontLibrary &GetFontLibrary();
     EventProcessor &GetEventProcessor();
     const ArxWindowSet &GetWindowSet();
@@ -64,7 +64,8 @@ private:
     ArxWindowSet m_windows;
     std::queue<ArxObject*> m_deleteQueue;
     std::unique_ptr<EventProcessor> m_eventProcessor;
-    std::unique_ptr<SoundDeviceContextPair, void(*)(SoundDeviceContextPair*)> m_soundDeviceContextPair;
+    std::unique_ptr<SoundDevice> m_soundDevice;
+    std::unique_ptr<SoundContext> m_soundContext;
     std::unique_ptr<FontLibrary, void(*)(FontLibrary*)> m_fontLibrary;
 };
 

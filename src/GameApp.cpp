@@ -2,22 +2,30 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "internal/UniversalExceptionHandler.h"
-#include "media/SoundPlayer.h"
 #include "media/Font.h"
 #include "logging/Logger.h"
 #include "evt/UIEventProcessor.h"
 #include "ArxObject.h"
 #include "ui/ArxWindow.h"
-
+#include "internal/al/SoundDevice.h"
 
 ARX_NAMESPACE_BEGIN
 
 namespace internal
 {
-    SoundDeviceContextPair *InitAL()
+    std::pair<std::unique_ptr<SoundDevice>, std::unique_ptr<SoundContext>> InitAL()
     {
         GLOG->Info("Initializing OpenAL...");
-        return CreateSoundDeviceContextPair("");
+        GLOG->Info("Creating OpenAL default device");
+        std::unique_ptr<SoundDevice> soundDevice(std::make_unique<SoundDevice>());
+        if (soundDevice->IsInvalid())
+            throw ArxException(ArxException::ErrorCode::FailedToInitializeOpenAL, "Failed to create default OpenAL device");
+        GLOG->Info("Creating OpenAL default device context");
+        std::unique_ptr<SoundContext> soundContext(std::make_unique<SoundContext>(soundDevice->CreateContext()));
+        if (soundContext->IsInvalid())
+            throw ArxException(ArxException::ErrorCode::FailedToInitializeOpenAL, "Failed to create default OpenAL device context");
+
+        return std::make_pair(std::move(soundDevice), std::move(soundContext));
     }
 
     FontLibrary *InitFT()
@@ -32,12 +40,6 @@ namespace internal
         int err = glfwInit();
         if (err != GLFW_TRUE)
             throw ArxException(ArxException::ErrorCode::FailedToInitializeFreetype, Utils::Format("Failed to initialize glfw library, glfw_error_code='%d'", err));
-
-        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-        glfwWindowHint(GLFW_FOCUS_ON_SHOW, GLFW_TRUE);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, defaults::GL_VERSION_MAJOR);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, defaults::GL_VERSION_MINOR);
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     }
 }
 
@@ -66,7 +68,6 @@ std::unique_ptr<GameApp> g_app;
 GameApp::GameApp()
     : m_initialized(false)
     , m_eventProcessor(nullptr)
-    , m_soundDeviceContextPair(nullptr, DestroySoundDeviceContextPair)
     , m_fontLibrary(nullptr, DestroyFontLibrary)
 {
     CleanUp();
@@ -84,7 +85,9 @@ int GameApp::Init()
             throw ArxException(ArxException::ErrorCode::GameAppAlreadyInitialized, "App is already inititalized");
     
         internal::InitGLFW();
-        m_soundDeviceContextPair.reset(internal::InitAL());
+        auto m_soundDeviceContextPair = internal::InitAL();
+        m_soundDevice = std::move(m_soundDeviceContextPair.first);
+        m_soundContext = std::move(m_soundDeviceContextPair.second);
         m_fontLibrary.reset(internal::InitFT());
         m_eventProcessor = std::make_unique<UIEventProcessor>();
         OnAfterInit();
@@ -95,7 +98,8 @@ int GameApp::Init()
     {
         code = static_cast<int>(UniversalExceptionHandler::HandleException());
         GLOG->Info("Initialization failed");
-        m_soundDeviceContextPair.reset();
+        m_soundContext.reset();
+        m_soundDevice.reset();
         m_fontLibrary.reset();
         glfwTerminate();
     }
@@ -177,11 +181,11 @@ int GameApp::Exit(int code)
     return static_cast<int>(ArxException::ErrorCode::NoError);
 }
 
-SoundDeviceContextPair &GameApp::GetSoundDeviceContextPair()
+SoundContext &GameApp::GetDefaultSoundDeviceContext()
 {
     if(!GameApp::GetGlobalApp() || !GameApp::GetGlobalApp()->IsInitialized())
         throw ArxException(ArxException::ErrorCode::GameAppNotInitialized, "GameApp is not initialized");
-    return *m_soundDeviceContextPair.get();
+    return *m_soundContext.get();
 }
 
 FontLibrary &GameApp::GetFontLibrary()
