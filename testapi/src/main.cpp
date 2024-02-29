@@ -238,6 +238,33 @@ TEST(ArxWindow, DISABLED_PositiveMultiWindow)
 
 TEST(ArxWindow, PositivePainterTest1)
 {
+    ArxWindow *win = new ArxWindow("test", Size(640, 360));
+    win->Show();
+    Texture2D *testTexture = new Texture2D(win);
+    std::filesystem::path testJpgPath(TEST_DATA_PATH / std::filesystem::path("test_png.png"));
+    Image img(Image::LoadFromFile(testJpgPath.native()));
+    win->SetIcon(img);
+    testTexture->SetData(img);
+    win->SetFixedViewport(640, 360);
+    win->SetWindowAspectRatio(16, 9);
+    win->GetEventManager().Bind<DrawEvent>([win, testTexture](DrawEvent &e){
+        (void)win;
+        Painter painter(e);
+        painter.Clear();
+        painter.SetBrush(Brush(Color(100, 200, 100)));
+        painter.DrawRectangle(Position(60, 60), Size(100, 100));
+        painter.SetBrush(Brush(Color(10, 50, 100)));
+        painter.DrawRectangle(Position(0, 0), Size(40, 40));
+        painter.SetBrush(Brush(Color(0, 0, 0)));
+        painter.DrawRectangle(Position(150, 200), Size(60, 60));
+        painter.DrawTexture2D(Position(0, 0), Size(100, 100), testTexture);
+    });
+
+    GameApp::GetGlobalApp()->Run();
+}
+
+TEST(ArxWindow, DISABLED_PositivePainterTest2)
+{
     ArxWindow *win = new ArxWindow("test", Size(300, 300));
     win->Show();
     Texture2D *testTexture = new Texture2D(win);
@@ -245,7 +272,6 @@ TEST(ArxWindow, PositivePainterTest1)
     Image img(Image::LoadFromFile(testJpgPath.native()));
     win->SetIcon(img);
     testTexture->SetData(img);
-    win->SetFixedViewport(300, 300);
     win->GetEventManager().Bind<DrawEvent>([win, testTexture](DrawEvent &e){
         (void)win;
         Painter painter(e);

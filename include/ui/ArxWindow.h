@@ -78,6 +78,9 @@ public:
 
     bool IsEnabledClipToBounds() const override;
 
+    //To disable the aspect ratio limit for a window, set both terms to defaults::IGNORE
+    bool SetWindowAspectRatio(int numer, int denom);
+
 private:
     void RecalculateSizes(Size s);
     void RegisterWindowFromWindowList();

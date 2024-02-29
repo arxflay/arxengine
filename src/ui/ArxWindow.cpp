@@ -303,4 +303,14 @@ bool ArxWindow::IsEnabledClipToBounds() const
     return false;
 }
 
+bool ArxWindow::SetWindowAspectRatio(int numer, int denom)
+{
+    if (numer != defaults::IGNORE && denom != defaults::IGNORE && (numer <= 0 || denom <= 0))
+        return false;
+
+    glfwSetWindowAspectRatio(m_win.get(), numer, denom);
+    return true;
+}
+
+
 ARX_NAMESPACE_END
