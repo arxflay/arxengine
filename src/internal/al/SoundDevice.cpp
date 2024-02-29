@@ -33,7 +33,7 @@ bool SoundContext::IsBound()
 
 bool SoundContext::IsInvalid()
 {
-    return !!m_context.get();
+    return !m_context.get();
 }
 
 SoundContext::~SoundContext()
@@ -67,7 +67,7 @@ SoundDevice::SoundDevice(std::string_view deviceName)
 
 bool SoundDevice::IsInvalid()
 {
-    return m_device.get();
+    return !m_device.get();
 }
 
 SoundContext SoundDevice::CreateContext()
