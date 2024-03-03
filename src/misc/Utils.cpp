@@ -7,6 +7,8 @@
 #include <numeric>
 #include <cstring>
 #include <charconv>
+#include <fstream>
+#include <sstream>
 ARX_NAMESPACE_BEGIN
 constexpr std::string_view BASE64_CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 constexpr char BASE64_PADDING_CHAR = '=';
@@ -189,4 +191,33 @@ static inline Utils::Base64DecodeErrCode Base64DecodeInternal(std::string_view e
     return err;
 }
 
+/*static*/ Utils::LoadFileErrorCode Utils::LoadBinaryFile(std::string_view filename, std::vector<uint8_t> &data)
+{
+    std::ifstream file(filename.data(), std::ios::binary | std::ios::in);
+    if (file.fail() || file.bad())
+        return Utils::LoadFileErrorCode::FailedToOpenFile;
+
+    file.seekg(0, std::ios::end);
+    std::vector<uint8_t> binaryData(file.tellg() < 0 ? 0 : static_cast<size_t>(file.tellg()));
+    file.seekg(0, std::ios::beg);
+    file.read(reinterpret_cast<char*>(binaryData.data()), static_cast<std::streamsize>(binaryData.size()));
+    file.close(); 
+    data = std::move(binaryData);
+
+    return Utils::LoadFileErrorCode::NoError;
+}
+
+/*static*/ Utils::LoadFileErrorCode Utils::LoadFile(std::string_view filename, std::string &data)
+{
+    std::ifstream file(filename.data());
+    if (file.fail() || file.bad())
+        return Utils::LoadFileErrorCode::FailedToOpenFile;
+   
+    std::stringstream stream;
+    stream << file.rdbuf();
+    file.close();
+    data = stream.str();
+
+    return Utils::LoadFileErrorCode::NoError;
+}
 ARX_NAMESPACE_END

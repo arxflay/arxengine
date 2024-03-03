@@ -29,10 +29,9 @@ int Image::GetColorChannels() const { return m_colorChannels; }
 const std::vector<uint8_t> &Image::GetData() const { return m_data; }
 
 
-
 bool Image::IsInvalid() const
 {
-    return m_data.empty() || m_size == Size(0, 0) || m_colorChannels > 4 || m_colorChannels < 0;
+    return m_data.empty() || m_size == Size(0, 0) || m_colorChannels > 4 || m_colorChannels <= 0;
 }
 
 /*static*/ Image Image::LoadFromFile(std::string_view filename, bool flipVerticaly)
@@ -47,17 +46,25 @@ bool Image::IsInvalid() const
     return img;
 }
 
-/*static*/ Image Image::LoadFromBinary(const std::vector<uint8_t> &binaryData, bool flipVerticaly)
+/*static*/ Image Image::LoadFromBinary(const uint8_t *binaryData, size_t binaryDataLen, bool flipVerticaly)
 {
     stbi_set_flip_vertically_on_load(flipVerticaly);
     Image img;
     int width = 0, height = 0;
-    std::unique_ptr<void, void(*)(void*)> data{ stbi_load_from_memory(binaryData.data(), static_cast<int>(binaryData.size()), &width, &height, &img.m_colorChannels, 0), stbi_image_free };
+    std::unique_ptr<void, void(*)(void*)> data{ stbi_load_from_memory(binaryData, static_cast<int>(binaryDataLen), &width, &height, &img.m_colorChannels, 0), stbi_image_free };
     const uint8_t *dataBytePtr = reinterpret_cast<uint8_t*>(data.get());
     img.m_size = Size(width, height);
     img.m_data.insert(img.m_data.end(), dataBytePtr, dataBytePtr + (width * height) * img.m_colorChannels);
     return img;
+}
 
+/*static*/ Image Image::LoadFromData(Size imageSize, int colorChannels, const uint8_t *data)
+{
+    Image img;
+    img.m_size = imageSize;
+    img.m_data.insert(img.m_data.end(), data, data + static_cast<ptrdiff_t>(imageSize.height * imageSize.width * static_cast<float>(colorChannels))); 
+    img.m_colorChannels = colorChannels;
+    return img;
 }
 
 Image::Image()

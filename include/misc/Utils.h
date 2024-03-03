@@ -48,6 +48,15 @@ public:
 
     static HexConversionErrorCode GetByteFromHexStr(std::string_view hexStr, uint8_t &byte);
     static HexConversionErrorCode HexStrToBin(std::string_view hexStr, uint8_t *data, size_t len);
+    
+    enum class LoadFileErrorCode
+    {
+        NoError,
+        FailedToOpenFile
+    };
+
+    static LoadFileErrorCode LoadBinaryFile(std::string_view filename, std::vector<uint8_t> &data);
+    static LoadFileErrorCode LoadFile(std::string_view filename, std::string &data);
 };
 
 ARX_NAMESPACE_END

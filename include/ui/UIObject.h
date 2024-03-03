@@ -7,6 +7,7 @@
 #include "Position.h"
 #include "ArxObject.h"
 #include <list>
+#include "FontCache.h"
 
 ARX_NAMESPACE_BEGIN
 
@@ -15,12 +16,15 @@ class UIObject;
 
 class DrawEvent : public Event
 {
+friend class ArxWindow;
 private:
+    DrawEvent() = default;
     void HandleEvent() override;
 };
 
 class UIObject : public ArxObject
 {
+friend class ArxWindow;
 public:
     UIObject(UIObject *parent, Size size = defaults::DEFAULT_SIZE, Position pos = defaults::DEFAULT_POSITION);
     
@@ -39,7 +43,7 @@ public:
     virtual Position GetPosition() const;
     
     ArxWindow *GetOwnerWindow();
-
+    
     virtual void Show(bool visible = true) = 0;
     virtual void Hide();
 
@@ -48,15 +52,19 @@ public:
     virtual void EnableClipToBounds(bool enable = true);
     virtual bool IsEnabledClipToBounds() const;
 
-protected:
+    FontCache *GetFontCache();
+    Font &GetFont();
+    void SetFont(Font &&font);
+private:
     //this constructor is used for windows
     UIObject();
-private:
     Size m_size;
     Position m_position;
     ArxWindow *m_ownerWindow;
     Color m_backgroundColor;
     bool m_clippingEnabled;
+    Font m_font;
+    FontCache *m_fontCache;
 };
 
 ARX_NAMESPACE_END

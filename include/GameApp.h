@@ -66,9 +66,11 @@ private:
     std::unique_ptr<EventProcessor> m_eventProcessor;
     std::unique_ptr<SoundDevice> m_soundDevice;
     std::unique_ptr<SoundContext> m_soundContext;
-    std::unique_ptr<FontLibrary, void(*)(FontLibrary*)> m_fontLibrary;
+    std::unique_ptr<FontLibrary> m_fontLibrary;
 };
 
+
+#define GlobalGameApp ::ARX_NAMESPACE::GameApp::GetGlobalApp()
 
 #ifdef _WIN32
 #include <winbase.h>

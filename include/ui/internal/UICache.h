@@ -27,7 +27,8 @@ public:
     enum class SHADER_PROGRAM_ID
     {
         RECTANGLE,
-        IMAGE /*RECT VAO AND VBO*/
+        IMAGE, /*RECT VAO AND VBO*/
+        TEXT /*RECT VAO AND VBO*/
     };
 
     using VAOMap = std::map<VAO_ID, VAO>;
@@ -55,6 +56,7 @@ public:
 private:
     void InitRectangleData();
     void InitImageData();
+    void InitTextData();
 
     bool m_initialized;
     VAOMap m_vaos; 

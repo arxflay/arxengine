@@ -12,7 +12,7 @@ class Image final
 {
 public:
     bool operator==(const Image &img) const;
-
+    Image();
     Size GetSize() const;
     int GetColorChannels() const;
     const std::vector<uint8_t> &GetData() const;
@@ -20,9 +20,9 @@ public:
     
     //jpeg, png, gif
     static Image LoadFromFile(std::string_view filename, bool flipVerticaly = true);
-    static Image LoadFromBinary(const std::vector<uint8_t> &binaryData, bool flipVerticaly = true);
+    static Image LoadFromBinary(const uint8_t *binaryData, size_t binaryDataLen, bool flipVerticaly = true);
+    static Image LoadFromData(Size imageSize, int colorChannels, const uint8_t *data);
 private:
-    Image();
     Size m_size;
     int m_colorChannels;
     std::vector<uint8_t> m_data;

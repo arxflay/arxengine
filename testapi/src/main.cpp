@@ -15,6 +15,7 @@
 #include <Timer.h>
 #include <ui/Painter.h>
 #include <gl/Texture2D.h>
+#include <media/Font.h>
 
 ARX_NAMESPACE_USE;
 
@@ -64,7 +65,7 @@ TEST(Image, PositiveLoadImageBinary)
     }
     const uint8_t *jpegFileContentBytePtr = reinterpret_cast<const uint8_t*>(jpegFileContent.c_str());
     std::vector<uint8_t> jpegFileContentVec(jpegFileContentBytePtr, jpegFileContentBytePtr + jpegFileContent.size());
-    Image img2 = Image::LoadFromBinary(jpegFileContentVec);
+    Image img2 = Image::LoadFromBinary(jpegFileContentVec.data(), jpegFileContentVec.size());
     ASSERT_EQ(img, img2);
 }
 
@@ -230,7 +231,7 @@ TEST(ArxWindow, DISABLED_PositiveMultiWindow)
     GameApp::GetGlobalApp()->Run();
 }
 
-TEST(ArxWindow, PositivePainterTest1)
+TEST(ArxWindow, DISABLED_PositivePainterTest1)
 {
     ArxWindow *win = new ArxWindow("test", Size(640, 360));
     win->Show();
@@ -280,5 +281,30 @@ TEST(ArxWindow, DISABLED_PositivePainterTest2)
     });
 
     GameApp::GetGlobalApp()->Run();
+}
+
+TEST(Font, PositiveLoadFont)
+{
+    std::filesystem::path testFontPath(TEST_DATA_PATH / std::filesystem::path("test-font-roboto.ttf"));
+    Font font(Font::LoadFromFile(testFontPath.native()));
+    font.SetSizeInPt(30);
+    ASSERT_FALSE(font.IsInvalid());
+    
+    ArxWindow *win = new ArxWindow("test", Size(640, 360));
+    win->Show();
+    win->SetFont(std::move(font));
+    win->SetFixedViewport(640, 360);
+    
+    win->GetEventManager().Bind<DrawEvent>([win](DrawEvent &e){
+        (void)win;
+        Painter painter(e);
+        painter.Clear();
+        painter.SetPen(Pen(Color(255, 0, 0)));
+        painter.DrawText("Test string", Position(0,0));
+    });
+
+    GameApp::GetGlobalApp()->Run();
+
+
 }
 

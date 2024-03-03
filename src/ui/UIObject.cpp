@@ -9,6 +9,7 @@ UIObject::UIObject(UIObject *parent, Size size, Position pos)
     , m_position(pos)
     , m_backgroundColor(defaults::COLOR_WHITE)
     , m_clippingEnabled(true)
+    , m_fontCache(new FontCache(this))
 {
     Reparent(parent);
 }
@@ -58,7 +59,10 @@ UIObject::UIObject()
     , m_position(defaults::DEFAULT_POSITION)
     , m_ownerWindow(nullptr)
     , m_backgroundColor(defaults::COLOR_WHITE)
+    , m_clippingEnabled(false)
+    , m_fontCache(new FontCache(this))
 {
+
 }
 
 void DrawEvent::HandleEvent()
@@ -76,4 +80,18 @@ bool UIObject::IsEnabledClipToBounds() const
     return m_clippingEnabled;
 }
 
+FontCache *UIObject::GetFontCache()
+{
+    return m_fontCache;
+}
+
+Font &UIObject::GetFont() 
+{
+    return m_font;
+}
+
+void UIObject::SetFont(Font &&font)
+{
+    m_font = std::move(font);
+}
 ARX_NAMESPACE_END

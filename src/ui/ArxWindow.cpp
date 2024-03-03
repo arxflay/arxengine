@@ -51,7 +51,7 @@ namespace
 }
 
 //uncompelte fullscreen
-ArxWindow::ArxWindow(std::string_view title, Size size , Position position, int attributes) //, bool isFullScreen)
+ArxWindow::ArxWindow(std::string_view title, Size size, Position position, int attributes) //, bool isFullScreen)
     : m_win(nullptr, glfwDestroyWindow)
     , m_attributes(attributes)
     , m_title(title)
@@ -249,7 +249,7 @@ UICache *ArxWindow::GetUICache()
 
 /*static*/ void ArxWindow::DrawInternal(UIObject *obj)
 {
-    std::unique_ptr<DrawEvent> evt(std::make_unique<DrawEvent>());
+    std::unique_ptr<DrawEvent> evt(new DrawEvent);
     obj->GetEventManager().QueueEvent<DrawEvent>(std::move(evt));
     for (ArxObject *obj : const_cast<ArxObjectList&>(obj->GetChildren()))
     {

@@ -69,12 +69,14 @@ namespace
 Painter::Painter(DrawEvent &evt)
     : m_sender(dynamic_cast<UIObject*>(evt.GetSender()))
     , m_brush(m_sender->GetColor())
+    , m_pen(defaults::COLOR_BLACK)
 {
     if (m_sender->IsEnabledClipToBounds())
     {     
         m_clippingArea = std::make_unique<ClippingArea>();
         m_clippingArea->SetClipBox(CreateClipBox(m_sender));
     }
+
 }
 
 void Painter::DrawRectangle(Position pos, Size size)
@@ -105,6 +107,8 @@ void Painter::DrawRectangle(Position pos, Size size)
 
 void Painter::DrawTexture2D(Position pos, Size size, const Texture2D *tex)
 {
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     OldClippingAreaGuard clipGuard;
     OldVAOGuard vaoGuard;
     if (m_clippingArea)
@@ -124,6 +128,61 @@ void Painter::DrawTexture2D(Position pos, Size size, const Texture2D *tex)
     shader.SetTransformMatrices(modelMatrix, viewMatrix, GetViewport().projectionMatrix);
 
     glDrawArrays(GL_TRIANGLES, 0, 6);
+    glDisable(GL_BLEND);
+}
+
+void Painter::DrawText(std::string_view text, Position pos)
+{
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    OldClippingAreaGuard clipGuard;
+    OldVAOGuard vaoGuard;
+    if (m_clippingArea)
+        m_clippingArea->UseThisClippingArea();
+
+    
+    glm::mat4 viewMatrix = glm::mat4(1.0f);
+    
+    VAO &rectVao = GetUICache(m_sender)->GetVAOMap().at(UICache::VAO_ID::RECTANGLE);
+    rectVao.Bind();
+    Shader &shader = GetUICache(m_sender)->GetShaderMap().at(UICache::SHADER_PROGRAM_ID::TEXT);
+    shader.UseShader();
+    shader.SetUniformVec4("color", m_pen.GetColor().GetNormalizedColorRGBA());
+
+    bool stopRendering = false;
+    float biggestSize = 0;
+    for (char ch : text)
+    {
+        auto cacheEntry = m_sender->GetFontCache()->GetCacheEntry(ch);
+        if (!cacheEntry.has_value())
+        {
+            stopRendering = true;
+            break;
+        }
+
+        biggestSize = std::max(cacheEntry->get().GetGlyphDimensions().bearings.y, biggestSize);
+    }
+
+    Position drawingPos = CalculateDrawPosition(pos, Size(0.0f, biggestSize));
+
+    if (!stopRendering)
+    { 
+        for (char ch : text)
+        {
+            auto cacheEntry = m_sender->GetFontCache()->GetCacheEntry(ch);
+            const FontCache::FontCacheEntry &cacheEntryValue = cacheEntry.value().get();
+            drawingPos.x += cacheEntryValue.GetGlyphDimensions().bearings.x;
+            cacheEntryValue.GetTexture()->Bind();
+            
+            glm::mat4 modelMatrix = glm::mat4(1.0f);
+            modelMatrix = glm::translate(modelMatrix, glm::vec3(drawingPos.x, drawingPos.y + cacheEntryValue.GetGlyphDimensions().bearings.y - cacheEntryValue.GetGlyphDimensions().size.height, 0.0f));
+            modelMatrix = glm::scale(modelMatrix, glm::vec3(cacheEntryValue.GetGlyphDimensions().size.width, cacheEntryValue.GetGlyphDimensions().size.height, 0.0f));
+            shader.SetTransformMatrices(modelMatrix, viewMatrix, GetViewport().projectionMatrix);
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+            drawingPos.x += cacheEntryValue.GetGlyphDimensions().advance.x;
+        }
+    }
+    glDisable(GL_BLEND);
 }
 
 Position Painter::CalculateDrawPosition(Position drawPos, Size drawSize)
@@ -171,6 +230,16 @@ void Painter::SetBrush(const Brush &brush)
 const Brush &Painter::GetBrush() const
 {
     return m_brush;
+}
+
+void Painter::SetPen(const Pen &pen)
+{
+    m_pen = pen;
+}
+
+const Pen &Painter::GetPen() const
+{
+    return m_pen;
 }
 
 Painter::~Painter() = default;

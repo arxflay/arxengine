@@ -107,6 +107,20 @@ void Texture::SetTextureUnit(TextureUnit textureUnit)
 
     m_textureUnit = textureUnit;
 }
+namespace
+{
+    int DetermineBestPackingAlignmentSize(const Image &img)
+    {
+        int unpackAlignment = 1;
+        size_t width = static_cast<size_t>(img.GetSize().width);
+        if (width % 4 == 0)
+            unpackAlignment = 4;
+        else if (width % 2 == 0)
+            unpackAlignment = 2;
+
+        return unpackAlignment;
+    }
+}
 
 Texture::Texture(UIObject *obj)
     : m_texture(0)
@@ -134,8 +148,19 @@ bool Texture::Set2DData(const Image &img)
         GLOG->Error("Invalid texture type, got %d but expected", m_textureType, TextureType::Texture2D);
         return false;
     }
+    else if (img.IsInvalid())
+    {
+        GLOG->Error("Provided image is invalid");
+        return false;
+    }
+
     OldTextureGuard guard(GetTextureType());
     Bind();
+
+    //By default opengl reads by four bytes
+    glPixelStorei(GL_UNPACK_ALIGNMENT, DetermineBestPackingAlignmentSize(img));
+    
+    //format = how interpret data
     glTexImage2D(GL_TEXTURE_2D, 0, static_cast<GLint>(ImageChannelsToGL(img)), static_cast<GLsizei>(img.GetSize().width), static_cast<GLsizei>(img.GetSize().height), 0, ImageChannelsToGL(img), GL_UNSIGNED_BYTE, img.GetData().data());
     glGenerateMipmap(GL_TEXTURE_2D);
     return true;

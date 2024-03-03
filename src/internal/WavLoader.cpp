@@ -98,18 +98,10 @@ WavLoader::WavLoadCode GetData(DataExtractor &extractor, std::vector<uint8_t> &o
 {
     if (!std::filesystem::is_regular_file(filename))
         return WavLoadCode::FailedToOpenFile;
-    
-    std::ifstream file(filename.data(), std::ios::binary | std::ios::in);
-    if (file.fail() || file.bad())
+   
+    std::vector<uint8_t> binaryData;
+    if (Utils::LoadBinaryFile(filename, binaryData) != Utils::LoadFileErrorCode::NoError)
         return WavLoadCode::FailedToOpenFile;
-
-    //could use stringstream, but somehow this is faster
-    file.seekg(0, std::ios::end);
-    std::vector<uint8_t> binaryData(file.tellg() < 0 ? 0 : static_cast<size_t>(file.tellg()));
-    file.seekg(0, std::ios::beg);
-    file.read(reinterpret_cast<char*>(binaryData.data()), static_cast<std::streamsize>(binaryData.size()));
-    file.close();
-
     if (binaryData.empty())
         return WavLoadCode::EmptyFile;
 

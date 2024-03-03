@@ -4,6 +4,7 @@
 #include "Position.h"
 #include "Viewport.h"
 #include "Brush.h"
+#include "Pen.h"
 #include <memory>
 
 ARX_NAMESPACE_BEGIN
@@ -18,8 +19,12 @@ public:
     Painter(DrawEvent &evt);
     void DrawRectangle(Position pos, Size size);
     void DrawTexture2D(Position pos, Size size, const Texture2D *tex);
+    void DrawText(std::string_view text, Position pos);
     void SetBrush(const Brush &brush);
+    void SetPen(const Pen &pen);
+
     const Brush &GetBrush() const;
+    const Pen &GetPen() const;
     const Viewport &GetViewport();
     
     void Clear();
@@ -30,6 +35,7 @@ private:
     UIObject *m_sender;
     std::unique_ptr<ClippingArea> m_clippingArea;
     Brush m_brush;
+    Pen m_pen;
 };
 
 ARX_NAMESPACE_END

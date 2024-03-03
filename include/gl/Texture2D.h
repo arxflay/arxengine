@@ -10,7 +10,7 @@
 ARX_NAMESPACE_BEGIN
 class Image;
 
-class Texture2D final: protected Texture 
+class Texture2D final: public Texture 
 {
 public:
     Texture2D(UIObject *obj);

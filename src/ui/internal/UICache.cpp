@@ -86,6 +86,25 @@ void UICache::InitImageData()
     m_shaderPrograms.insert(std::make_pair(SHADER_PROGRAM_ID::IMAGE, std::move(shader)));
 }
 
+constexpr std::string_view TEXT_FRAGMENT_SHADER = R"(
+    #version 330 core
+    in vec2 TexPos;
+    out vec4 FragColor;
+    uniform sampler2D imageTex;
+    uniform vec4 color;
+    void main()
+    {
+        vec2 inversedTexPos = vec2(TexPos.x, 1 - TexPos.y);
+        float intesity = texture(imageTex, inversedTexPos).r;
+        FragColor = intesity * color;
+    }
+)";
+
+void UICache::InitTextData()
+{
+    Shader shader = Shader::FromData(IMAGE_VERTEX_SHADER, TEXT_FRAGMENT_SHADER, std::nullopt);
+    m_shaderPrograms.insert(std::make_pair(SHADER_PROGRAM_ID::TEXT, std::move(shader)));
+}
 
 void UICache::Init()
 {
@@ -93,6 +112,7 @@ void UICache::Init()
     {
         InitRectangleData();
         InitImageData();
+        InitTextData();
         m_initialized = true;
     }
 }
