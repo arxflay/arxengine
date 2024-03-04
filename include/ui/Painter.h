@@ -5,6 +5,7 @@
 #include "Viewport.h"
 #include "Brush.h"
 #include "Pen.h"
+#include "gl/Texture.h"
 #include <memory>
 
 ARX_NAMESPACE_BEGIN
@@ -26,7 +27,6 @@ public:
     const Brush &GetBrush() const;
     const Pen &GetPen() const;
     const Viewport &GetViewport();
-    
     void Clear();
     ~Painter();
 private:

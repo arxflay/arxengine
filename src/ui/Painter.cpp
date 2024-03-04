@@ -64,6 +64,7 @@ namespace
         clipBox.height = static_cast<int>(clipSize.height);
         return clipBox;
     }
+
 }
 
 Painter::Painter(DrawEvent &evt)
@@ -119,7 +120,7 @@ void Painter::DrawTexture2D(Position pos, Size size, const Texture2D *tex)
     modelMatrix = glm::translate(modelMatrix, glm::vec3(drawingPos.x, drawingPos.y, 0.0f));
     modelMatrix = glm::scale(modelMatrix, glm::vec3(size.width, size.height, 0.0f));
     glm::mat4 viewMatrix = glm::mat4(1.0f);
-    
+
     tex->Bind();
     VAO &rectVao = GetUICache(m_sender)->GetVAOMap().at(UICache::VAO_ID::RECTANGLE);
     rectVao.Bind();
@@ -140,7 +141,6 @@ void Painter::DrawText(std::string_view text, Position pos)
     if (m_clippingArea)
         m_clippingArea->UseThisClippingArea();
 
-    
     glm::mat4 viewMatrix = glm::mat4(1.0f);
     
     VAO &rectVao = GetUICache(m_sender)->GetVAOMap().at(UICache::VAO_ID::RECTANGLE);
@@ -149,38 +149,20 @@ void Painter::DrawText(std::string_view text, Position pos)
     shader.UseShader();
     shader.SetUniformVec4("color", m_pen.GetColor().GetNormalizedColorRGBA());
 
-    bool stopRendering = false;
-    float biggestSize = 0;
+    Position drawingPos = CalculateDrawPosition(pos, Size(0.0f, 0.0f));
+
+    auto *fontCache = m_sender->GetFontCache();
     for (char ch : text)
     {
-        auto cacheEntry = m_sender->GetFontCache()->GetCacheEntry(ch);
-        if (!cacheEntry.has_value())
-        {
-            stopRendering = true;
-            break;
-        }
-
-        biggestSize = std::max(cacheEntry->get().GetGlyphDimensions().bearings.y, biggestSize);
-    }
-
-    Position drawingPos = CalculateDrawPosition(pos, Size(0.0f, biggestSize));
-
-    if (!stopRendering)
-    { 
-        for (char ch : text)
-        {
-            auto cacheEntry = m_sender->GetFontCache()->GetCacheEntry(ch);
-            const FontCache::FontCacheEntry &cacheEntryValue = cacheEntry.value().get();
-            drawingPos.x += cacheEntryValue.GetGlyphDimensions().bearings.x;
-            cacheEntryValue.GetTexture()->Bind();
-            
-            glm::mat4 modelMatrix = glm::mat4(1.0f);
-            modelMatrix = glm::translate(modelMatrix, glm::vec3(drawingPos.x, drawingPos.y + cacheEntryValue.GetGlyphDimensions().bearings.y - cacheEntryValue.GetGlyphDimensions().size.height, 0.0f));
-            modelMatrix = glm::scale(modelMatrix, glm::vec3(cacheEntryValue.GetGlyphDimensions().size.width, cacheEntryValue.GetGlyphDimensions().size.height, 0.0f));
-            shader.SetTransformMatrices(modelMatrix, viewMatrix, GetViewport().projectionMatrix);
-            glDrawArrays(GL_TRIANGLES, 0, 6);
-            drawingPos.x += cacheEntryValue.GetGlyphDimensions().advance.x;
-        }
+        const auto &cacheEntry = fontCache->GetCacheEntry(ch);
+        drawingPos.x += cacheEntry.GetGlyphDimensions().bearings.x;
+        cacheEntry.GetTexture()->Bind();
+        glm::mat4 modelMatrix = glm::mat4(1.0f);
+        modelMatrix = glm::translate(modelMatrix, glm::vec3(drawingPos.x, drawingPos.y + cacheEntry.GetGlyphDimensions().bearings.y - cacheEntry.GetGlyphDimensions().size.height, 0.0f));
+        modelMatrix = glm::scale(modelMatrix, glm::vec3(cacheEntry.GetGlyphDimensions().size.width, cacheEntry.GetGlyphDimensions().size.height, 0.0f));
+        shader.SetTransformMatrices(modelMatrix, viewMatrix, GetViewport().projectionMatrix);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+        drawingPos.x += cacheEntry.GetGlyphDimensions().advance.x;
     }
     glDisable(GL_BLEND);
 }

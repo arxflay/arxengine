@@ -33,44 +33,36 @@ namespace
         glGetIntegerv(GL_ACTIVE_TEXTURE, &textureUnit);
         return static_cast<GLuint>(textureUnit);
     }
+}
 
-    GLenum ImageChannelsToGL(const Image &img)
+/*static*/ unsigned int Texture::ImageChannelsToGL(const Image &img)
+{
+    switch (img.GetColorChannels())
     {
-        switch (img.GetColorChannels())
-        {
-            case 1:
-                return GL_RED;
-            case 2:
-                return GL_RG;
-            case 3:
-                return GL_RGB;
-            case 4:
-                return GL_RGBA;
-            default:
-                return GL_INVALID_ENUM;
-        } 
-    }
+        case 1:
+            return GL_RED;
+        case 2:
+            return GL_RG;
+        case 3:
+            return GL_RGB;
+        case 4:
+            return GL_RGBA;
+        default:
+            return GL_INVALID_ENUM;
+    } 
+}
 
-    class OldTextureGuard final
-    {
-    public:
-        OldTextureGuard(Texture::TextureType textureType)
-            : m_textureType(textureType)
-        {
-            m_texture = GetCurrentlyBoundTexture(m_textureType);
-            m_oldTextureUnit = GetCurrentlyBoundTextureUnit();
-        }
+Texture::OldTextureGuard::OldTextureGuard(Texture::TextureType textureType)
+    : m_textureType(textureType)
+{
+    m_texture = GetCurrentlyBoundTexture(m_textureType);
+    m_oldTextureUnit = GetCurrentlyBoundTextureUnit();
+}
 
-        ~OldTextureGuard()
-        {
-            glActiveTexture(m_oldTextureUnit);
-            glBindTexture(static_cast<GLenum>(m_textureType), m_texture);
-        }
-    private:
-        Texture::TextureType m_textureType;
-        unsigned int m_oldTextureUnit;
-        unsigned int m_texture;
-    };
+Texture::OldTextureGuard::~OldTextureGuard()
+{
+    glActiveTexture(m_oldTextureUnit);
+    glBindTexture(static_cast<GLenum>(m_textureType), m_texture);
 }
 
 void Texture::Bind() const
@@ -107,23 +99,23 @@ void Texture::SetTextureUnit(TextureUnit textureUnit)
 
     m_textureUnit = textureUnit;
 }
-namespace
-{
-    int DetermineBestPackingAlignmentSize(const Image &img)
-    {
-        int unpackAlignment = 1;
-        size_t width = static_cast<size_t>(img.GetSize().width);
-        if (width % 4 == 0)
-            unpackAlignment = 4;
-        else if (width % 2 == 0)
-            unpackAlignment = 2;
 
-        return unpackAlignment;
-    }
+/*static*/ int Texture::DetermineBestPackingAlignmentSize(const Image &img)
+{
+    int packAlignment = 1;
+    size_t width = static_cast<size_t>(img.GetSize().width);
+    if (width % 4 == 0)
+        packAlignment = 4;
+    else if (width % 2 == 0)
+        packAlignment = 2;
+
+    return packAlignment;
 }
 
 Texture::Texture(UIObject *obj)
     : m_texture(0)
+    , m_textureType(Texture::TextureType::Default)
+    , m_textureUnit(Texture::TextureUnit::Default)
 {
     if (!obj)
         throw ArxException(ArxException::ErrorCode::GenericError, "Error during creating texture, uiobject is nullptr");
@@ -136,35 +128,7 @@ Texture::Texture(UIObject *obj)
         GLOG->Error("failed to create texture, gl_error %d",  glGetError());
 }
 
-bool Texture::Set2DData(const Image &img)
-{
-    if (IsInvalid())
-    {
-        GLOG->Error("Texture is in invalid state, textureType=%d, textureUnit=%d, textureHandle=%d", m_textureType, m_textureUnit, m_texture);
-        return false;
-    }
-    else if (m_textureType != TextureType::Texture2D)
-    {
-        GLOG->Error("Invalid texture type, got %d but expected", m_textureType, TextureType::Texture2D);
-        return false;
-    }
-    else if (img.IsInvalid())
-    {
-        GLOG->Error("Provided image is invalid");
-        return false;
-    }
 
-    OldTextureGuard guard(GetTextureType());
-    Bind();
-
-    //By default opengl reads by four bytes
-    glPixelStorei(GL_UNPACK_ALIGNMENT, DetermineBestPackingAlignmentSize(img));
-    
-    //format = how interpret data
-    glTexImage2D(GL_TEXTURE_2D, 0, static_cast<GLint>(ImageChannelsToGL(img)), static_cast<GLsizei>(img.GetSize().width), static_cast<GLsizei>(img.GetSize().height), 0, ImageChannelsToGL(img), GL_UNSIGNED_BYTE, img.GetData().data());
-    glGenerateMipmap(GL_TEXTURE_2D);
-    return true;
-}
 
 Texture::TextureType Texture::GetTextureType() const
 {
@@ -200,7 +164,7 @@ Texture &Texture::operator=(Texture &&tex)
 
 bool Texture::IsInvalid() const
 {
-    return m_texture == 0 || m_textureType == TextureType::InvalidTexture || m_textureUnit == TextureUnit::InvalidTextureUnit;
+    return m_texture == 0;
 }
 
 ARX_NAMESPACE_END

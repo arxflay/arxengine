@@ -13,13 +13,16 @@ class Image;
 class Texture2D final: public Texture 
 {
 public:
+    virtual void SetTextureFilteringMode(TextureFilteringMode textureFiltering) override;
+    virtual void SetTextureWrapping(TextureWrapping textureWrapping) override;
+    virtual TextureFilteringMode GetTextureFilteringMode() const override;
+    virtual TextureWrapping GetTextureWrapping() const override;
+
     Texture2D(UIObject *obj);
-    virtual void Bind() const override;
-    virtual void Unbind() const override;
-    void SetData(const Image &image);
-    void SetTextureUnit(Texture::TextureUnit textureUnit) override;
-    virtual bool IsInvalid() const override;
+    bool SetData(const Image &image);
 private:
+    TextureFilteringMode m_filteringMode;
+    TextureWrapping m_wrappingMode;
 };
 
 

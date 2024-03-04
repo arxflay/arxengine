@@ -19,6 +19,7 @@ const GlyphDimensions &FontCache::FontCacheEntry::GetGlyphDimensions() const
 FontCache::FontCacheEntry::FontCacheEntry(UIObject *obj)
     : m_texture(new Texture2D(obj))
 {
+    m_texture->SetTextureWrapping(Texture::TextureWrapping::ClampToEdge);
 }
 
 void FontCache::FontCacheEntry::UpdateTexture(const Image &img)
@@ -29,6 +30,11 @@ void FontCache::FontCacheEntry::UpdateTexture(const Image &img)
 void FontCache::FontCacheEntry::UpdateDimensions(const GlyphDimensions &dimensions)
 {
     m_dimensions = dimensions;
+}
+
+void FontCache::FontCacheEntry::UpdateTextureFiltering(Texture::TextureFilteringMode filtering)
+{
+    m_texture->SetTextureFilteringMode(filtering);
 }
 
 FontCache::FontCacheEntry::FontCacheEntry(FontCacheEntry &&cacheEntry)
@@ -50,33 +56,52 @@ FontCache::FontCacheEntry &FontCache::FontCacheEntry::operator=(FontCacheEntry &
 FontCache::FontCache(UIObject *parent)
     : ArxObject(nullptr)
     , m_oldChangeTime(parent->GetFont().GetLastChangeTime())
+    , m_textureFiltering(Texture::TextureFilteringMode::Default)
 {
     if (parent == nullptr)
         throw ArxException(ArxException::ErrorCode::GenericError, "FontCache parent is nullptr when it's expected to be not null");
 
     Reparent(parent);
 }
+
 //creates cache entry if character doesnt exists
-std::optional<std::reference_wrapper<const FontCache::FontCacheEntry>> FontCache::GetCacheEntry(char ch)
+const FontCache::FontCacheEntry &FontCache::GetCacheEntry(char ch)
 {
     UIObject *parent = dynamic_cast<UIObject*>(GetParent());
     Font &font = parent->GetFont();
     if (font.IsInvalid())
-        return std::nullopt;
+        throw ArxException(ArxException::ErrorCode::GenericError, "FontCacheEntry invalid font set");
 
     if (m_oldChangeTime != font.GetLastChangeTime())
         UpdateCacheEntries();
-
+     
     auto it = m_cache.find(ch);
     if (it == m_cache.end())
     {
         FontCache::FontCacheEntry entry(parent);
         entry.UpdateDimensions(font.GetGlyphDimensions(ch));
         entry.UpdateTexture(font.RenderGlyph(ch));
+        entry.UpdateTextureFiltering(m_textureFiltering);
         it = m_cache.emplace(ch, std::move(entry)).first;
     }
 
-    return std::cref(it->second);
+    return it->second;
+}
+
+void FontCache::EnableFontSmoothing(bool enable)
+{
+    Texture::TextureFilteringMode filtering = enable ? Texture::TextureFilteringMode::Linear : Texture::TextureFilteringMode::Nearest;
+    if (m_textureFiltering == filtering)
+        return;
+
+    m_textureFiltering = filtering;
+    for(auto &[ch, entry] : m_cache)
+        entry.UpdateTextureFiltering(m_textureFiltering);
+}
+
+bool FontCache::IsFontSmoothingEnabled() const
+{
+    return m_textureFiltering == Texture::TextureFilteringMode::Linear;
 }
 
 void FontCache::UpdateCacheEntries()

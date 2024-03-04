@@ -11,22 +11,19 @@ class Image;
 class UIObject;
 class ArxWindow;
 
-
-//FIXME error when texture is deleted after window is closed
 class Texture : public ArxObject
 {
 public:
     //https://www.khronos.org/opengl/wiki/Texture
     enum class TextureType
     {
-        InvalidTexture = 0,
-        Texture2D = 0x0DE1 
+        Texture2D = 0x0DE1,
+        Default = Texture2D
     };
     
     //https://www.khronos.org/opengl/wiki/Shader#Resource_limitations
     enum class TextureUnit
     {
-        InvalidTextureUnit = 0,
         Tex0 = 0x84C0,
         Tex1 = 0x84C1,
         Tex2 = 0x84C2,
@@ -58,18 +55,38 @@ public:
         Tex28 = 0x84DC,
         Tex29 = 0x84DD,
         Tex30 = 0x84DE,
-        Tex31 = 0x84DF
+        Tex31 = 0x84DF,
+        Default = Tex0
     };
 
-    virtual void Bind() const;
-    virtual void Unbind() const;
-    void SetTextureType(TextureType textureType);
-    virtual void SetTextureUnit(TextureUnit textureUnit);
-    bool Set2DData(const Image &image);
+    enum class TextureFilteringMode
+    {
+        Nearest = 0x2600,
+        Linear = 0x2601,
+        Default = Nearest 
+    };
+
+    enum class TextureWrapping
+    {
+        ClampToBorder = 0x812D,
+        ClampToEdge = 0x812F,
+        Repeat = 0x290f,
+        MirrorRepeat = 0x8370,
+        Default = Repeat
+    };
+    
+    virtual void SetTextureFilteringMode(TextureFilteringMode textureFiltering) = 0;
+    virtual void SetTextureWrapping(TextureWrapping textureWrapping) = 0;
+    virtual TextureFilteringMode GetTextureFilteringMode() const = 0;
+    virtual TextureWrapping GetTextureWrapping() const = 0;
+
+    void Bind() const;
+    void Unbind() const;
+    void SetTextureUnit(TextureUnit textureUnit);
 
     TextureType GetTextureType() const;
     TextureUnit GetTextureUnit() const;
-
+    
     Texture(UIObject *obj);
 
     //cleanup
@@ -78,14 +95,33 @@ public:
     //context unsafe
     Texture(Texture&&);
     Texture &operator=(Texture&&);
+    Texture(const Texture&) = delete;
+    Texture &operator=(const Texture&) = delete;
 
-    virtual bool IsInvalid() const;
+    bool IsInvalid() const;
     bool IsBound() const;
+protected:
+    class OldTextureGuard final
+    {
+    public:
+        OldTextureGuard(Texture::TextureType textureType);
+        ~OldTextureGuard();
+    private:
+        Texture::TextureType m_textureType;
+        unsigned int m_oldTextureUnit;
+        unsigned int m_texture;
+    };
+
+    static unsigned int ImageChannelsToGL(const Image &img);
+    static int DetermineBestPackingAlignmentSize(const Image &img);
+
+    unsigned int GetTextureHandle();
+    void SetTextureType(TextureType textureType);
 private:
     ArxWindow *m_window;
+    unsigned int m_texture;
     TextureType m_textureType;
     TextureUnit m_textureUnit;
-    unsigned int m_texture;
 };
 ARX_NAMESPACE_END
 #endif
