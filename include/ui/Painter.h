@@ -10,7 +10,7 @@
 
 ARX_NAMESPACE_BEGIN
 class DrawEvent;
-class UIObject;
+class UIControl;
 class Texture2D;
 class ClippingArea;
 
@@ -31,8 +31,8 @@ public:
     ~Painter();
 private:
     Position CalculateDrawPosition(Position uiobjectPos, Size uiobjectSize);
-    UIObject *GetSender();
-    UIObject *m_sender;
+    UIControl *GetSender();
+    UIControl *m_sender;
     std::unique_ptr<ClippingArea> m_clippingArea;
     Brush m_brush;
     Pen m_pen;

@@ -4,14 +4,13 @@
 #include <type_traits>
 #include <iterator>
 #include <vector>
-#include "ArxObject.h"
+#include "ui/UIObject.h"
 
 ARX_NAMESPACE_BEGIN
 class Image;
-class UIObject;
 class ArxWindow;
 
-class Texture : public ArxObject
+class Texture : public UIObject 
 {
 public:
     //https://www.khronos.org/opengl/wiki/Texture
@@ -87,16 +86,12 @@ public:
     TextureType GetTextureType() const;
     TextureUnit GetTextureUnit() const;
     
-    Texture(UIObject *obj);
+    Texture(UIControl *obj);
 
     //cleanup
     virtual ~Texture();
 
-    //context unsafe
-    Texture(Texture&&);
-    Texture &operator=(Texture&&);
-    Texture(const Texture&) = delete;
-    Texture &operator=(const Texture&) = delete;
+    Texture *Clone() override;
 
     bool IsInvalid() const;
     bool IsBound() const;
@@ -118,7 +113,8 @@ protected:
     unsigned int GetTextureHandle();
     void SetTextureType(TextureType textureType);
 private:
-    ArxWindow *m_window;
+    Texture *AllocClone() override = 0;
+
     unsigned int m_texture;
     TextureType m_textureType;
     TextureUnit m_textureUnit;

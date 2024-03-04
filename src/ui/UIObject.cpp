@@ -1,97 +1,55 @@
 #include "ui/UIObject.h"
+#include "ui/UIControl.h"
 #include "ui/ArxWindow.h"
-#include <memory>
+#include "ArxException.h"
 
 ARX_NAMESPACE_BEGIN
 
-UIObject::UIObject(UIObject *parent, Size size, Position pos)
-    : m_size(size)
-    , m_position(pos)
-    , m_backgroundColor(defaults::COLOR_WHITE)
-    , m_clippingEnabled(true)
-    , m_fontCache(new FontCache(this))
-{
-    Reparent(parent);
-}
-
-void UIObject::SetBackgroundColor(Color c) { m_backgroundColor = c; }
-Color UIObject::GetColor() const { return m_backgroundColor; }
-
-void UIObject::SetSize(Size s) { m_size = s; }
-Size UIObject::GetSize() const { return m_size; }
-Size UIObject::GetClientSize() const { return m_size; }
-
-void UIObject::SetPosition(Position pos) { m_position = pos; }
-Position UIObject::GetPosition() const { return m_position; }
-
-ArxWindow *UIObject::GetOwnerWindow() { return m_ownerWindow; }
-
-void UIObject::Reparent(ArxObject *parent)
+//UIControl parent can't be nullptr, otherwise exception will be thrown
+UIObject::UIObject(UIControl *parent)
 {
     if (!parent)
-        throw ArxException(ArxException::ErrorCode::GenericError, "parent must be not null");
-    
-    UIObject *uiobjParent = dynamic_cast<UIObject*>(parent);
-    if (uiobjParent)
-        throw ArxException(ArxException::ErrorCode::GenericError, "parent is not uiobject");
+        throw ArxException(ArxException::ErrorCode::GenericError, "Failed to set parent for UIObject, parent is null");
 
     ArxObject::Reparent(parent);
-     
-    if (!uiobjParent->GetOwnerWindow())
-    {
-        ArxWindow *win = dynamic_cast<ArxWindow*>(parent);
-        if (win)
-            throw ArxException(ArxException::ErrorCode::GenericError, "Parent is not a window but doesn't have owner window");
-
-        m_ownerWindow = win;
-    }
-    else
-        m_ownerWindow = uiobjParent->GetOwnerWindow();
 }
 
-void UIObject::Hide()
+//Reparenting is allowed only if OwnerWindow is not changed otherwise expection will be thrown
+void UIObject::Reparent(ArxObject *parent)
 {
-    Show(false);
+    UIControl *uiControl = dynamic_cast<UIControl*>(parent);
+    if (!uiControl)
+        throw ArxException(ArxException::ErrorCode::GenericError, "Failed to set parent for UIObject, parent is not an UIControl");
+
+    if (GetWindow() != GetOwnerUIControl()->GetWindow())
+        throw ArxException(ArxException::ErrorCode::GenericError, "Can't change owner window in UIObject");
+
+    ArxObject::Reparent(parent);
 }
 
-UIObject::UIObject()
-    : m_size(defaults::DEFAULT_SIZE)
-    , m_position(defaults::DEFAULT_POSITION)
-    , m_ownerWindow(nullptr)
-    , m_backgroundColor(defaults::COLOR_WHITE)
-    , m_clippingEnabled(false)
-    , m_fontCache(new FontCache(this))
+UIControl *UIObject::GetOwnerUIControl()
 {
-
+    return static_cast<UIControl*>(GetParent()); //dynamic cast is not required
 }
 
-void DrawEvent::HandleEvent()
+ArxWindow *UIObject::GetWindow()
 {
-
+    return GetOwnerUIControl()->GetWindow();
 }
 
-void UIObject::EnableClipToBounds(bool enable)
+const UIControl *UIObject::GetOwnerUIControl() const
 {
-    m_clippingEnabled = enable;
+    return static_cast<const UIControl*>(GetParent()); //dynamic cast is not required
 }
 
-bool UIObject::IsEnabledClipToBounds() const
+const ArxWindow *UIObject::GetWindow() const
 {
-    return m_clippingEnabled;
+    return GetOwnerUIControl()->GetWindow();
 }
 
-FontCache *UIObject::GetFontCache()
+ArxObject *UIObject::AllocClone()
 {
-    return m_fontCache;
+    return new UIObject(GetOwnerUIControl());
 }
 
-Font &UIObject::GetFont() 
-{
-    return m_font;
-}
-
-void UIObject::SetFont(Font &&font)
-{
-    m_font = std::move(font);
-}
 ARX_NAMESPACE_END

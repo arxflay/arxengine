@@ -1,12 +1,12 @@
 #include "gl/Texture2D.h"
-#include "ui/UIObject.h"
+#include "ui/UIControl.h"
 #include <glad/glad.h>
 
 ARX_NAMESPACE_BEGIN
 class Image;
 
 
-Texture2D::Texture2D(UIObject *obj)
+Texture2D::Texture2D(UIControl *obj)
     : Texture(obj)
     , m_filteringMode(Texture::TextureFilteringMode::Default)
     , m_wrappingMode(Texture::TextureWrapping::Default)
@@ -63,5 +63,20 @@ void Texture2D::SetTextureWrapping(TextureWrapping textureWrapping)
 Texture2D::TextureFilteringMode Texture2D::GetTextureFilteringMode() const { return m_filteringMode; }
 Texture2D::TextureWrapping Texture2D::GetTextureWrapping() const { return m_wrappingMode; }
 
+Texture2D *Texture2D::Clone()
+{
+    //FIXME
+    throw ArxException(ArxException::ErrorCode::GenericError, "Texture2D::Clone not implemented");
+    std::unique_ptr<Texture2D> clone(static_cast<Texture2D*>(Texture::Clone()));
+    clone->SetTextureFilteringMode(m_filteringMode);
+    clone->SetTextureWrapping(m_wrappingMode);
+    //implement copying image
+    return clone.release();
+}
+
+Texture2D *Texture2D::AllocClone()
+{
+    return new Texture2D(GetOwnerUIControl());
+}
 
 ARX_NAMESPACE_END

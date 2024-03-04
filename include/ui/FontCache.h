@@ -1,16 +1,13 @@
 #ifndef ARX_FONTCACHE_H
 #define ARX_FONTCACHE_H
 #include "ArxDefines.h"
-#include "ArxObject.h"
+#include "UIObject.h"
 #include <map>
 #include "media/Font.h"
 #include "gl/Texture2D.h"
 ARX_NAMESPACE_BEGIN
 
-class UIObject;
-
-
-class FontCache final : public ArxObject
+class FontCache final : public UIObject 
 {
 public:
     class FontCacheEntry final
@@ -23,10 +20,11 @@ public:
         void UpdateTexture(const Image &img);
         void UpdateDimensions(const GlyphDimensions &dimensions);
         FontCacheEntry(FontCacheEntry&&);
-    private:
-        FontCacheEntry(UIObject *obj);
-    
 
+        FontCacheEntry Clone();
+    private:
+        FontCacheEntry(UIControl *obj);
+        FontCacheEntry(Texture2D *texture, GlyphDimensions dimensions);
         FontCacheEntry(const FontCacheEntry&) = delete;
         FontCacheEntry &operator=(FontCacheEntry&&);
         FontCacheEntry &operator=(const FontCacheEntry&) = delete;
@@ -34,12 +32,15 @@ public:
         Texture2D *m_texture;
     };
 
-    FontCache(UIObject *parent);
+    FontCache(UIControl *parent);
     //creates cache entry if character doesnt exists
     const FontCache::FontCacheEntry &GetCacheEntry(char ch);
     void EnableFontSmoothing(bool enable);
     bool IsFontSmoothingEnabled() const;
+    FontCache *Clone() override;
+
 private:
+    FontCache *AllocClone() override;
     void UpdateCacheEntries();
     FontCache(FontCache&&) = delete;
     FontCache(const FontCache&) = delete;

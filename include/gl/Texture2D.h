@@ -18,8 +18,13 @@ public:
     virtual TextureFilteringMode GetTextureFilteringMode() const override;
     virtual TextureWrapping GetTextureWrapping() const override;
 
-    Texture2D(UIObject *obj);
+    Texture2D(UIControl *obj);
     bool SetData(const Image &image);
+    
+    //for now clone copies only parameters, not texture
+    Texture2D *Clone() override;
+    Texture2D *AllocClone() override;
+
 private:
     TextureFilteringMode m_filteringMode;
     TextureWrapping m_wrappingMode;

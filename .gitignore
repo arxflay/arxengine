@@ -37,3 +37,5 @@ build/*
 compile_commands.json
 cmake/CPM/*
 libs/third_party/CPM/*
+
+vgcore.*

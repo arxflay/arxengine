@@ -6,7 +6,6 @@
 #include "internal/ft/FontLibrary.h"
 #include "GameApp.h"
 #include "misc/Convertors.h"
-#include "logging/Logger.h"
 #include <iostream>
 ARX_NAMESPACE_BEGIN
 

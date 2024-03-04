@@ -23,7 +23,7 @@ public:
         GameAppNotSetAsGlobal       = 8,
         GameAppNotInitialized       = 9,
         CaughtStdException          = 10,
-        FailedToConstructUIObject   = 11,
+        FailedToConstructUIControl  = 11,
         FailedToConstructArxWindow  = 12,
         GameAppIsRunning            = 13,
         GameAppAlreadyScheduledExit = 14

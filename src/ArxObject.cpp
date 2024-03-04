@@ -19,8 +19,16 @@ ArxObject *ArxObject::GetParent()
     return m_parent;
 }
 
+const ArxObject *ArxObject::GetParent() const
+{
+    return m_parent;
+}
+
 void ArxObject::Reparent(ArxObject *parent)
 {
+    if (m_parent == parent)
+        return;
+    
     if (!IsDestroyCalled())
     {
         if (parent == this)
@@ -64,9 +72,29 @@ ArxObject::~ArxObject()
     if (GetParent())
         m_parent->m_children.remove(this);
 
-    for(ArxObject *obj : m_children)
-        if (!obj->IsDestroyCalled())
-            delete obj;
+    for(ArxObject *child : m_children)
+        if (!child->IsDestroyCalled())
+            delete child;
+}
+
+ArxObject *ArxObject::Clone()
+{
+    if (IsDestroyCalled())
+        throw ArxException(ArxException::ErrorCode::GenericError, "Can't clone ArxObject if delete is called");
+
+    std::unique_ptr<ArxObject> obj(AllocClone());
+    obj->m_eventManager.ReplaceWithCopy(m_eventManager);
+    for(ArxObject *child : m_children)
+    {
+        child->Clone();
+        child->Reparent(obj.get());
+    }
+    return obj.release();
+}
+
+ArxObject *ArxObject::AllocClone()
+{
+    return new ArxObject(GetParent());
 }
 
 ARX_NAMESPACE_END

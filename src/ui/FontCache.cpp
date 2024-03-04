@@ -1,6 +1,6 @@
 #include "ui/FontCache.h"
 #include "ArxException.h"
-#include "ui/UIObject.h"
+#include "ui/UIControl.h"
 #include <iostream>
 ARX_NAMESPACE_BEGIN
 
@@ -16,7 +16,7 @@ const GlyphDimensions &FontCache::FontCacheEntry::GetGlyphDimensions() const
     return m_dimensions;
 }
 
-FontCache::FontCacheEntry::FontCacheEntry(UIObject *obj)
+FontCache::FontCacheEntry::FontCacheEntry(UIControl *obj)
     : m_texture(new Texture2D(obj))
 {
     m_texture->SetTextureWrapping(Texture::TextureWrapping::ClampToEdge);
@@ -37,6 +37,20 @@ void FontCache::FontCacheEntry::UpdateTextureFiltering(Texture::TextureFiltering
     m_texture->SetTextureFilteringMode(filtering);
 }
 
+FontCache::FontCacheEntry FontCache::FontCacheEntry::Clone()
+{
+    Texture2D *texture = static_cast<Texture2D*>(m_texture->Clone());
+    FontCacheEntry entry(texture, m_dimensions);
+    return entry;
+}
+
+FontCache::FontCacheEntry::FontCacheEntry(Texture2D *texture, GlyphDimensions dimensions)
+    : m_dimensions(dimensions)
+    , m_texture(texture)
+{
+
+}
+
 FontCache::FontCacheEntry::FontCacheEntry(FontCacheEntry &&cacheEntry)
     : m_texture(nullptr)
 {
@@ -53,21 +67,18 @@ FontCache::FontCacheEntry &FontCache::FontCacheEntry::operator=(FontCacheEntry &
     return *this;
 }
 
-FontCache::FontCache(UIObject *parent)
-    : ArxObject(nullptr)
+FontCache::FontCache(UIControl *parent)
+    : UIObject(parent)
     , m_oldChangeTime(parent->GetFont().GetLastChangeTime())
     , m_textureFiltering(Texture::TextureFilteringMode::Default)
 {
-    if (parent == nullptr)
-        throw ArxException(ArxException::ErrorCode::GenericError, "FontCache parent is nullptr when it's expected to be not null");
 
-    Reparent(parent);
 }
 
 //creates cache entry if character doesnt exists
 const FontCache::FontCacheEntry &FontCache::GetCacheEntry(char ch)
 {
-    UIObject *parent = dynamic_cast<UIObject*>(GetParent());
+    UIControl *parent = GetOwnerUIControl();
     Font &font = parent->GetFont();
     if (font.IsInvalid())
         throw ArxException(ArxException::ErrorCode::GenericError, "FontCacheEntry invalid font set");
@@ -106,13 +117,27 @@ bool FontCache::IsFontSmoothingEnabled() const
 
 void FontCache::UpdateCacheEntries()
 {
-    Font &font = static_cast<UIObject*>(GetParent())->GetFont();
+    Font &font = static_cast<UIControl*>(GetParent())->GetFont();
     m_oldChangeTime = font.GetLastChangeTime();
     for(auto &[ch, entry] : m_cache)
     {
         entry.UpdateDimensions(font.GetGlyphDimensions(ch));
         entry.UpdateTexture(font.RenderGlyph(ch));
     }
+}
+
+FontCache *FontCache::Clone()
+{
+    std::unique_ptr<FontCache> clone(static_cast<FontCache*>(UIObject::Clone()));
+    for(auto &[ch, entry] : m_cache)
+        clone->m_cache.emplace(std::make_pair(ch, entry.Clone()));
+
+    return clone.release();
+}
+
+FontCache *FontCache::AllocClone()
+{
+    return new FontCache(GetOwnerUIControl());
 }
 
 ARX_NAMESPACE_END

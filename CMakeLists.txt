@@ -22,7 +22,7 @@ list(APPEND SOURCES
     ${SOURCE_PATH}/evt/Event.cpp
     ${SOURCE_PATH}/evt/EventProcessor.cpp
     ${SOURCE_PATH}/ui/Color.cpp
-    ${SOURCE_PATH}/ui/UIObject.cpp
+    ${SOURCE_PATH}/ui/UIControl.cpp
     ${SOURCE_PATH}/ui/ArxWindow.cpp
     ${SOURCE_PATH}/ArxObject.cpp
     ${SOURCE_PATH}/evt/UIEventProcessor.cpp
@@ -40,6 +40,7 @@ list(APPEND SOURCES
     ${SOURCE_PATH}/internal/ft/FontLibrary.cpp
     ${SOURCE_PATH}/ui/FontCache.cpp
     ${SOURCE_PATH}/ui/Pen.cpp
+    ${SOURCE_PATH}/ui/UIObject.cpp
 )
 set(CMAKE_EXPORT_COMPILE_COMMANDS True)
 set(gcc_like_cxx "$<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang,GNU,LCC>")

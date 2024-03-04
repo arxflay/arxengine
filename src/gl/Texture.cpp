@@ -67,7 +67,7 @@ Texture::OldTextureGuard::~OldTextureGuard()
 
 void Texture::Bind() const
 {
-    m_window->SetAsCurrentContext();
+    GetWindow()->SetAsCurrentContext();
     glActiveTexture(static_cast<GLenum>(m_textureUnit));
     glBindTexture(static_cast<GLenum>(m_textureType), m_texture);
 }
@@ -112,23 +112,27 @@ void Texture::SetTextureUnit(TextureUnit textureUnit)
     return packAlignment;
 }
 
-Texture::Texture(UIObject *obj)
-    : m_texture(0)
+Texture::Texture(UIControl *parent)
+    : UIObject(parent)
+    , m_texture(0)
     , m_textureType(Texture::TextureType::Default)
     , m_textureUnit(Texture::TextureUnit::Default)
 {
-    if (!obj)
-        throw ArxException(ArxException::ErrorCode::GenericError, "Error during creating texture, uiobject is nullptr");
-
-    Reparent(obj);
-    m_window = (obj->GetOwnerWindow() == nullptr) ? static_cast<ArxWindow*>(obj) : obj->GetOwnerWindow();
-    m_window->SetAsCurrentContext();
+    GetWindow()->SetAsCurrentContext();
     glGenTextures(1, &m_texture);
     if (m_texture == 0)
         GLOG->Error("failed to create texture, gl_error %d",  glGetError());
 }
 
-
+Texture *Texture::Clone()
+{
+    std::unique_ptr<Texture> clone(static_cast<Texture*>(UIObject::Clone()));
+    GetWindow()->SetAsCurrentContext();
+    glGenTextures(1, &clone->m_texture);
+    clone->m_textureType = m_textureType;
+    clone->m_textureUnit = m_textureUnit;
+    return clone.release();
+}
 
 Texture::TextureType Texture::GetTextureType() const
 {
@@ -145,21 +149,9 @@ Texture::~Texture()
 {
     if (m_texture != 0)
     {
-        m_window->SetAsCurrentContext();
+        GetWindow()->SetAsCurrentContext();
         glDeleteTextures(1, &m_texture);
     }
-}
-
-//context unsafe
-Texture::Texture(Texture &&tex)
-{
-    m_texture = std::exchange(tex.m_texture, 0);
-}
-
-Texture &Texture::operator=(Texture &&tex)
-{
-    std::swap(m_texture, tex.m_texture);
-    return *this;
 }
 
 bool Texture::IsInvalid() const

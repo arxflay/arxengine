@@ -159,6 +159,12 @@ public:
         : m_owner(owner)
     {
     }
+
+    void ReplaceWithCopy(const EventManager &manager)
+    {
+        m_eventsHandlersMap = manager.m_eventsHandlersMap;
+    }
+
     EventManager(const EventManager&) = delete;
     EventManager(EventManager&&) = delete;
     EventManager &operator=(const EventManager&) = delete;

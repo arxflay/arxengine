@@ -1,5 +1,5 @@
 #include "ui/Painter.h"
-#include "ui/UIObject.h"
+#include "ui/UIControl.h"
 #include <glad/glad.h>
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -13,25 +13,20 @@
 ARX_NAMESPACE_BEGIN
 namespace
 {
-    ArxWindow *GetWindow(UIObject *obj)
+    UICache *GetUICache(UIControl *obj)
     {
-        return (obj->GetOwnerWindow() == nullptr) ? static_cast<ArxWindow*>(obj) : obj->GetOwnerWindow(); 
+        return obj->GetWindow()->GetUICache();
     }
 
-    UICache *GetUICache(UIObject *obj)
-    {
-        return GetWindow(obj)->GetUICache();
-    }
-
-    Position GetSenderPosition(UIObject *obj)
+    Position GetSenderPosition(UIControl *obj)
     {
         //position is only required if it's an element inside window
         return (obj->GetOwnerWindow() == nullptr) ? Position(0, 0) : obj->GetPosition(); 
     }
 
-    ClippingArea::ClipBox CreateClipBox(UIObject *obj)
+    ClippingArea::ClipBox CreateClipBox(UIControl *obj)
     {
-        ArxWindow *window = GetWindow(obj);
+        ArxWindow *window = obj->GetWindow();
         Position senderPos = GetSenderPosition(obj);
         Size senderSize = obj->GetClientSize();
         Size windowSize = window->GetClientSize();
@@ -68,7 +63,7 @@ namespace
 }
 
 Painter::Painter(DrawEvent &evt)
-    : m_sender(dynamic_cast<UIObject*>(evt.GetSender()))
+    : m_sender(dynamic_cast<UIControl*>(evt.GetSender()))
     , m_brush(m_sender->GetColor())
     , m_pen(defaults::COLOR_BLACK)
 {
@@ -170,7 +165,7 @@ void Painter::DrawText(std::string_view text, Position pos)
 Position Painter::CalculateDrawPosition(Position drawPos, Size drawSize)
 {
     Position senderPos = GetSenderPosition(m_sender); //draw offset, because sender could be positioned somewhereElse
-    ArxWindow *window = GetWindow(m_sender);
+    ArxWindow *window = m_sender->GetWindow();
     Size viewPortSize = window->GetViewport().size;
     
     //inverse top axis, top should be 0 and bottom == viewPortSize.size()
@@ -196,10 +191,10 @@ void Painter::Clear()
 
 const Viewport &Painter::GetViewport()
 {
-    return GetWindow(m_sender)->GetViewport(); 
+    return m_sender->GetWindow()->GetViewport(); 
 }
 
-UIObject *Painter::GetSender()
+UIControl *Painter::GetSender()
 {
     return m_sender;
 }

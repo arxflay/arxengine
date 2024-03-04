@@ -1,70 +1,33 @@
 #ifndef ARX_UIOBJECT_H
 #define ARX_UIOBJECT_H
-
 #include "ArxDefines.h"
-#include "Size.h"
-#include "Color.h"
-#include "Position.h"
 #include "ArxObject.h"
-#include <list>
-#include "FontCache.h"
 
 ARX_NAMESPACE_BEGIN
 
+class UIControl;
 class ArxWindow;
-class UIObject;
 
-class DrawEvent : public Event
-{
-friend class ArxWindow;
-private:
-    DrawEvent() = default;
-    void HandleEvent() override;
-};
-
+/*
+ * @brief UIObject class for graphic related objects that depends on UIControl
+ */
 class UIObject : public ArxObject
 {
-friend class ArxWindow;
 public:
-    UIObject(UIObject *parent, Size size = defaults::DEFAULT_SIZE, Position pos = defaults::DEFAULT_POSITION);
+    //UIControl parent can't be nullptr, otherwise exception will be thrown
+    UIObject(UIControl *parent);
     
-    virtual void SetBackgroundColor(Color c);
-    virtual Color GetColor() const;
-
-    virtual void SetSize(Size s);
-    
-    //size with borders (limits)
-    virtual Size GetSize() const;
-
-    //size available for client
-    virtual Size GetClientSize() const;
-    
-    virtual void SetPosition(Position pos);
-    virtual Position GetPosition() const;
-    
-    ArxWindow *GetOwnerWindow();
-    
-    virtual void Show(bool visible = true) = 0;
-    virtual void Hide();
-
-    //only UIObject can be parent
+    //Reparenting is allowed only if OwnerWindow is not changed otherwise expection will be thrown
     void Reparent(ArxObject *parent) override;
-    virtual void EnableClipToBounds(bool enable = true);
-    virtual bool IsEnabledClipToBounds() const;
 
-    FontCache *GetFontCache();
-    Font &GetFont();
-    void SetFont(Font &&font);
+    UIControl *GetOwnerUIControl();
+    ArxWindow *GetWindow();
+
+    const UIControl *GetOwnerUIControl() const;
+    const ArxWindow *GetWindow() const;
+
 private:
-    //this constructor is used for windows
-    UIObject();
-    Size m_size;
-    Position m_position;
-    ArxWindow *m_ownerWindow;
-    Color m_backgroundColor;
-    bool m_clippingEnabled;
-    Font m_font;
-    FontCache *m_fontCache;
+    ArxObject *AllocClone() override;
 };
 
 ARX_NAMESPACE_END

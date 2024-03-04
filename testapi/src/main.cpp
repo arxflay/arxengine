@@ -208,7 +208,7 @@ TEST(ArxWindow, DISABLED_PositiveEndAfter2Seconds)
     GameApp::GetGlobalApp()->Run();
 }
 
-TEST(ArxWindow, DISABLED_PositiveMultiWindow)
+TEST(ArxWindow, PositiveMultiWindow)
 {
     ArxWindow *win = new ArxWindow("test", Size(300, 300));
     win->Show();

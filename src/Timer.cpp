@@ -84,4 +84,17 @@ Timer::TimerType Timer::GetType() const
     return m_timerType;
 }
 
+Timer *Timer::Clone() 
+{
+    std::unique_ptr<Timer> clone(static_cast<Timer*>(ArxObject::Clone()));
+    clone->m_timerType = m_timerType;
+    clone->m_interval = m_interval;
+    return clone.release();
+}
+
+Timer *Timer::AllocClone()
+{
+    return new Timer(GetParent());
+}
+
 ARX_NAMESPACE_END

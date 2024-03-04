@@ -2,7 +2,7 @@
 #define ARX_ARXWINDOW_H
 
 #include "ArxDefines.h"
-#include "UIObject.h"
+#include "UIControl.h"
 #include "Viewport.h"
 #include <string_view>
 
@@ -13,7 +13,7 @@ ARX_NAMESPACE_BEGIN
 class UICache;
 class Image;
 
-class ArxWindow : public UIObject
+class ArxWindow : public UIControl
 {
 public:
     enum ARX_EXPORTS WindowAttributes : int
@@ -59,7 +59,9 @@ public:
     int GetAttributes() const;
     virtual WindowBorders GetWindowBorders() const;
 
-    void SetAsCurrentContext();
+    ArxWindow *GetWindow() override;
+    const ArxWindow *GetWindow() const override;
+    void SetAsCurrentContext() const;
 
     virtual void SetFixedViewport(float width, float height);
     virtual void RemoveFixedViewport();
@@ -80,6 +82,10 @@ public:
 
     //To disable the aspect ratio limit for a window, set both terms to defaults::IGNORE
     bool SetWindowAspectRatio(int numer, int denom);
+    ArxWindow *Clone() override;
+
+private:
+    ArxWindow *AllocClone() override;
 
 private:
     void RecalculateSizes(Size s);
@@ -91,7 +97,7 @@ private:
     static void RefreshCallback(GLFWwindow *win);
     static void SetGlfwCallbacks(GLFWwindow *win);
 
-    static void DrawInternal(UIObject *obj);
+    static void DrawInternal(UIControl *obj);
 private:
     std::unique_ptr<GLFWwindow, void(*)(GLFWwindow*)> m_win;
     Size m_clientSize;

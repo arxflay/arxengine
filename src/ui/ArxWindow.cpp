@@ -4,6 +4,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/ext/matrix_clip_space.hpp>
 #include "media/Image.h"
+#include <memory>
 ARX_NAMESPACE_BEGIN
 
 namespace
@@ -23,7 +24,7 @@ namespace
     int xOffset, yOffset;
     glfwGetMonitorPos(glfwGetPrimaryMonitor(), &xOffset, &yOffset);
     ArxWindow::WindowBorders borders = arxWin->GetWindowBorders(); 
-    arxWin->UIObject::SetPosition(Position(static_cast<float>(x - xOffset - borders.left), static_cast<float>(y - yOffset - borders.top)));
+    arxWin->UIControl::SetPosition(Position(static_cast<float>(x - xOffset - borders.left), static_cast<float>(y - yOffset - borders.top)));
 }
 
 /*static*/ void ArxWindow::CloseCallback(GLFWwindow *win)
@@ -68,8 +69,8 @@ ArxWindow::ArxWindow(std::string_view title, Size size, Position position, int a
         
         GLFWmonitor *primaryMonitor = glfwGetPrimaryMonitor();
         const GLFWvidmode *currentVideoMode = glfwGetVideoMode(primaryMonitor);
-        UIObject::SetPosition(Position{ 0, 0 });
-        UIObject::SetSize(Size{ static_cast<float>(currentVideoMode->width), static_cast<float>(currentVideoMode->height) });
+        UIControl::SetPosition(Position{ 0, 0 });
+        UIControl::SetSize(Size{ static_cast<float>(currentVideoMode->width), static_cast<float>(currentVideoMode->height) });
         m_win.reset(glfwCreateWindow(static_cast<int>(GetSize().width), static_cast<int>(GetSize().height), m_title.c_str(), primaryMonitor, nullptr));
     }
     else
@@ -165,7 +166,7 @@ void ArxWindow::RecalculateSizes(Size s)
 
     WindowBorders borders = GetWindowBorders();
     Size newSize = Size(newClientSize.width + static_cast<float>(borders.left + borders.right), newClientSize.height + static_cast<float>(borders.bottom + borders.top));
-    UIObject::SetSize(newSize);
+    UIControl::SetSize(newSize);
 }
 
 void ArxWindow::RegisterWindowFromWindowList()
@@ -191,7 +192,7 @@ ArxWindow::WindowBorders ArxWindow::GetWindowBorders() const
 }
 void ArxWindow::SetPosition(Position pos)
 {
-    UIObject::SetPosition(pos);
+    UIControl::SetPosition(pos);
     int xOffset, yOffset;
     glfwGetMonitorPos(glfwGetPrimaryMonitor(), &xOffset, &yOffset);
     WindowBorders borders = GetWindowBorders();
@@ -205,7 +206,17 @@ Position ArxWindow::GetRealPosition()
     return Position(x, y);
 }
 
-void ArxWindow::SetAsCurrentContext()
+ArxWindow *ArxWindow::GetWindow() 
+{
+    return this;
+}
+
+const ArxWindow *ArxWindow::GetWindow() const
+{
+    return this;
+}
+
+void ArxWindow::SetAsCurrentContext() const
 {
     glfwMakeContextCurrent(m_win.get());
 }
@@ -247,15 +258,15 @@ UICache *ArxWindow::GetUICache()
     return m_uiCache.get();
 }
 
-/*static*/ void ArxWindow::DrawInternal(UIObject *obj)
+/*static*/ void ArxWindow::DrawInternal(UIControl *obj)
 {
     std::unique_ptr<DrawEvent> evt(new DrawEvent);
     obj->GetEventManager().QueueEvent<DrawEvent>(std::move(evt));
     for (ArxObject *obj : const_cast<ArxObjectList&>(obj->GetChildren()))
     {
-        UIObject *uiobject = dynamic_cast<UIObject*>(obj);
-        if (uiobject)
-            DrawInternal(uiobject);
+        UIControl *uiControl = dynamic_cast<UIControl*>(obj);
+        if (uiControl)
+            DrawInternal(uiControl);
     }
 }
 
@@ -316,6 +327,22 @@ bool ArxWindow::SetWindowAspectRatio(int numer, int denom)
     glfwSetWindowAspectRatio(m_win.get(), numer, denom);
     return true;
 }
+
+ArxWindow *ArxWindow::Clone()
+{
+    std::unique_ptr<ArxWindow> window(static_cast<ArxWindow*>(UIControl::Clone()));
+    window->m_useFixedViewport = m_useFixedViewport;
+    window->m_viewport = m_viewport;
+    window->m_clientSize = m_clientSize;
+    return window.release();
+}
+
+
+ArxWindow *ArxWindow::AllocClone()
+{
+    return new ArxWindow(m_title, m_size, m_position, m_attributes);
+}
+
 
 
 ARX_NAMESPACE_END

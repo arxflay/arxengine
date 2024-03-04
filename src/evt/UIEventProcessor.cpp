@@ -5,14 +5,9 @@ ARX_NAMESPACE_BEGIN
 
 void UIEventProcessor::CallBeforeProcessing(Event &evt) 
 {
-    UIObject *obj = dynamic_cast<UIObject*>(evt.GetSender());
+    UIControl *obj = dynamic_cast<UIControl*>(evt.GetSender());
     if (obj)
-    {
-        if (obj->GetOwnerWindow())
-            obj->GetOwnerWindow()->SetAsCurrentContext();
-        else
-            dynamic_cast<ArxWindow*>(obj)->SetAsCurrentContext();
-    }
+        obj->GetWindow()->SetAsCurrentContext(); 
 }
 
 ARX_NAMESPACE_END
