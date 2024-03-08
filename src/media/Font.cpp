@@ -3,7 +3,7 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include <ArxException.h>
-#include "internal/ft/FontLibrary.h"
+#include "internal/ft/FontLoader.h"
 #include "GameApp.h"
 #include "misc/Convertors.h"
 #include <iostream>
@@ -39,7 +39,9 @@ Font &Font::operator=(Font &&font)
 /*static*/ Font Font::LoadFromFile(std::string_view filename)
 {
     Font font;
-    font.m_face = GlobalGameApp->GetFontLibrary().NewFace(filename, 0);
+    auto fontData = GlobalGameApp->GetFontLoader().NewFace(filename, 0);
+    font.m_face = std::move(fontData.face);
+    font.m_fontData = std::move(fontData.fontBinaryData);
     font.SetSizeInPt(10);
     return font;
 }
@@ -47,7 +49,9 @@ Font &Font::operator=(Font &&font)
 /*static*/ Font Font::LoadFromBinary(const uint8_t *binaryData, size_t len)
 {
     Font font;
-    font.m_face = GlobalGameApp->GetFontLibrary().NewFaceFromBinary(binaryData, len, 0);
+    auto fontData = GlobalGameApp->GetFontLoader().NewFaceFromBinary(binaryData, len, 0);
+    font.m_face = std::move(fontData.face);
+    font.m_fontData = std::move(fontData.fontBinaryData);
     font.SetSizeInPt(10);
     return font;
 }
@@ -139,6 +143,24 @@ void Font::UpdateLastChangeTime()
 const Font::ChangeTime_t &Font::GetLastChangeTime()
 {
     return m_lastChangeTime; 
+}
+
+Font::Font(const Font &f)
+    : Font()
+{
+    m_fontData = f.m_fontData;
+    m_face = GameApp::GetGlobalApp()->GetFontLoader().NewFaceFromExistingDataBinary(m_fontData->data(), m_fontData->size(), 0);
+    SetSizeInPixels(f.m_sizeInPixels);
+}
+
+Font &Font::operator=(const Font &f)
+{
+    m_fontData = f.m_fontData;
+    m_face = GameApp::GetGlobalApp()->GetFontLoader().NewFaceFromExistingDataBinary(m_fontData->data(), m_fontData->size(), 0);
+    SetSizeInPixels(f.m_sizeInPixels);
+    UpdateLastChangeTime();
+    
+    return *this;
 }
 
 

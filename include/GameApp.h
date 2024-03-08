@@ -12,7 +12,7 @@ ARX_NAMESPACE_BEGIN
 class EventProcessor;
 class SoundDevice;
 class SoundContext;
-class FontLibrary;
+class FontLoader;
 class ArxWindow;
 
 class DeleteEvent : public Event
@@ -44,7 +44,7 @@ public:
     int Exit(int code);
    
     SoundContext &GetDefaultSoundDeviceContext();
-    FontLibrary &GetFontLibrary();
+    FontLoader &GetFontLoader();
     EventProcessor &GetEventProcessor();
     const ArxWindowSet &GetWindowSet();
     virtual ~GameApp();
@@ -66,7 +66,7 @@ private:
     std::unique_ptr<EventProcessor> m_eventProcessor;
     std::unique_ptr<SoundDevice> m_soundDevice;
     std::unique_ptr<SoundContext> m_soundContext;
-    std::unique_ptr<FontLibrary> m_fontLibrary;
+    std::unique_ptr<FontLoader> m_fontLoader;
 };
 
 

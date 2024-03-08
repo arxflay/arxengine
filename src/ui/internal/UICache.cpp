@@ -117,5 +117,4 @@ void UICache::Init()
     }
 }
 
-
 ARX_NAMESPACE_END

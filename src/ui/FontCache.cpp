@@ -99,6 +99,11 @@ const FontCache::FontCacheEntry &FontCache::GetCacheEntry(char ch)
     return it->second;
 }
 
+void FontCache::ManuallyUpdateLastFontChangeTime(Font::ChangeTime_t time)
+{
+    m_oldChangeTime = time;
+}
+
 void FontCache::EnableFontSmoothing(bool enable)
 {
     Texture::TextureFilteringMode filtering = enable ? Texture::TextureFilteringMode::Linear : Texture::TextureFilteringMode::Nearest;

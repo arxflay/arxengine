@@ -37,7 +37,7 @@ list(APPEND SOURCES
     ${SOURCE_PATH}/gl/Texture.cpp
     ${SOURCE_PATH}/gl/Texture2D.cpp
     ${SOURCE_PATH}/internal/al/SoundDevice.cpp
-    ${SOURCE_PATH}/internal/ft/FontLibrary.cpp
+    ${SOURCE_PATH}/internal/ft/FontLoader.cpp
     ${SOURCE_PATH}/ui/FontCache.cpp
     ${SOURCE_PATH}/ui/Pen.cpp
     ${SOURCE_PATH}/ui/UIObject.cpp

@@ -37,7 +37,7 @@ class EventHandler
         }
 
         template<typename EventType>
-        constexpr EventHandler(const std::function<std::enable_if_t<is_event_type_v<EventType>>(EventType&)> &functor) //fix
+        constexpr EventHandler(const std::function<std::enable_if_t<is_event_type_v<EventType>>(EventType&)> &functor) 
         {
             m_func = [functor](Event& evt) constexpr -> void { functor(static_cast<EventType&>(evt)); };
             m_originalFuncAddress = UnwrappedFuncAddrs { reinterpret_cast<const char*>(&functor), nullptr };

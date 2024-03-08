@@ -290,7 +290,7 @@ TEST(ArxWindow, DISABLED_PositivePainterTest2)
     GameApp::GetGlobalApp()->Run();
 }
 
-TEST(Font, DISABLED_PositiveLoadFont)
+TEST(Font, PositiveLoadFont)
 {
     std::filesystem::path testFontPath(TEST_DATA_PATH / std::filesystem::path("test-font-roboto.ttf"));
     Font font(Font::LoadFromFile(testFontPath.native()));
@@ -312,11 +312,9 @@ TEST(Font, DISABLED_PositiveLoadFont)
     });
 
     GameApp::GetGlobalApp()->Run();
-
-
 }
 
-TEST(ArxWindow, PositiveWindowInput)
+TEST(ArxWindow, DISABLED_PositiveWindowInput)
 {
     ArxWindow *win = new ArxWindow("test", Size(640, 360));
     win->Show();

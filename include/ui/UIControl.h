@@ -61,6 +61,7 @@ public:
     FontCache *GetFontCache();
     Font &GetFont();
     void SetFont(Font &&font);
+    void SetFont(const Font &font);
 
     UIControl *Clone() override;
 

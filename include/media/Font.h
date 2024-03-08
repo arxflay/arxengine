@@ -25,6 +25,8 @@ public:
     Font();
     Font(Font&&);
     Font &operator=(Font&&);
+    Font(const Font&);
+    Font &operator=(const Font&);
     /*loading functions begin*/
     static Font LoadFromFile(std::string_view filename);
     static Font LoadFromBinary(const uint8_t *data, size_t len);
@@ -43,6 +45,7 @@ private:
     void UpdateLastChangeTime();
     unsigned int m_sizeInPixels;
     ChangeTime_t m_lastChangeTime;
+    std::shared_ptr<std::vector<uint8_t>> m_fontData;
     std::unique_ptr<FT_FaceRec_, int(*)(FT_FaceRec_ *)> m_face;
 };
 

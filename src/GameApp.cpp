@@ -7,7 +7,7 @@
 #include "ArxObject.h"
 #include "ui/ArxWindow.h"
 #include "internal/al/SoundDevice.h"
-#include "internal/ft/FontLibrary.h"
+#include "internal/ft/FontLoader.h"
 
 ARX_NAMESPACE_BEGIN
 
@@ -28,10 +28,10 @@ namespace internal
         return std::make_pair(std::move(soundDevice), std::move(soundContext));
     }
 
-    std::unique_ptr<FontLibrary> InitFT()
+    std::unique_ptr<FontLoader> InitFT()
     {
         GLOG->Info("Initializing Freetype...");
-        std::unique_ptr<FontLibrary> lib(std::make_unique<FontLibrary>());
+        std::unique_ptr<FontLoader> lib(std::make_unique<FontLoader>());
         if (lib->IsInvalid())
             throw ArxException(ArxException::ErrorCode::FailedToInitializeFreetype, "Failed to initialize freetype");
 
@@ -91,7 +91,7 @@ int GameApp::Init()
         auto m_soundDeviceContextPair = internal::InitAL();
         m_soundDevice = std::move(m_soundDeviceContextPair.first);
         m_soundContext = std::move(m_soundDeviceContextPair.second);
-        m_fontLibrary = internal::InitFT();
+        m_fontLoader = internal::InitFT();
         m_eventProcessor = std::make_unique<UIEventProcessor>();
         OnAfterInit();
         m_initialized = true;
@@ -103,7 +103,7 @@ int GameApp::Init()
         GLOG->Info("Initialization failed");
         m_soundContext.reset();
         m_soundDevice.reset();
-        m_fontLibrary.reset();
+        m_fontLoader.reset();
         glfwTerminate();
     }
 
@@ -191,11 +191,11 @@ SoundContext &GameApp::GetDefaultSoundDeviceContext()
     return *m_soundContext.get();
 }
 
-FontLibrary &GameApp::GetFontLibrary()
+FontLoader &GameApp::GetFontLoader()
 {
     if(!GameApp::GetGlobalApp() || !GameApp::GetGlobalApp()->IsInitialized())
         throw ArxException(ArxException::ErrorCode::GameAppNotInitialized, "GameApp is not initialized");
-    return *m_fontLibrary.get();
+    return *m_fontLoader.get();
 }
 
 bool GameApp::IsInitialized() const
