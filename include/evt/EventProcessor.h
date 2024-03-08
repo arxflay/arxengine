@@ -13,7 +13,7 @@ class EventProcessor
 {
 friend class DeleteEvent;
 public:
-    EventProcessor() = default; 
+    EventProcessor(); 
     EventProcessor(EventProcessor&&) = delete;
     EventProcessor(const EventProcessor&) = delete;
     EventProcessor &operator=(EventProcessor&&) = delete;
@@ -28,6 +28,9 @@ public:
     };
 
     //ignores exceptions
+    void ProcessEvent(Event &event);
+
+    /*if ProcessEvents still processing events, then do nothing*/
     void ProcessEvents(); //TODO
     void EnqueueEvent(std::unique_ptr<Event> &&event);
     void ScheduleEvent(std::unique_ptr<Event> &&event);
@@ -35,16 +38,24 @@ public:
     void RemoveEvents();
     void RemoveScheduledEvents();
     void RemoveAllEvents();
+    
+    bool IsEventsProcessingRunning() const;
 
     virtual ~EventProcessor() = default;
 
 protected:
     virtual void CallBeforeProcessing(Event &evt) = 0;
 private:
+    void ProcessEventInternal(Event &event);
+    bool ShouldStopProcessingEvents() const;
+    bool IsInterruptCalled() const;
+    
+
     void MoveScheduledEventsToEventQueue();
     std::queue<std::unique_ptr<Event>> m_eventQueue;
     std::queue<std::unique_ptr<Event>> m_scheduledEvents;
     bool m_stopEventProcessing;
+    bool m_eventsProcessingRunning;
 };
 
 

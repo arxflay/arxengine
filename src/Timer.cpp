@@ -28,8 +28,8 @@ private:
         if(timer->m_past + timer->m_interval <= std::chrono::steady_clock::now())
         {
             timer->m_past = timeNow;
-            std::unique_ptr<TimerEvent> evt = std::make_unique<TimerEvent>();
-            timer->GetEventManager().QueueEvent<TimerEvent>(std::move(evt));
+            TimerEvent evt;
+            timer->GetEventManager().ProcessEvent<TimerEvent>(evt);
 
             if (timer->GetType() == Timer::TimerType::SINGLE_FIRE)
                 timer->Stop();

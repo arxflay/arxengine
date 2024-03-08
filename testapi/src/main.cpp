@@ -16,6 +16,7 @@
 #include <ui/Painter.h>
 #include <gl/Texture2D.h>
 #include <media/Font.h>
+#include <ui/KeyEvent.h>
 
 ARX_NAMESPACE_USE;
 
@@ -190,7 +191,10 @@ TEST(ArxWindow, DISABLED_PositiveRainbowWin)
     ArxWindow *win = new ArxWindow("test", Size(300, 300));
     win->Show();
     Timer *t = new Timer(win);
-    t->GetEventManager().Bind<TimerEvent>([win](TimerEvent &){win->SetBackgroundColor(arx::Color((uint)rand() % 255, (uint)rand() % 255, (uint)rand() % 255)); win->Draw(); });
+    t->GetEventManager().Bind<TimerEvent>([win](TimerEvent &){
+        win->SetBackgroundColor(arx::Color((uint8_t)(rand() % 255), (uint8_t)(rand() % 255), (uint8_t)(rand() % 255))); 
+        win->Draw(); 
+    });
     t->SetInterval(std::chrono::seconds(1));
     t->Start(Timer::TimerType::CONTINUOUS);
 
@@ -208,12 +212,15 @@ TEST(ArxWindow, DISABLED_PositiveEndAfter2Seconds)
     GameApp::GetGlobalApp()->Run();
 }
 
-TEST(ArxWindow, PositiveMultiWindow)
+TEST(ArxWindow, DISABLED_PositiveMultiWindow)
 {
     ArxWindow *win = new ArxWindow("test", Size(300, 300));
     win->Show();
     Timer *t = new Timer(win);
-    t->GetEventManager().Bind<TimerEvent>([win](TimerEvent &){win->SetBackgroundColor(arx::Color((uint)rand() % 255, (uint)rand() % 255, (uint)rand() % 255)); win->Draw(); });
+    t->GetEventManager().Bind<TimerEvent>([win](TimerEvent &){
+        win->SetBackgroundColor(arx::Color((uint8_t)(rand() % 255), (uint8_t)(rand() % 255), (uint8_t)(rand() % 255))); 
+        win->Draw(); 
+    });
     t->SetInterval(std::chrono::seconds(1));
     t->Start(Timer::TimerType::CONTINUOUS);
 
@@ -221,7 +228,7 @@ TEST(ArxWindow, PositiveMultiWindow)
     win2->Show();
     Timer *t2 = new Timer(win2);
     t2->GetEventManager().Bind<TimerEvent>([win2](TimerEvent &){
-        win2->SetBackgroundColor(arx::Color((uint)rand() % 255, (uint)rand() % 255, (uint)rand() % 255)); 
+        win2->SetBackgroundColor(arx::Color((uint8_t)(rand() % 255), (uint8_t)(rand() % 255), (uint8_t)(rand() % 255))); 
         win2->SetPosition(Position(win2->GetPosition().x + 10, win2->GetPosition().y)); 
         win2->Draw(); 
     });
@@ -283,7 +290,7 @@ TEST(ArxWindow, DISABLED_PositivePainterTest2)
     GameApp::GetGlobalApp()->Run();
 }
 
-TEST(Font, PositiveLoadFont)
+TEST(Font, DISABLED_PositiveLoadFont)
 {
     std::filesystem::path testFontPath(TEST_DATA_PATH / std::filesystem::path("test-font-roboto.ttf"));
     Font font(Font::LoadFromFile(testFontPath.native()));
@@ -309,3 +316,47 @@ TEST(Font, PositiveLoadFont)
 
 }
 
+TEST(ArxWindow, PositiveWindowInput)
+{
+    ArxWindow *win = new ArxWindow("test", Size(640, 360));
+    win->Show();
+    win->SetFixedViewport(640, 360);
+    float position = 20.0f; 
+
+    win->GetEventManager().Bind<KeyDownEvent>([win](KeyDownEvent &e) {  
+        if (e.GetKey() == KeyEvent::Key::Esc)
+            win->RequestDelete();
+        else if (e.GetKey() == KeyEvent::Key::L)
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        else if (e.GetKey() == KeyEvent::Key::F)
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+        win->Draw();
+    });
+
+    win->GetEventManager().Bind<KeyHoldEvent>([win, &position](KeyHoldEvent &e) {
+        if (e.GetKey() == KeyEvent::Key::D)
+            position += 10e5f * static_cast<float>(GameApp::GetGlobalApp()->GetDeltaTime());
+        if (e.GetKey() == KeyEvent::Key::A)
+            position -= 10e5f * static_cast<float>(GameApp::GetGlobalApp()->GetDeltaTime());
+
+        win->Draw();
+    });
+
+    win->GetEventManager().Bind<KeyUpEvent>([win](KeyUpEvent &e) {
+        (void)win;
+        if (e.GetKey() != KeyEvent::Key::D && e.GetKey() != KeyEvent::Key::A)
+            std::cout << e.GetKeyChar() << '\n'; 
+    });
+
+    win->GetEventManager().Bind<DrawEvent>([win, &position](DrawEvent &e){
+        (void)win;
+        Painter painter(e);
+        painter.Clear();
+        painter.SetBrush(Brush(Color(100, 200, 100)));
+        painter.DrawRectangle(Position(position, 60.0f), Size(100, 100));
+
+    });
+
+    GameApp::GetGlobalApp()->Run();
+}

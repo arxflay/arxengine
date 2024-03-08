@@ -5,6 +5,9 @@
 #include <glm/ext/matrix_clip_space.hpp>
 #include "media/Image.h"
 #include <memory>
+#include <iostream>
+#include "ui/KeyEvent.h"
+
 ARX_NAMESPACE_BEGIN
 
 namespace
@@ -44,11 +47,40 @@ namespace
     arxWin->Draw();
 }
 
+
+/*static*/ void ArxWindow::InputCallback(GLFWwindow* window, int key, int, int action, int)
+{
+    ArxWindow *arxWin = static_cast<ArxWindow*>(glfwGetWindowUserPointer(window));
+    std::unique_ptr<KeyEvent> keyEvent;
+    switch(action)
+    {
+        case GLFW_PRESS:
+            keyEvent = std::make_unique<KeyDownEvent>();
+            keyEvent->SetKey(static_cast<KeyEvent::Key>(key));
+            arxWin->GetEventManager().QueueEvent<KeyDownEvent>(std::move(keyEvent));
+            break;
+        case GLFW_RELEASE:
+            keyEvent = std::make_unique<KeyUpEvent>();
+            keyEvent->SetKey(static_cast<KeyEvent::Key>(key));
+            arxWin->GetEventManager().QueueEvent<KeyUpEvent>(std::move(keyEvent));
+            break;
+        case GLFW_REPEAT:
+            keyEvent = std::make_unique<KeyHoldEvent>();
+            keyEvent->SetKey(static_cast<KeyEvent::Key>(key));
+            arxWin->GetEventManager().QueueEvent<KeyHoldEvent>(std::move(keyEvent));
+            break;
+        default:
+            break;
+    }
+
+}
+
 /*static*/ void ArxWindow::SetGlfwCallbacks(GLFWwindow *win)
 {
     glfwSetWindowCloseCallback(win, ArxWindow::CloseCallback); 
     glfwSetWindowPosCallback(win, ArxWindow::PositionCallback);
     glfwSetWindowRefreshCallback(win, ArxWindow::RefreshCallback);
+    glfwSetKeyCallback(win, ArxWindow::InputCallback);
 }
 
 //uncompelte fullscreen
@@ -100,7 +132,6 @@ ArxWindow::ArxWindow(std::string_view title, Size size, Position position, int a
     m_viewport = Viewport{glm::ortho(0.0f, size.width, 0.0f, size.height), size };
     m_uiCache->Init();
     RegisterWindowFromWindowList();
-
 }
 
 class ShowWindowEvent : public Event
@@ -290,6 +321,25 @@ void ArxWindow::Draw()
     DrawInternal(this);
     std::unique_ptr<SwapBuffersEvent> evt(std::make_unique<SwapBuffersEvent>(m_win.get()));
     GetEventManager().QueueEvent<SwapBuffersEvent>(std::move(evt));
+}
+
+void ArxWindow::DrawNowInternal(UIControl *obj)
+{
+    DrawEvent evt;
+    obj->GetEventManager().ProcessEvent<DrawEvent>(evt);
+    for (ArxObject *obj : const_cast<ArxObjectList&>(obj->GetChildren()))
+    {
+        UIControl *uiControl = dynamic_cast<UIControl*>(obj);
+        if (uiControl)
+            DrawNowInternal(uiControl);
+    }
+}
+
+void ArxWindow::DrawNow()
+{
+    DrawInternal(this);
+    SwapBuffersEvent event(m_win.get());
+    GetEventManager().ProcessEvent<SwapBuffersEvent>(event);
 }
 
 bool ArxWindow::SetIcon(std::optional<std::reference_wrapper<const Image>> img)

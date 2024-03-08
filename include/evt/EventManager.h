@@ -238,6 +238,35 @@ public:
         GameApp::GetGlobalApp()->GetEventProcessor().ScheduleEvent(std::move(event));
     }
 
+    class InternalEventParamsUnsetter final
+    {
+    public:
+        friend class EventManager;
+        InternalEventParamsUnsetter(Event &e)
+            : m_event(e)
+        {
+        
+        }
+
+        ~InternalEventParamsUnsetter()
+        {
+            m_event.SetSender(nullptr);
+            m_event.m_eventHandlersPtr = std::nullopt;
+        }
+    private:
+        Event &m_event;
+    };
+    
+    /*process event immediately without enqueue into event queue*/
+    template<typename EventType>
+    std::enable_if_t<is_event_type_v<EventType>> ProcessEvent(Event &event)
+    {
+        InternalEventParamsUnsetter unsetter(event);
+        event.SetSender(m_owner);
+        event.m_eventHandlersPtr = m_eventsHandlersMap.FindOrCreateEventHandlers<EventType>();
+        GameApp::GetGlobalApp()->GetEventProcessor().ProcessEvent(event);
+    }
+
 private:
     ArxObject *m_owner;
     EventsHandlersMap m_eventsHandlersMap;

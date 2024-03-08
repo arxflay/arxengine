@@ -6,48 +6,99 @@
 #include <iostream>
 ARX_NAMESPACE_BEGIN
 
+EventProcessor::EventProcessor()
+    : m_stopEventProcessing(false)
+    , m_eventsProcessingRunning(false)
+{
+
+}
+
+void EventProcessor::ProcessEventInternal(Event &event)
+{
+    CallBeforeProcessing(event);
+    if (!event.m_eventHandlersPtr.has_value())
+    {
+        event.HandleEvent();
+        return;
+    }
+
+    bool hasMoreHandlers = true;
+    event.Skip(false);
+    typename std::vector<int>::difference_type evtHandlerIndex = 0;
+
+    while(hasMoreHandlers && !IsInterruptCalled())
+    {
+        if(evtHandlerIndex < static_cast<decltype(evtHandlerIndex)>(event.m_eventHandlersPtr->get().size()))
+        {
+            auto handler = *(event.m_eventHandlersPtr->get().rbegin() + evtHandlerIndex);
+            handler(event);
+            hasMoreHandlers = event.WasSkipCalled();
+            evtHandlerIndex++;
+        }
+        else
+        {
+            event.HandleEvent();
+            hasMoreHandlers = false;
+        }
+        event.Skip(false);
+    }
+
+}
+
+void EventProcessor::ProcessEvent(Event &event)
+{
+
+    bool oldProcessingState = IsInterruptCalled();
+    m_stopEventProcessing = false;
+    try
+    {
+        ProcessEventInternal(event);
+    }
+    catch(...)
+    {
+        /*do nothing*/
+        UniversalExceptionHandler::HandleException();
+    }
+    m_stopEventProcessing = oldProcessingState;
+}
+
+bool EventProcessor::IsEventsProcessingRunning() const
+{
+    return m_eventsProcessingRunning ;
+}
+
+bool EventProcessor::ShouldStopProcessingEvents() const
+{
+    return m_eventQueue.empty() || IsInterruptCalled();
+}
+
+bool EventProcessor::IsInterruptCalled() const
+{
+    return m_stopEventProcessing;
+}
+
 void EventProcessor::ProcessEvents()
 {
+    if (IsEventsProcessingRunning())
+        return;
+    
+    m_eventsProcessingRunning = true;
     m_stopEventProcessing = false;
-    while(!m_eventQueue.empty() && !m_stopEventProcessing)
+    
+    while(!ShouldStopProcessingEvents())
     {
         try
         {
-            std::unique_ptr<Event> evt = std::move(m_eventQueue.front());
+            std::unique_ptr<Event> event = std::move(m_eventQueue.front());
             m_eventQueue.pop();
-
-            CallBeforeProcessing(*evt.get());
-            if (!evt->m_eventHandlersPtr.has_value())
+            if (!event)
+                throw ArxException(ArxException::ErrorCode::GenericError, "nullptr event arrived");
+         
+            ProcessEventInternal(*event);
+            if (event->IsScheduledAfterProcessing())
             {
-                evt->HandleEvent();
-                continue;
-            }
-
-            bool shouldContinueProcessing = true;
-            evt->Skip(false);
-            typename std::vector<int>::difference_type evtHandlerIndex = 0;
-        
-            while(shouldContinueProcessing && !m_stopEventProcessing)
-            {
-                if(evtHandlerIndex < static_cast<decltype(evtHandlerIndex)>(evt->m_eventHandlersPtr->get().size()))
-                {
-                    auto handler = *(evt->m_eventHandlersPtr->get().rbegin() + evtHandlerIndex);
-                    handler(*evt);
-                    shouldContinueProcessing = evt->WasSkipCalled();
-                    evtHandlerIndex++;
-                }
-                else
-                {
-                    evt->HandleEvent();
-                    shouldContinueProcessing = false; //ignore Skip to avoid loop
-                }
-                evt->Skip(false);
-            }
-            
-            if (evt->IsScheduledAfterProcessing())
-            {
-                evt->ScheduleAfterProcessing(false);
-                m_scheduledEvents.push(std::move(evt));
+                event->ScheduleAfterProcessing(false);
+                m_scheduledEvents.push(std::move(event));
             }
         }
         catch(...)
@@ -56,18 +107,28 @@ void EventProcessor::ProcessEvents()
             UniversalExceptionHandler::HandleException();
         }
     }
+    
     MoveScheduledEventsToEventQueue();
+    m_eventsProcessingRunning = false;
 }
 
 void EventProcessor::MoveScheduledEventsToEventQueue()
 {
-    while(!m_scheduledEvents.empty())
+    try
     {
-        std::unique_ptr<Event> evt = std::move(m_scheduledEvents.front());
-        if (!(evt->GetSender() && evt->GetSender()->IsDestroyCalled()))
-            m_eventQueue.emplace(std::move(evt));
+        while(!m_scheduledEvents.empty())
+        {
+            std::unique_ptr<Event> evt = std::move(m_scheduledEvents.front());
+            if (!(evt->GetSender() && evt->GetSender()->IsDestroyCalled()))
+                m_eventQueue.emplace(std::move(evt));
 
-        m_scheduledEvents.pop();
+            m_scheduledEvents.pop();
+        }
+    }
+    catch(...)
+    {
+        /*do nothing*/
+        UniversalExceptionHandler::HandleException();
     }
 }
 

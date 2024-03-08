@@ -41,6 +41,7 @@ list(APPEND SOURCES
     ${SOURCE_PATH}/ui/FontCache.cpp
     ${SOURCE_PATH}/ui/Pen.cpp
     ${SOURCE_PATH}/ui/UIObject.cpp
+    ${SOURCE_PATH}/ui/KeyEvent.cpp
 )
 set(CMAKE_EXPORT_COMPILE_COMMANDS True)
 set(gcc_like_cxx "$<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang,GNU,LCC>")

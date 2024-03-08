@@ -13,6 +13,9 @@ ARX_NAMESPACE_BEGIN
 class UICache;
 class Image;
 
+
+
+
 class ArxWindow : public UIControl
 {
 public:
@@ -75,8 +78,11 @@ public:
     //nullopt == unset icon
     bool SetIcon(std::optional<std::reference_wrapper<const Image>> img);
     
-    /* full redraw */
+    /* schedules draw event */
     void Draw();
+
+    /* redraw now */
+    void DrawNow();
 
     bool IsEnabledClipToBounds() const override;
 
@@ -95,9 +101,13 @@ private:
     static void PositionCallback(GLFWwindow *win, int x, int y);
     static void CloseCallback(GLFWwindow *win);
     static void RefreshCallback(GLFWwindow *win);
+    static void InputCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+
     static void SetGlfwCallbacks(GLFWwindow *win);
 
     static void DrawInternal(UIControl *obj);
+    static void DrawNowInternal(UIControl *obj);
+
 private:
     std::unique_ptr<GLFWwindow, void(*)(GLFWwindow*)> m_win;
     Size m_clientSize;
