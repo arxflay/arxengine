@@ -61,10 +61,14 @@ constexpr std::string_view IMAGE_VERTEX_SHADER = R"(
     uniform mat4 )" VIEW_MATRIX_NAME R"(;
     uniform mat4 )" PROJECTION_MATRIX_NAME R"(;
     out vec2 TexPos;
+    uniform int tileHeightCount;
+    uniform int tileWidthCount;
     void main()
     {
         gl_Position = )" PROJECTION_MATRIX_NAME "*" VIEW_MATRIX_NAME "*" MODEL_MATRIX_NAME R"(* vec4(Pos, 0.0f, 1.0f);
         TexPos = Pos;
+        TexPos.x *= tileWidthCount;
+        TexPos.y *= tileHeightCount;
     }
 )";
 

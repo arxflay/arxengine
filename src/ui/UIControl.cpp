@@ -137,7 +137,7 @@ ShowEvent::ShowEvent()
 
 void ShowEvent::HandleEvent() 
 {
-    static_cast<UIControl*>(GetSender())->m_isShown = true;    
+    static_cast<UIControl*>(GetSender())->m_isShown = WillBeShown();    
 }
 
 bool ShowEvent::WillBeShown() const

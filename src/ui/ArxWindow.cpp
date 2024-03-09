@@ -268,6 +268,9 @@ UICache *ArxWindow::GetUICache()
 
 /*static*/ void ArxWindow::DrawInternal(UIControl *obj)
 {
+    if (!obj->IsShown())
+        return;
+
     std::unique_ptr<DrawEvent> evt(new DrawEvent);
     obj->GetEventManager().QueueEvent<DrawEvent>(std::move(evt));
     for (ArxObject *obj : const_cast<ArxObjectList&>(obj->GetChildren()))

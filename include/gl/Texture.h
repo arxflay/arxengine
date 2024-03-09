@@ -69,7 +69,7 @@ public:
     {
         ClampToBorder = 0x812D,
         ClampToEdge = 0x812F,
-        Repeat = 0x290f,
+        Repeat = 0x2901,
         MirrorRepeat = 0x8370,
         Default = Repeat
     };

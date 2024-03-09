@@ -207,7 +207,7 @@ TEST(ArxWindow, DISABLED_PositiveEndAfter2Seconds)
     win->Show();
     Timer *t = new Timer(win);
     t->GetEventManager().Bind<TimerEvent>([errCode=0](TimerEvent &){ GameApp::GetGlobalApp()->Exit(errCode); });
-    t->SetInterval(std::chrono::seconds(1));
+    t->SetInterval(std::chrono::seconds(2));
     t->Start(Timer::TimerType::SINGLE_FIRE);
     GameApp::GetGlobalApp()->Run();
 }
@@ -355,7 +355,7 @@ TEST(ArxWindow, DISABLED_PositiveWindowInput)
     GameApp::GetGlobalApp()->Run();
 }
 
-TEST(ArxWindow, PositiveImageControl)
+TEST(ArxWindow, DISABLED_PositiveImageControl)
 {
     ArxWindow *win = new ArxWindow("test", Size(640, 360));
     win->Show();
@@ -364,8 +364,51 @@ TEST(ArxWindow, PositiveImageControl)
     Image img(Image::LoadFromFile(testJpgPath.native()));
     ImageControl *ctrl = new ImageControl(win, img, Size(100, 100), Position(100, 100));
     ctrl->SetFilteringMode(Texture::TextureFilteringMode::Linear);
-    ctrl->SetWrappingMode(Texture::TextureWrapping::Repeat);
     ctrl->SetBackgroundColor(defaults::COLOR_BLACK);
 
     GameApp::GetGlobalApp()->Run();
 }
+
+TEST(ArxWindow, DISABLED_PositiveImageControlHideShow)
+{
+    ArxWindow *win = new ArxWindow("test", Size(640, 360));
+    win->Show();
+    win->SetFixedViewport(640, 360);
+    std::filesystem::path testJpgPath(TEST_DATA_PATH / std::filesystem::path("test_png.png"));
+    Image img(Image::LoadFromFile(testJpgPath.native()));
+    ImageControl *ctrl = new ImageControl(win, img, Size(100, 100), Position(100, 100));
+    ctrl->SetFilteringMode(Texture::TextureFilteringMode::Linear);
+    ctrl->Hide();
+    Timer *t = new Timer(win);
+    t->GetEventManager().Bind<TimerEvent>([ctrl](TimerEvent &){ ctrl->Show(); });
+    t->SetInterval(std::chrono::seconds(1));
+    t->Start(Timer::TimerType::SINGLE_FIRE);
+
+    GameApp::GetGlobalApp()->Run();
+}
+
+TEST(ArxWindow, PositiveImageControlTileSize)
+{
+    ArxWindow *win = new ArxWindow("test", Size(640, 360));
+    win->Show();
+    win->SetFixedViewport(640, 360);
+    std::filesystem::path testJpgPath(TEST_DATA_PATH / std::filesystem::path("test_png.png"));
+    Image img(Image::LoadFromFile(testJpgPath.native()));
+    ImageControl *ctrl = new ImageControl(win, img, Size(100, 100), Position(100, 100));
+    ctrl->SetFilteringMode(Texture::TextureFilteringMode::Linear);
+    ctrl->EnableTilingMode(TileData{3, 3});
+    ctrl->SetBackgroundColor(defaults::COLOR_BLACK);
+    win->EnableVSync(true);
+    Position pos(100, 100);
+    win->GetEventManager().Bind<KeyHoldEvent>([ctrl, &pos](KeyHoldEvent &e) {
+        if (e.GetKey() == KeyEvent::Key::W)
+            pos.y -= 1000 * static_cast<float>(GameApp::GetGlobalApp()->GetDeltaTime());
+        else if (e.GetKey() == KeyEvent::Key::S)
+            pos.y += 1000 * static_cast<float>(GameApp::GetGlobalApp()->GetDeltaTime());
+        ctrl->SetPosition(pos);
+    });
+
+
+    GameApp::GetGlobalApp()->Run();
+}
+

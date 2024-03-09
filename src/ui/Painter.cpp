@@ -106,7 +106,7 @@ void Painter::DrawRectangle(Position pos, Size size)
     glDrawArrays(GL_TRIANGLES, 0, 6); 
 }
 
-void Painter::DrawTexture2D(Position pos, Size size, const Texture2D *tex)
+void Painter::DrawTexture2D(Position pos, Size size, const Texture2D *tex, int tileWidthCount, int tileHeightCount)
 {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -130,7 +130,8 @@ void Painter::DrawTexture2D(Position pos, Size size, const Texture2D *tex)
     Shader &shader = GetUICache(m_sender)->GetShaderMap().at(UICache::SHADER_PROGRAM_ID::IMAGE);
     shader.UseShader();
     shader.SetTransformMatrices(modelMatrix, viewMatrix, GetViewport().projectionMatrix);
-
+    shader.SetUniformInt("tileHeightCount", tileHeightCount);
+    shader.SetUniformInt("tileWidthCount", tileWidthCount);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glDisable(GL_BLEND);
 }
