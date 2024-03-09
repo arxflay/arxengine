@@ -126,6 +126,8 @@ int GameApp::Run()
         m_now = glfwGetTime();
         m_deltaTime = m_now - m_past;
         m_past = m_now;
+        for (ArxWindow *win : m_windows)
+            win->Draw();
         glfwPollEvents();
         m_eventProcessor->ProcessEvents();
         try

@@ -35,7 +35,6 @@ public:
     bool IsDestroyCalled() const;
     EventManager &GetEventManager();
 
-
 private:
     virtual ArxObject *AllocClone();
     ArxObject *m_parent;

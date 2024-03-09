@@ -10,6 +10,7 @@ UIControl::UIControl(UIControl *parent, Size size, Position pos)
     , m_backgroundColor(defaults::COLOR_WHITE)
     , m_clippingEnabled(true)
     , m_fontCache(new FontCache(this))
+    , m_isShown(true)
 {
     if (!parent)
         throw ArxException(ArxException::ErrorCode::GenericError, "UIControl parent is null");
@@ -47,6 +48,13 @@ void UIControl::Reparent(ArxObject *parent)
     ArxObject::Reparent(parent);
 }
 
+void UIControl::Show(bool visible)
+{
+    std::unique_ptr<ShowEvent> showEvent(new ShowEvent);
+    showEvent->SetWillBeShown(visible);
+    GetEventManager().QueueEvent<ShowEvent>(std::move(showEvent));
+}
+
 void UIControl::Hide()
 {
     Show(false);
@@ -59,13 +67,14 @@ UIControl::UIControl()
     , m_backgroundColor(defaults::COLOR_WHITE)
     , m_clippingEnabled(false)
     , m_fontCache(new FontCache(this))
+    , m_isShown(false)
 {
 
 }
 
 void DrawEvent::HandleEvent()
 {
-
+    static_cast<UIControl*>(GetSender())->OnDraw(*this);
 }
 
 void UIControl::EnableClipToBounds(bool enable)
@@ -114,6 +123,31 @@ void UIControl::SetFont(Font &&font)
 void UIControl::SetFont(const Font &font)
 {
     m_font = font;
+}
+
+bool UIControl::IsShown() const
+{
+    return m_isShown;
+}
+
+ShowEvent::ShowEvent()
+    : m_show(false)
+{
+}
+
+void ShowEvent::HandleEvent() 
+{
+    static_cast<UIControl*>(GetSender())->m_isShown = true;    
+}
+
+bool ShowEvent::WillBeShown() const
+{
+    return m_show;
+}
+
+void ShowEvent::SetWillBeShown(bool show)
+{
+    m_show = show;
 }
 
 ARX_NAMESPACE_END

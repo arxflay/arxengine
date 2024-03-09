@@ -34,23 +34,29 @@ namespace
         
         //invert y axis, top = 0
         Position clipPosition = senderPos;
-        clipPosition.y = -clipPosition.y;
-        clipPosition.y += windowSize.height;
-        clipPosition.y -= senderSize.height;
+        
 
         Size clipSize(senderSize.width, senderSize.height);
-        if (viewPortSize == windowSize)
+        if (!(viewPortSize == windowSize))
         {
             //transform screen coordinates and size to viewport dimensions
             float widthCoef = windowSize.width / viewPortSize.width;
             float heightCoef = windowSize.height / viewPortSize.height;
-
+            
             clipPosition.x *= widthCoef;
-            clipPosition.y *= heightCoef;
-            clipSize.width *= widthCoef; 
-            clipSize.height *= heightCoef;
+            clipSize.width *= widthCoef;
+            clipSize.height += (clipSize.height * heightCoef) - clipSize.height;
+            
+            clipPosition.y = -clipPosition.y * heightCoef;
+            clipPosition.y += windowSize.height;
+            clipPosition.y -= clipSize.height;
         }
-        
+        else
+        {
+            clipPosition.y = -clipPosition.y;
+            clipPosition.y += windowSize.height;
+            clipPosition.y -= senderSize.height;
+        }
         //transform size in window to size in Viewport  
         ClippingArea::ClipBox clipBox;
         clipBox.x = static_cast<int>(clipPosition.x);
@@ -80,18 +86,17 @@ void Painter::DrawRectangle(Position pos, Size size)
     OldClippingAreaGuard clipGuard;
     OldVAOGuard vaoGuard;
     if (m_clippingArea)
+    {
+        m_clippingArea->SetClipBox(CreateClipBox(m_sender));
         m_clippingArea->UseThisClippingArea();
-
-    ClippingArea clippingArea;
-    clippingArea.SetClipBox(CreateClipBox(m_sender));
-    clippingArea.UseThisClippingArea();
+    }
 
     Position drawPos = CalculateDrawPosition(pos, size);
     glm::mat4 modelMatrix = glm::mat4(1.0f);
     modelMatrix = glm::translate(modelMatrix, glm::vec3(drawPos.x, drawPos.y, 0.0f));
     modelMatrix = glm::scale(modelMatrix, glm::vec3(size.width, size.height, 0.0f));
     glm::mat4 viewMatrix = glm::mat4(1.0f);
-
+        
     VAO &rectVao = GetUICache(m_sender)->GetVAOMap().at(UICache::VAO_ID::RECTANGLE);
     rectVao.Bind();
     Shader &shader = GetUICache(m_sender)->GetShaderMap().at(UICache::SHADER_PROGRAM_ID::RECTANGLE);
@@ -108,7 +113,10 @@ void Painter::DrawTexture2D(Position pos, Size size, const Texture2D *tex)
     OldClippingAreaGuard clipGuard;
     OldVAOGuard vaoGuard;
     if (m_clippingArea)
+    {
+        m_clippingArea->SetClipBox(CreateClipBox(m_sender));
         m_clippingArea->UseThisClippingArea();
+    }
 
     Position drawingPos = CalculateDrawPosition(pos, size);
     glm::mat4 modelMatrix = glm::mat4(1.0f);
@@ -134,7 +142,10 @@ void Painter::DrawText(std::string_view text, Position pos)
     OldClippingAreaGuard clipGuard;
     OldVAOGuard vaoGuard;
     if (m_clippingArea)
+    {
+        m_clippingArea->SetClipBox(CreateClipBox(m_sender));
         m_clippingArea->UseThisClippingArea();
+    }
 
     glm::mat4 viewMatrix = glm::mat4(1.0f);
     
@@ -145,7 +156,6 @@ void Painter::DrawText(std::string_view text, Position pos)
     shader.SetUniformVec4("color", m_pen.GetColor().GetNormalizedColorRGBA());
 
     Position drawingPos = CalculateDrawPosition(pos, Size(0.0f, 0.0f));
-
     auto *fontCache = m_sender->GetFontCache();
     for (char ch : text)
     {
@@ -172,7 +182,9 @@ Position Painter::CalculateDrawPosition(Position drawPos, Size drawSize)
     drawPos.y = -drawPos.y;
     drawPos.y += viewPortSize.height;
     drawPos.y -= drawSize.height;
-    drawPos += senderPos;
+    drawPos.x = senderPos.x + drawPos.x;
+    drawPos.y -= senderPos.y;
+
     
     return drawPos;
 }

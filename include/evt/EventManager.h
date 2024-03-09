@@ -25,29 +25,39 @@ class EventHandler
             {
                 return addr == b.addr && instance_addr == b.instance_addr; 
             }
-            const char *addr;
-            const char *instance_addr;
+            uintptr_t addr;
+            uintptr_t instance_addr;
         };
 
         template<typename EventType>
         constexpr EventHandler(std::enable_if_t<is_event_type_v<EventType>> (*c_func)(EventType&))
         {
             m_func = [c_func](Event& evt) constexpr -> void { c_func(static_cast<EventType&>(evt)); };
-            m_originalFuncAddress = UnwrappedFuncAddrs{ reinterpret_cast<const char *>(c_func), nullptr };
+            m_originalFuncAddress = UnwrappedFuncAddrs{ reinterpret_cast<uintptr_t>(c_func), 0 };
         }
 
         template<typename EventType>
         constexpr EventHandler(const std::function<std::enable_if_t<is_event_type_v<EventType>>(EventType&)> &functor) 
         {
             m_func = [functor](Event& evt) constexpr -> void { functor(static_cast<EventType&>(evt)); };
-            m_originalFuncAddress = UnwrappedFuncAddrs { reinterpret_cast<const char*>(&functor), nullptr };
+            m_originalFuncAddress = UnwrappedFuncAddrs { reinterpret_cast<uintptr_t>(&functor), 0 };
         }
 
         template<typename EventType, typename ClassType>
-        constexpr EventHandler(std::enable_if_t<is_event_type_v<EventType>> (ClassType::*memberFunction)(EventType&), ClassType *instance)
+        constexpr EventHandler(std::enable_if_t<is_event_type_v<EventType>>(ClassType::*memberFunction)(EventType&), ClassType *instance)
         {
-            m_func = [instance, memberFunction](Event& evt) constexpr -> void { (instance.*memberFunction)(static_cast<EventType&>(evt)); };
-            m_originalFuncAddress = UnwrappedFuncAddrs{ reinterpret_cast<const char*>(memberFunction),reinterpret_cast<const char*>(instance) };
+            m_func = [instance, memberFunction](Event& evt) constexpr -> void { (*instance.*memberFunction)(static_cast<EventType&>(evt)); };
+            
+            /*hacky workaround*/
+            union
+            {
+                void (ClassType::*memberFunction)(EventType&);
+                uintptr_t addr;
+            } memberFunctionAddr;
+            
+            memberFunctionAddr.memberFunction = memberFunction;
+            m_originalFuncAddress = UnwrappedFuncAddrs{ memberFunctionAddr.addr, reinterpret_cast<uintptr_t>(instance) };
+            
         }
 
         void operator()(Event &evt) const //do not call directly, unsafe

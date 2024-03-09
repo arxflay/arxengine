@@ -44,7 +44,6 @@ namespace
     glfwGetWindowSize(arxWin->m_win.get(), &width, &height);
     arxWin->RecalculateSizes(Size(width, height));
     glViewport(0, 0, static_cast<GLsizei>(arxWin->GetClientSize().width), static_cast<GLsizei>(arxWin->GetClientSize().height));
-    arxWin->Draw();
 }
 
 
@@ -90,6 +89,7 @@ ArxWindow::ArxWindow(std::string_view title, Size size, Position position, int a
     , m_title(title)
     , m_useFixedViewport(false)
     , m_uiCache(std::make_unique<UICache>())
+    , m_vsyncEnabled(false)
 {
     glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
     glfwWindowHint(GLFW_FOCUS_ON_SHOW, GLFW_TRUE);
@@ -108,7 +108,7 @@ ArxWindow::ArxWindow(std::string_view title, Size size, Position position, int a
     else
     {*/
         Size validSize = MakeSizeValid(size); 
-        m_win.reset(glfwCreateWindow(static_cast<int>(validSize.height), static_cast<int>(validSize.width), m_title.c_str(), nullptr, nullptr));
+        m_win.reset(glfwCreateWindow(static_cast<int>(validSize.width), static_cast<int>(validSize.height), m_title.c_str(), nullptr, nullptr));
     //}
     if (!m_win)
         throw ArxException(ArxException::ErrorCode::FailedToConstructArxWindow, "failed to create opengl context");
@@ -123,40 +123,19 @@ ArxWindow::ArxWindow(std::string_view title, Size size, Position position, int a
     RecalculateSizes(validSize);
     SetPosition(position);
     SetGlfwCallbacks(m_win.get());
-    GetEventManager().Bind<DrawEvent>([this](DrawEvent &evt){
-        void(this);
-        Painter painter(evt);
-        painter.Clear();
-    });
 
+    GetEventManager().Bind<ShowEvent>(&ArxWindow::OnShow, this);
     m_viewport = Viewport{glm::ortho(0.0f, size.width, 0.0f, size.height), size };
     m_uiCache->Init();
     RegisterWindowFromWindowList();
+    glfwSwapInterval(1);
 }
 
-class ShowWindowEvent : public Event
+void ArxWindow::OnDraw(DrawEvent &e)
 {
-public:
-    ShowWindowEvent(GLFWwindow *window, bool show = true)
-        : m_window(window)
-        , m_show(show)
-    {
-    }
-    void HandleEvent()
-    {
-        if (m_show)
-            glfwShowWindow(m_window);
-        else
-            glfwHideWindow(m_window);
-    }
-private:
-    GLFWwindow *m_window;
-    bool m_show;
-};
-
-void ArxWindow::Show(bool visible) 
-{
-    GetEventManager().QueueEvent<ShowWindowEvent>(std::make_unique<ShowWindowEvent>(m_win.get(), visible));
+    void(this);
+    Painter painter(e);
+    painter.Clear();
 }
 
 void ArxWindow::SetWindowAttributes(int attributes)
@@ -256,14 +235,12 @@ void ArxWindow::SetFixedViewport(float width, float height)
 {
     m_useFixedViewport = true;
     m_viewport = Viewport{glm::ortho(0.0f, width, 0.0f, height), Size(width, height)};
-    Draw();
 }
 
 void ArxWindow::RemoveFixedViewport()
 {
     m_useFixedViewport = false;
     m_viewport = Viewport{glm::ortho(0.0f, GetClientSize().width, 0.0f, GetClientSize().height), GetClientSize() };
-    Draw();
 }
 
 const Viewport &ArxWindow::GetViewport()
@@ -391,6 +368,24 @@ ArxWindow *ArxWindow::Clone()
 ArxWindow *ArxWindow::AllocClone()
 {
     return new ArxWindow(m_title, m_size, m_position, m_attributes);
+}
+
+void ArxWindow::OnShow(ShowEvent &e)
+{
+    if (e.WillBeShown())
+        glfwShowWindow(m_win.get());
+    else
+        glfwHideWindow(m_win.get());
+
+    e.Skip();
+}
+
+void ArxWindow::EnableVSync(bool enable)
+{
+    SetAsCurrentContext();
+    //wait for monitor refresh
+    glfwSwapInterval(enable);
+    m_vsyncEnabled = enable;
 }
 
 

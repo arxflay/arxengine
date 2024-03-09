@@ -36,11 +36,7 @@ public:
     
     ArxWindow(std::string_view title, Size size = defaults::DEFAULT_SIZE, Position position = defaults::DEFAULT_POSITION, int attributes = WindowAttributes::RESIZABLE | WindowAttributes::DECORATED); //, bool isFullScreen= false);
     
-    /**
-     * @brief Shows/Hides window
-     * @param[in] visible Show/Hide
-     */
-    void Show(bool visible = true) override;
+    
     void SetWindowAttributes(int attributes);
     
     std::string_view GetTitle();
@@ -90,10 +86,12 @@ public:
     bool SetWindowAspectRatio(int numer, int denom);
     ArxWindow *Clone() override;
 
-private:
-    ArxWindow *AllocClone() override;
+    void EnableVSync(bool enable);
 
 private:
+    ArxWindow *AllocClone() override;
+    void OnShow(ShowEvent &e);
+    void OnDraw(DrawEvent &e) override;
     void RecalculateSizes(Size s);
     void RegisterWindowFromWindowList();
     void UnregisterWindowFromWindowList();
@@ -116,6 +114,7 @@ private:
     Viewport m_viewport;
     bool m_useFixedViewport;
     std::unique_ptr<UICache> m_uiCache;
+    bool m_vsyncEnabled;
 };
 
 ARX_NAMESPACE_END

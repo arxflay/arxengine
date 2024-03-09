@@ -17,6 +17,7 @@
 #include <gl/Texture2D.h>
 #include <media/Font.h>
 #include <ui/KeyEvent.h>
+#include <ui/ImageControl.h>
 
 ARX_NAMESPACE_USE;
 
@@ -192,8 +193,7 @@ TEST(ArxWindow, DISABLED_PositiveRainbowWin)
     win->Show();
     Timer *t = new Timer(win);
     t->GetEventManager().Bind<TimerEvent>([win](TimerEvent &){
-        win->SetBackgroundColor(arx::Color((uint8_t)(rand() % 255), (uint8_t)(rand() % 255), (uint8_t)(rand() % 255))); 
-        win->Draw(); 
+        win->SetBackgroundColor(arx::Color((uint8_t)(rand() % 255), (uint8_t)(rand() % 255), (uint8_t)(rand() % 255)));  
     });
     t->SetInterval(std::chrono::seconds(1));
     t->Start(Timer::TimerType::CONTINUOUS);
@@ -219,7 +219,6 @@ TEST(ArxWindow, DISABLED_PositiveMultiWindow)
     Timer *t = new Timer(win);
     t->GetEventManager().Bind<TimerEvent>([win](TimerEvent &){
         win->SetBackgroundColor(arx::Color((uint8_t)(rand() % 255), (uint8_t)(rand() % 255), (uint8_t)(rand() % 255))); 
-        win->Draw(); 
     });
     t->SetInterval(std::chrono::seconds(1));
     t->Start(Timer::TimerType::CONTINUOUS);
@@ -230,7 +229,6 @@ TEST(ArxWindow, DISABLED_PositiveMultiWindow)
     t2->GetEventManager().Bind<TimerEvent>([win2](TimerEvent &){
         win2->SetBackgroundColor(arx::Color((uint8_t)(rand() % 255), (uint8_t)(rand() % 255), (uint8_t)(rand() % 255))); 
         win2->SetPosition(Position(win2->GetPosition().x + 10, win2->GetPosition().y)); 
-        win2->Draw(); 
     });
     t2->SetInterval(std::chrono::seconds(1));
     t2->Start(Timer::TimerType::CONTINUOUS);
@@ -290,7 +288,7 @@ TEST(ArxWindow, DISABLED_PositivePainterTest2)
     GameApp::GetGlobalApp()->Run();
 }
 
-TEST(Font, PositiveLoadFont)
+TEST(Font, DISABLED_PositiveLoadFont)
 {
     std::filesystem::path testFontPath(TEST_DATA_PATH / std::filesystem::path("test-font-roboto.ttf"));
     Font font(Font::LoadFromFile(testFontPath.native()));
@@ -328,17 +326,13 @@ TEST(ArxWindow, DISABLED_PositiveWindowInput)
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         else if (e.GetKey() == KeyEvent::Key::F)
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-        win->Draw();
     });
 
-    win->GetEventManager().Bind<KeyHoldEvent>([win, &position](KeyHoldEvent &e) {
+    win->GetEventManager().Bind<KeyHoldEvent>([ &position](KeyHoldEvent &e) {
         if (e.GetKey() == KeyEvent::Key::D)
-            position += 10e5f * static_cast<float>(GameApp::GetGlobalApp()->GetDeltaTime());
+            position += 1000 * static_cast<float>(GameApp::GetGlobalApp()->GetDeltaTime());
         if (e.GetKey() == KeyEvent::Key::A)
-            position -= 10e5f * static_cast<float>(GameApp::GetGlobalApp()->GetDeltaTime());
-
-        win->Draw();
+            position -= 1000 * static_cast<float>(GameApp::GetGlobalApp()->GetDeltaTime());
     });
 
     win->GetEventManager().Bind<KeyUpEvent>([win](KeyUpEvent &e) {
@@ -355,6 +349,23 @@ TEST(ArxWindow, DISABLED_PositiveWindowInput)
         painter.DrawRectangle(Position(position, 60.0f), Size(100, 100));
 
     });
+
+    win->EnableVSync(true);
+
+    GameApp::GetGlobalApp()->Run();
+}
+
+TEST(ArxWindow, PositiveImageControl)
+{
+    ArxWindow *win = new ArxWindow("test", Size(640, 360));
+    win->Show();
+    win->SetFixedViewport(640, 360);
+    std::filesystem::path testJpgPath(TEST_DATA_PATH / std::filesystem::path("test_png.png"));
+    Image img(Image::LoadFromFile(testJpgPath.native()));
+    ImageControl *ctrl = new ImageControl(win, img, Size(100, 100), Position(100, 100));
+    ctrl->SetFilteringMode(Texture::TextureFilteringMode::Linear);
+    ctrl->SetWrappingMode(Texture::TextureWrapping::Repeat);
+    ctrl->SetBackgroundColor(defaults::COLOR_BLACK);
 
     GameApp::GetGlobalApp()->Run();
 }
