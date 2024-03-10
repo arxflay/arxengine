@@ -16,21 +16,23 @@ EventProcessor::EventProcessor()
 void EventProcessor::ProcessEventInternal(Event &event)
 {
     CallBeforeProcessing(event);
-    if (!event.m_eventHandlersPtr.has_value())
+    auto eventHandlersOpt = event.m_getEventHandlersFn();
+    if (!eventHandlersOpt.has_value())
     {
         event.HandleEvent();
         return;
     }
 
+    auto &eventHandlersRef = eventHandlersOpt.value().get();
     bool hasMoreHandlers = true;
     event.Skip(false);
     typename std::vector<int>::difference_type evtHandlerIndex = 0;
 
     while(hasMoreHandlers && !IsInterruptCalled())
     {
-        if(evtHandlerIndex < static_cast<decltype(evtHandlerIndex)>(event.m_eventHandlersPtr->get().size()))
+        if(evtHandlerIndex < static_cast<decltype(evtHandlerIndex)>(eventHandlersRef.size()))
         {
-            auto handler = *(event.m_eventHandlersPtr->get().rbegin() + evtHandlerIndex);
+            auto handler = *(eventHandlersRef.rbegin() + evtHandlerIndex);
             handler(event);
             hasMoreHandlers = event.WasSkipCalled();
             evtHandlerIndex++;

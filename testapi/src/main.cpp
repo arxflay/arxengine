@@ -386,6 +386,31 @@ TEST(ArxWindow, DISABLED_PositiveImageControlHideShow)
 
     GameApp::GetGlobalApp()->Run();
 }
+template<typename T>
+class RawPointer
+{
+public:
+    RawPointer(T *ptr = nullptr)
+        : m_ptr(ptr)
+    {
+    }
+
+    void Replace(T *ptr = nullptr)
+    {
+    }
+
+    T *Get()
+    {
+        return m_ptr;
+    }
+
+    T &operator*()
+    {
+        return m_ptr;
+    }
+private:
+    T *m_ptr;
+};
 
 TEST(ArxWindow, PositiveImageControlTileSize)
 {
@@ -396,7 +421,7 @@ TEST(ArxWindow, PositiveImageControlTileSize)
     Image img(Image::LoadFromFile(testJpgPath.native()));
     ImageControl *ctrl = new ImageControl(win, img, Size(100, 100), Position(100, 100));
     ctrl->SetFilteringMode(Texture::TextureFilteringMode::Linear);
-    ctrl->EnableTilingMode(TileData{3, 3});
+    ctrl->EnableTilingMode(TileData{3, 10});
     ctrl->SetBackgroundColor(defaults::COLOR_BLACK);
     win->EnableVSync(true);
     Position pos(100, 100);
@@ -408,7 +433,8 @@ TEST(ArxWindow, PositiveImageControlTileSize)
         ctrl->SetPosition(pos);
     });
 
-
     GameApp::GetGlobalApp()->Run();
 }
+
+
 

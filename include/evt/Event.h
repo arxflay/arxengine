@@ -48,7 +48,7 @@ private:
     virtual void HandleEvent() = 0; //default event handler
     bool m_skipped;
     bool m_scheduleAfterProcessing; 
-    std::optional<EventHandlersVectorRef> m_eventHandlersPtr;
+    std::function<std::optional<EventHandlersVectorRef>()> m_getEventHandlersFn;
     ArxObject *m_sender;
 };
 

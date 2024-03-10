@@ -87,7 +87,6 @@ public:
     ArxWindow *Clone() override;
 
     void EnableVSync(bool enable);
-
 private:
     ArxWindow *AllocClone() override;
     void OnShow(ShowEvent &e);

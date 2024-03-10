@@ -216,26 +216,33 @@ public:
     template<typename EventType>
     bool Unbind(std::enable_if_t<is_event_type_v<EventType>> (*c_func)(EventType&))    
     {
-        return Unbind<EventType>(detail::EventHandler::UnwrappedFuncAddrs{ reinterpret_cast<const char*>(c_func), 0 });
+        return Unbind<EventType>(detail::EventHandler::UnwrappedFuncAddrs{ reinterpret_cast<uintptr_t>(c_func), 0 });
     }
 
     template<typename EventType>
     bool Unbind(const std::function<std::enable_if_t<is_event_type_v<EventType>>(EventType&)> &functor)
     {
-        return Unbind<EventType>(detail::EventHandler::UnwrappedFuncAddrs{ reinterpret_cast<const char *>(&functor), 0 } );
+        return Unbind<EventType>(detail::EventHandler::UnwrappedFuncAddrs{ reinterpret_cast<uintptr_t>(&functor), 0 } );
     }
 
     template<typename EventType, typename ClassType>
     bool Unbind(std::enable_if_t<is_event_type_v<EventType>> (ClassType::*memberFunction)(EventType&), ClassType *member)
     {
-        return Unbind<EventType>(detail::EventHandler::UnwrappedFuncAddrs{ reinterpret_cast<const char *>(memberFunction), reinterpret_cast<const char *>(member) });
+        /*hacky workaround*/
+        union
+        {
+            void (ClassType::*memberFunction)(EventType&);
+            uintptr_t addr;
+        } memberFunctionAddr;
+        memberFunctionAddr.memberFunction = memberFunction;
+        return Unbind<EventType>(detail::EventHandler::UnwrappedFuncAddrs{ memberFunctionAddr.addr, reinterpret_cast<uintptr_t>(member) });
     }
 
     //m_eventHandlers vector can be changed after queue event 
     template<typename EventType>
     std::enable_if_t<is_event_type_v<EventType>> QueueEvent(std::unique_ptr<Event> &&event)
     {
-        event->m_eventHandlersPtr = m_eventsHandlersMap.FindOrCreateEventHandlers<EventType>();
+        event->m_getEventHandlersFn = [this]() { return m_eventsHandlersMap.FindEventHandlers<EventType>(); };
         event->SetSender(m_owner);
         GameApp::GetGlobalApp()->GetEventProcessor().EnqueueEvent(std::move(event));
     }
@@ -243,7 +250,7 @@ public:
     template<typename EventType>
     std::enable_if_t<is_event_type_v<EventType>> ScheduleEvent(std::unique_ptr<Event> &&event)
     {
-        event->m_eventHandlersPtr = m_eventsHandlersMap.FindOrCreateEventHandlers<EventType>();
+        event->m_getEventHandlersFn = [this]() { return m_eventsHandlersMap.FindEventHandlers<EventType>(); };        
         event->SetSender(m_owner);
         GameApp::GetGlobalApp()->GetEventProcessor().ScheduleEvent(std::move(event));
     }
@@ -261,7 +268,7 @@ public:
         ~InternalEventParamsUnsetter()
         {
             m_event.SetSender(nullptr);
-            m_event.m_eventHandlersPtr = std::nullopt;
+            m_event.m_getEventHandlersFn = decltype(m_event.m_getEventHandlersFn){};
         }
     private:
         Event &m_event;
@@ -273,7 +280,7 @@ public:
     {
         InternalEventParamsUnsetter unsetter(event);
         event.SetSender(m_owner);
-        event.m_eventHandlersPtr = m_eventsHandlersMap.FindOrCreateEventHandlers<EventType>();
+        event.m_getEventHandlersFn = [this]() { return m_eventsHandlersMap.FindEventHandlers<EventType>(); };
         GameApp::GetGlobalApp()->GetEventProcessor().ProcessEvent(event);
     }
 
