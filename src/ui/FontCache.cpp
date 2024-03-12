@@ -48,7 +48,7 @@ FontCache::FontCacheEntry::FontCacheEntry(Texture2D *texture, GlyphDimensions di
     : m_dimensions(dimensions)
     , m_texture(texture)
 {
-
+    m_texture->SetTextureWrapping(Texture::TextureWrapping::ClampToEdge);
 }
 
 FontCache::FontCacheEntry::FontCacheEntry(FontCacheEntry &&cacheEntry)
@@ -91,8 +91,11 @@ const FontCache::FontCacheEntry &FontCache::GetCacheEntry(char ch)
     {
         FontCache::FontCacheEntry entry(parent);
         entry.UpdateDimensions(font.GetGlyphDimensions(ch));
-        entry.UpdateTexture(font.RenderGlyph(ch));
-        entry.UpdateTextureFiltering(m_textureFiltering);
+        if (ch != ' ')
+        {
+            entry.UpdateTexture(font.RenderGlyph(ch));
+            entry.UpdateTextureFiltering(m_textureFiltering);
+        }
         it = m_cache.emplace(ch, std::move(entry)).first;
     }
 

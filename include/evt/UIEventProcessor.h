@@ -6,7 +6,7 @@
 ARX_NAMESPACE_BEGIN
 class ArxWindow;
 
-class UIEventProcessor final : public EventProcessor
+class ARX_EXPORTS UIEventProcessor final : public EventProcessor
 {
 protected:
     void CallBeforeProcessing(Event &evt) override; 

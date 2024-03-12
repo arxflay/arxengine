@@ -9,7 +9,7 @@ ARX_NAMESPACE_BEGIN
 class Event;
 class ArxObject;
 
-class EventProcessor 
+class ARX_EXPORTS EventProcessor 
 {
 friend class DeleteEvent;
 public:

@@ -2,11 +2,11 @@
 #define ARX_MATH_H
 #include "ArxDefines.h"
 #include <cmath>
-#include <type_traits>
+#include <limits>
 
 ARX_NAMESPACE_BEGIN
 
-static inline constexpr bool AreEqualFloat(float a, float b)
+static inline bool AreEqualFloat(float a, float b)
 {
     return std::fabs(a - b) <= std::numeric_limits<float>::epsilon();
 }

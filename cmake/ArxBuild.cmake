@@ -53,7 +53,7 @@
         COMMAND ${CMAKE_COMMAND} -P "${ARX_SET_HEADER_PATH}")
     add_dependencies("${ARX_SET_HEADERS_TARGET}" copy_headers)
     
-    target_include_directories("${ARX_SET_HEADERS_TARGET}" PUBLIC "${HEADER_PUBLIC_FOLDER}")
+    target_include_directories("${ARX_SET_HEADERS_TARGET}" PUBLIC "$<INSTALL_INTERFACE:include/arxengine>" "$<BUILD_INTERFACE:${HEADER_PUBLIC_FOLDER}>")
     target_include_directories("${ARX_SET_HEADERS_TARGET}" PRIVATE "${HEADER_PRIVATE_FOLDER}")
     
 endmacro()

@@ -6,6 +6,14 @@
 #include <queue>
 #include "evt/Event.h"
 #include <set>
+#include <memory>
+
+#ifdef WIN32
+#include <windows.h>
+#define MAIN_ENTRY_POINT int APIENTRY WinMain(HINSTANCE, HINSTANCE, PSTR, int)
+#else
+#define MAIN_ENTRY_POINT int main(int, const char **)
+#endif
 
 ARX_NAMESPACE_BEGIN
 
@@ -15,7 +23,7 @@ class SoundContext;
 class FontLoader;
 class ArxWindow;
 
-class DeleteEvent : public Event
+class ARX_EXPORTS DeleteEvent : public Event
 {
 private:
     friend class ArxObject;
@@ -25,7 +33,7 @@ private:
 
 using ArxWindowSet = std::set<ArxWindow*>;
 
-class GameApp
+class ARX_EXPORTS GameApp
 {
 private:
     friend class DeleteEvent;
@@ -64,20 +72,13 @@ private:
     ArxWindowSet m_windows;
     std::queue<ArxObject*> m_deleteQueue;
     std::unique_ptr<EventProcessor> m_eventProcessor;
-    std::unique_ptr<SoundDevice> m_soundDevice;
-    std::unique_ptr<SoundContext> m_soundContext;
+    SoundDevice *m_soundDevice;
+    SoundContext *m_soundContext;
     std::unique_ptr<FontLoader> m_fontLoader;
 };
 
 
 #define GlobalGameApp ::ARX_NAMESPACE::GameApp::GetGlobalApp()
-
-#ifdef _WIN32
-#include <winbase.h>
-#define MAIN_ENTRY_POINT int APIENTRY WinMain(HINSTANCE, HINSTANCE, PSTR, int)
-#else
-#define MAIN_ENTRY_POINT int main(int, const char **)
-#endif
 
 #define IMPLEMENT_GAMEAPP_NO_MAIN(App, errCodeVariableName)\
     ::ARX_NAMESPACE::GameApp::SetAppAsGlobal(std::make_unique<App>());\

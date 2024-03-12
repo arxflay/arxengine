@@ -99,8 +99,8 @@ constexpr std::string_view TEXT_FRAGMENT_SHADER = R"(
     void main()
     {
         vec2 inversedTexPos = vec2(TexPos.x, 1 - TexPos.y);
-        float intesity = texture(imageTex, inversedTexPos).r;
-        FragColor = intesity * color;
+        float intensity = texture(imageTex, inversedTexPos).r;
+        FragColor = intensity * color;
     }
 )";
 

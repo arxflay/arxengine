@@ -62,7 +62,7 @@ bool Image::IsInvalid() const
 {
     Image img;
     img.m_size = imageSize;
-    img.m_data.insert(img.m_data.end(), data, data + static_cast<ptrdiff_t>(imageSize.height * imageSize.width * static_cast<float>(colorChannels))); 
+    img.m_data.insert(img.m_data.end(), data, data + static_cast<uintptr_t>(imageSize.height * imageSize.width * static_cast<float>(colorChannels))); 
     img.m_colorChannels = colorChannels;
     return img;
 }

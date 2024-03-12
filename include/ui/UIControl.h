@@ -14,7 +14,7 @@ ARX_NAMESPACE_BEGIN
 class ArxWindow;
 class UIControl;
 
-class DrawEvent : public Event
+class ARX_EXPORTS DrawEvent : public Event
 {
 friend class ArxWindow;
 private:
@@ -22,7 +22,7 @@ private:
     void HandleEvent() override;
 };
 
-class ShowEvent : public Event
+class ARX_EXPORTS ShowEvent : public Event
 {
 friend class UIControl; 
 public:
@@ -35,13 +35,13 @@ private:
 };
 
 
-class UIControl : public ArxObject
+class ARX_EXPORTS UIControl : public ArxObject
 {
 friend class ArxWindow;
 friend class DrawEvent;
 friend class ShowEvent;
 public:
-    UIControl(UIControl *parent, Size size = defaults::DEFAULT_SIZE, Position pos = defaults::DEFAULT_POSITION);
+    UIControl(UIControl *parent, Size size = constants::DEFAULT_SIZE, Position pos = constants::DEFAULT_POSITION);
     
     virtual void SetBackgroundColor(Color c);
     virtual Color GetColor() const;

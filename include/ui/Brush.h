@@ -5,7 +5,7 @@
 
 ARX_NAMESPACE_BEGIN
 
-class Brush
+class ARX_EXPORTS Brush
 {
 public:
     Brush(Color color);

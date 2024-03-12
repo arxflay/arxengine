@@ -6,7 +6,6 @@
 #include "testdefs.h"
 
 ARX_NAMESPACE_USE;
-
 #ifdef TEST_BASE64
 
 TEST(Base64, PositiveBase64Decode1)
@@ -53,7 +52,7 @@ TEST(Base64, PositiveBase64DecEncDecode)
     auto str = Utils::Base64Encode(jpegFileContent);
     std::vector<uint8_t> vec;
     Utils::Base64Decode(str, vec);
-    Image img2 = Image::LoadFromBinary(vec);
+    Image img2 = Image::LoadFromBinary(vec.data(), vec.size());
     ASSERT_FALSE(img2.IsInvalid());
 }
 

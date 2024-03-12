@@ -15,7 +15,7 @@ namespace
     Size MakeSizeValid(Size s)
     {
         if (s.height < 1 || s.width < 1)
-            return defaults::DEFAULT_SIZE;
+            return constants::DEFAULT_SIZE;
 
         return Size::Truncate(s);
     }
@@ -93,8 +93,8 @@ ArxWindow::ArxWindow(std::string_view title, Size size, Position position, int a
 {
     glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
     glfwWindowHint(GLFW_FOCUS_ON_SHOW, GLFW_TRUE);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, defaults::GL_VERSION_MAJOR);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, defaults::GL_VERSION_MINOR);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, constants::GL_VERSION_MAJOR);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, constants::GL_VERSION_MINOR);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     /*if (isFullScreen) //TODO fullscreen
     {
@@ -111,7 +111,10 @@ ArxWindow::ArxWindow(std::string_view title, Size size, Position position, int a
         m_win.reset(glfwCreateWindow(static_cast<int>(validSize.width), static_cast<int>(validSize.height), m_title.c_str(), nullptr, nullptr));
     //}
     if (!m_win)
+    {
+        GLOG->Error("Failed to create window. Probably platform doesn't support OpenGL %d %d", constants::GL_VERSION_MAJOR, constants::GL_VERSION_MINOR);
         throw ArxException(ArxException::ErrorCode::FailedToConstructArxWindow, "failed to create opengl context");
+    }
 
     SetAsCurrentContext();
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -339,7 +342,7 @@ bool ArxWindow::SetIcon(std::optional<std::reference_wrapper<const Image>> img)
     
     //glfw will not modify buffer so don't worry
     glfwImg.pixels = const_cast<unsigned char*>(img->get().GetData().data()); 
-    glfwSetWindowIcon(m_win.get(), 1, &glfwImg); 
+    glfwSetWindowIcon(m_win.get(), 1, &glfwImg);
     
     return true;
 }
@@ -351,7 +354,7 @@ bool ArxWindow::IsEnabledClipToBounds() const
 
 bool ArxWindow::SetWindowAspectRatio(int numer, int denom)
 {
-    if (numer != defaults::IGNORE && denom != defaults::IGNORE && (numer <= 0 || denom <= 0))
+    if (numer != constants::IGNORE_VALUE && denom != constants::IGNORE_VALUE && (numer <= 0 || denom <= 0))
         return false;
 
     glfwSetWindowAspectRatio(m_win.get(), numer, denom);

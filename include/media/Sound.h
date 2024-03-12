@@ -6,7 +6,7 @@
 
 ARX_NAMESPACE_BEGIN
 
-class Sound
+class ARX_EXPORTS Sound
 {
 public:
     enum class Format

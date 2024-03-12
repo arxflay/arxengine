@@ -7,10 +7,10 @@
 #include "gl/Texture2D.h"
 ARX_NAMESPACE_BEGIN
 
-class FontCache final : public UIObject 
+class ARX_EXPORTS FontCache final : public UIObject 
 {
 public:
-    class FontCacheEntry final
+    class ARX_EXPORTS FontCacheEntry final
     {
     friend class FontCache;
     public:

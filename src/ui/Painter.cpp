@@ -71,7 +71,7 @@ namespace
 Painter::Painter(DrawEvent &evt)
     : m_sender(dynamic_cast<UIControl*>(evt.GetSender()))
     , m_brush(m_sender->GetColor())
-    , m_pen(defaults::COLOR_BLACK)
+    , m_pen(constants::COLOR_BLACK)
 {
     if (m_sender->IsEnabledClipToBounds())
     {     
@@ -162,12 +162,15 @@ void Painter::DrawText(std::string_view text, Position pos)
     {
         const auto &cacheEntry = fontCache->GetCacheEntry(ch);
         drawingPos.x += cacheEntry.GetGlyphDimensions().bearings.x;
-        cacheEntry.GetTexture()->Bind();
-        glm::mat4 modelMatrix = glm::mat4(1.0f);
-        modelMatrix = glm::translate(modelMatrix, glm::vec3(drawingPos.x, drawingPos.y + cacheEntry.GetGlyphDimensions().bearings.y - cacheEntry.GetGlyphDimensions().size.height, 0.0f));
-        modelMatrix = glm::scale(modelMatrix, glm::vec3(cacheEntry.GetGlyphDimensions().size.width, cacheEntry.GetGlyphDimensions().size.height, 0.0f));
-        shader.SetTransformMatrices(modelMatrix, viewMatrix, GetViewport().projectionMatrix);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+        if (ch != ' ')
+        {
+            cacheEntry.GetTexture()->Bind();
+            glm::mat4 modelMatrix = glm::mat4(1.0f);
+            modelMatrix = glm::translate(modelMatrix, glm::vec3(drawingPos.x, drawingPos.y + cacheEntry.GetGlyphDimensions().bearings.y - cacheEntry.GetGlyphDimensions().size.height, 0.0f));
+            modelMatrix = glm::scale(modelMatrix, glm::vec3(cacheEntry.GetGlyphDimensions().size.width, cacheEntry.GetGlyphDimensions().size.height, 0.0f));
+            shader.SetTransformMatrices(modelMatrix, viewMatrix, GetViewport().projectionMatrix);
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+        }
         drawingPos.x += cacheEntry.GetGlyphDimensions().advance.x;
     }
     glDisable(GL_BLEND);

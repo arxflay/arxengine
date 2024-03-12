@@ -14,7 +14,7 @@ class UIControl;
 class Texture2D;
 class ClippingArea;
 
-class Painter final
+class ARX_EXPORTS Painter final
 {
 public:
     Painter(DrawEvent &evt);

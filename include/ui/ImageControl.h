@@ -11,10 +11,10 @@ struct TileData
     int tileHeightCount;
 };
 
-class ImageControl : public UIControl
+class ARX_EXPORTS ImageControl : public UIControl
 {
 public:
-    ImageControl(UIControl *parent, const Image &image = Image{}, Size size = defaults::DEFAULT_SIZE, Position pos = defaults::DEFAULT_POSITION);
+    ImageControl(UIControl *parent, const Image &image = Image{}, Size size = constants::DEFAULT_SIZE, Position pos = constants::DEFAULT_POSITION);
     bool Load(const Image &image);
     void SetFilteringMode(Texture::TextureFilteringMode filteringMode);
     void EnableTilingMode(std::optional<TileData> tileData);

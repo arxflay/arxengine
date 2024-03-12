@@ -8,7 +8,7 @@
 
 ARX_NAMESPACE_BEGIN
 
-class TimerEvent final : public Event 
+class ARX_EXPORTS TimerEvent final : public Event 
 {
 private:
     void HandleEvent() override;
@@ -16,7 +16,7 @@ private:
 
 using TimerTime = std::chrono::time_point<std::chrono::steady_clock, std::chrono::nanoseconds>;
 
-class Timer : public ArxObject
+class ARX_EXPORTS Timer : public ArxObject
 {
 public:
     Timer(ArxObject *parent);

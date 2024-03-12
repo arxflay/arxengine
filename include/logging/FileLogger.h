@@ -5,7 +5,7 @@
 
 ARX_NAMESPACE_BEGIN
 
-class FileLogger final : public Logger
+class ARX_EXPORTS FileLogger final : public Logger
 {
 public:
     //throws if file doesnt exist

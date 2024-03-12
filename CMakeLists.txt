@@ -1,8 +1,7 @@
-cmake_minimum_required(VERSION 3.10.2)
+cmake_minimum_required(VERSION 3.0...3.10.2)
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/ProjectVersion.cmake")
 project(arxengine VERSION ${VER_MAJOR}.${VER_MINOR} LANGUAGES C CXX)
 
-option(ARX_LIB_STATIC "Build as static library" OFF)
 option(ARX_BUILD_TEST "Build testapi" OFF)
 
 set(SOURCE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/src")
@@ -49,25 +48,32 @@ set(gcc_like_cxx "$<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang,GNU,LCC>")
 set(msvc_cxx "$<COMPILE_LANG_AND_ID:CXX,MSVC>")
 set(OpenGL_GL_PREFERENCE LEGACY)
 
-if (${ARX_LIB_STATIC})
-    message(STATUS "Static library")
+if (NOT BUILD_SHARED_LIBS)
+    option(BUILD_SHARED_LIBS "Build as static library" OFF)
+endif()
+
+if (NOT BUILD_SHARED_LIBS OR "${BUILD_SHARED_LIBS}" STREQUAL "OFF")
+    message(STATUS "Build arxengine as static library")
     add_library(arxengine STATIC "${SOURCES}")
 else()
-    message(STATUS "Shared library")
+    message(STATUS "Build arxengine as shared library")
     add_library(arxengine SHARED "${SOURCES}")
+    target_compile_definitions(arxengine PUBLIC ARX_SHARED)
 endif()
 
 target_compile_options(arxengine PRIVATE "$<${gcc_like_cxx}:-Wall;-Wextra;-Wconversion;-std=c++17>"  
-                                                        "$<${msvc_cxx}:/W3;/std:c++17>")
+                                                        "$<${msvc_cxx}:/W3;/wd4251;/wd4996;/std:c++17>")
+
+target_compile_options(arxengine INTERFACE "$<${msvc_cxx}:/wd4251;/wd4996>")
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/libs/ProjectLibs.cmake")
 
 if (WIN32)
-    target_link_libraries(arxengine PRIVATE glfw stb_image openal Freetype::Freetype)
-    target_link_libraries(arxengine PUBLIC glm glad OpenGL::GL)
+    target_link_libraries(arxengine PRIVATE glfw stb_image OpenAL freetype glad OpenGL::GL)
+    target_link_libraries(arxengine PUBLIC glm::glm)
 else()
-    target_link_libraries(arxengine PRIVATE glfw stb_image openal Freetype::Freetype)
-    target_link_libraries(arxengine PUBLIC glm glad OpenGL::GL openal m pthread)
+    target_link_libraries(arxengine PRIVATE glfw stb_image openal Freetype::Freetype glad OpenGL::GL)
+    target_link_libraries(arxengine PUBLIC glm::glm m pthread)
 endif()
 
 if (${ARX_BUILD_TEST})

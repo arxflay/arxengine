@@ -30,9 +30,10 @@ FontLoader::FontData FontLoader::NewFace(std::string_view filename, long faceInd
         GLOG->Error("Failed to load file %s", filename.data());
     else
     {
-        fontData = NewFaceFromBinaryInternal(data.data(), data.size(), faceIndex);
-        if (fontData.face.get() != nullptr)
-            fontData.fontBinaryData = std::make_shared<std::vector<uint8_t>>(std::move(data));
+        auto fontBinaryData = std::make_shared<std::vector<uint8_t>>(std::move(data));
+        fontData = NewFaceFromBinaryInternal(fontBinaryData->data(), fontBinaryData->size(), faceIndex);
+        if (fontData.face != nullptr)
+            fontData.fontBinaryData = fontBinaryData;
     }
     return fontData;
 }
@@ -40,12 +41,10 @@ FontLoader::FontData FontLoader::NewFace(std::string_view filename, long faceInd
 FontLoader::FontData FontLoader::NewFaceFromBinary(const uint8_t *binaryData, size_t len, long faceIndex)
 {
     FUNC_LOG_ENTER;
-    FontData fontData = NewFaceFromBinaryInternal(binaryData, len, faceIndex);
-    if (fontData.face)
-    {
-        fontData.fontBinaryData = std::make_shared<std::vector<uint8_t>>();
-        fontData.fontBinaryData->insert(fontData.fontBinaryData->begin(), binaryData, binaryData + len);
-    }
+    auto fontBinaryData = std::make_shared<std::vector<uint8_t>>(binaryData, binaryData + len);
+    FontData fontData = NewFaceFromBinaryInternal(fontBinaryData->data(), fontBinaryData->size(), faceIndex);
+    if (fontData.face != nullptr)
+        fontData.fontBinaryData = fontBinaryData;
     return fontData;
 }
 

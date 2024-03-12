@@ -8,7 +8,7 @@
 ARX_NAMESPACE_BEGIN
 #define GLOG Logger::GetGlobalLogger()
 
-class Logger
+class ARX_EXPORTS Logger
 {
 public:
     Logger();

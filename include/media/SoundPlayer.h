@@ -8,7 +8,7 @@ ARX_NAMESPACE_BEGIN
 class Sound;
 class SoundContext;
 
-class SoundPlayer final
+class ARX_EXPORTS SoundPlayer final
 {
 public:
     enum PlayMode

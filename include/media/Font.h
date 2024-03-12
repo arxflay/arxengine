@@ -8,7 +8,7 @@
 #include "ui/Size.h"
 #include "ui/Position.h"
 #include <chrono>
-class FT_FaceRec_;
+struct FT_FaceRec_;
 ARX_NAMESPACE_BEGIN
 
 struct GlyphDimensions
@@ -18,7 +18,7 @@ struct GlyphDimensions
     Size size;
 };
 
-class Font final 
+class ARX_EXPORTS Font final 
 {
 public:
     using ChangeTime_t = std::chrono::time_point<std::chrono::steady_clock, std::chrono::nanoseconds>;

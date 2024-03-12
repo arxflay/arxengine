@@ -8,7 +8,7 @@
 #define ARX_NAMESPACE_END }
 #define ARX_NAMESPACE_USE using namespace ARX_NAMESPACE
 
-#ifdef WIN32
+#if defined(WIN32) && defined(ARX_SHARED)
 #define ARX_IMPORTS __declspec(dllimport)
 #define ARX_EXPORTS __declspec(dllexport)
 #else
@@ -17,11 +17,11 @@
 #endif
 
 ARX_NAMESPACE_BEGIN
-namespace defaults
+namespace constants
 {
     static inline constexpr int GL_VERSION_MAJOR = 3;
     static inline constexpr int GL_VERSION_MINOR = 3;
-    static inline constexpr int IGNORE = -1;
+    static inline constexpr int IGNORE_VALUE = -1;
 }
 ARX_NAMESPACE_END
 

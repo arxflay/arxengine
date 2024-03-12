@@ -21,8 +21,8 @@ std::array<uint8_t, 256> CreateBase64DecodingTable()
     std::array<uint8_t, 256> out{};
     std::fill(out.begin(), out.end(), INVALID_BASE64_SYMBOL);
     std::iota(out.begin() + static_cast<size_t>('A'), out.begin() + static_cast<size_t>('Z') + 1, 0);
-    std::iota(out.begin() + static_cast<size_t>('a'), out.begin() + static_cast<size_t>('z') + 1, sizeof("ABCDEFGHIJKLMNOPQRSTUVWXYZ") - 1);
-    std::iota(out.begin() + static_cast<size_t>('0'), out.begin() + static_cast<size_t>('9') + 1, sizeof("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz") - 1);
+    std::iota(out.begin() + static_cast<size_t>('a'), out.begin() + static_cast<size_t>('z') + 1, static_cast<uint8_t>(sizeof("ABCDEFGHIJKLMNOPQRSTUVWXYZ") - 1));
+    std::iota(out.begin() + static_cast<size_t>('0'), out.begin() + static_cast<size_t>('9') + 1, static_cast<uint8_t>(sizeof("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz") - 1));
     out['+'] = 62;
     out['/'] = 63;
 
@@ -32,7 +32,7 @@ std::array<uint8_t, 256> CreateBase64DecodingTable()
 uint8_t Base64CharToByte(char base64Char)
 {
     static auto decodingTable = CreateBase64DecodingTable();
-    uint8_t decoded = decodingTable[static_cast<uint8_t>(base64Char)];
+    uint8_t decoded = decodingTable[base64Char];
 
     return decoded;
 }
@@ -167,7 +167,7 @@ static inline Utils::Base64DecodeErrCode Base64DecodeInternal(std::string_view e
 
 /*static*/ Utils::HexConversionErrorCode Utils::GetByteFromHexStr(std::string_view hexStr, uint8_t &byte)
 {
-    if (std::from_chars(hexStr.begin(), hexStr.begin() + 2, byte, 16).ec != std::errc{})
+    if (std::from_chars(hexStr.data(), hexStr.data() + 2, byte, 16).ec != std::errc{})
         return Utils::HexConversionErrorCode::InvalidHexString;
     
     return Utils::HexConversionErrorCode::NoError;

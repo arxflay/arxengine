@@ -89,20 +89,18 @@ int GameApp::Init()
     
         internal::InitGLFW();
         auto m_soundDeviceContextPair = internal::InitAL();
-        m_soundDevice = std::move(m_soundDeviceContextPair.first);
-        m_soundContext = std::move(m_soundDeviceContextPair.second);
         m_fontLoader = internal::InitFT();
         m_eventProcessor = std::make_unique<UIEventProcessor>();
         OnAfterInit();
         m_initialized = true;
         GLOG->Info("Initialization done");
+        m_soundDevice = m_soundDeviceContextPair.first.release();
+        m_soundContext = m_soundDeviceContextPair.second.release();
     }
     catch(...)
     {
         code = static_cast<int>(UniversalExceptionHandler::HandleException());
         GLOG->Info("Initialization failed");
-        m_soundContext.reset();
-        m_soundDevice.reset();
         m_fontLoader.reset();
         glfwTerminate();
     }
@@ -190,7 +188,7 @@ SoundContext &GameApp::GetDefaultSoundDeviceContext()
 {
     if(!GameApp::GetGlobalApp() || !GameApp::GetGlobalApp()->IsInitialized())
         throw ArxException(ArxException::ErrorCode::GameAppNotInitialized, "GameApp is not initialized");
-    return *m_soundContext.get();
+    return *m_soundContext;
 }
 
 FontLoader &GameApp::GetFontLoader()
@@ -211,6 +209,9 @@ GameApp::~GameApp()
     {
         glfwTerminate();
         CleanUp();
+        //delete context and then device
+        delete m_soundContext;
+        delete m_soundDevice;
     }
 }
 

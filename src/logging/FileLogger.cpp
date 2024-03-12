@@ -38,7 +38,7 @@ FileLogger::~FileLogger()
         return;
     for(size_t i = 0; i < MAX_LOGGING_ATTEMPTS; i++)
     {
-        FILE *file = fopen(fileLogger->GetFilename().data(), "ab"); //append and binary
+        FILE *file = fopen(fileLogger->GetFilename().data(), "ab+"); //append and binary
         if(file)
         {
             fwrite(logLineBeggining, sizeof(char), static_cast<size_t>(len), file);

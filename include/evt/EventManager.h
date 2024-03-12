@@ -254,7 +254,7 @@ public:
         event->SetSender(m_owner);
         GameApp::GetGlobalApp()->GetEventProcessor().ScheduleEvent(std::move(event));
     }
-
+private:
     class InternalEventParamsUnsetter final
     {
     public:
@@ -273,6 +273,7 @@ public:
     private:
         Event &m_event;
     };
+public:
     
     /*process event immediately without enqueue into event queue*/
     template<typename EventType>

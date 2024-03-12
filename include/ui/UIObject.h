@@ -11,7 +11,7 @@ class ArxWindow;
 /*
  * @brief UIObject class for graphic related objects that depends on UIControl
  */
-class UIObject : public ArxObject
+class ARX_EXPORTS UIObject : public ArxObject
 {
 public:
     //UIControl parent can't be nullptr, otherwise exception will be thrown

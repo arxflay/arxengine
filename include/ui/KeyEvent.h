@@ -9,7 +9,7 @@ ARX_NAMESPACE_BEGIN
 
 /*because of time shortage keyevents are handled only by window*/
 
-class KeyEvent : public Event
+class ARX_EXPORTS KeyEvent : public Event
 {
 public:
 

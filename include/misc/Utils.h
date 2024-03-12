@@ -5,9 +5,10 @@
 #include <string_view>
 #include <string>
 #include <cstdio>
+#include "WarningSupressionHelpers.h"
 ARX_NAMESPACE_BEGIN
 
-class Utils
+class ARX_EXPORTS Utils
 {
 public:
     enum class Base64DecodeErrCode

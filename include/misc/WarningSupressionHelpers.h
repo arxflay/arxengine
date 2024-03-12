@@ -1,6 +1,5 @@
 #ifndef ARX_WARNINGSUPRESSIONHELPERS_H
 #define ARX_WARNINGSUPRESSIONHELPERS_H
-#pragma once
 
 //more info about _Pragma from https://gcc.gnu.org/onlinedocs/cpp/Pragmas.html
 #define DO_PRAGMA(x) _Pragma(#x)
@@ -16,7 +15,7 @@
 /*code for GNU C compiler */
 #elif _MSC_VER
     #define WARNING_PUSH DO_PRAGMA(warning(push))
-    #define WARNING_DISABLE(warningNum) DO_PRAGMA(warning(disable: #warningNum ))
+    #define WARNING_DISABLE(warningNum) DO_PRAGMA(warning(disable: warningNum ))
     #define WARNING_POP DO_PRAGMA(warning(pop))
 #endif
 

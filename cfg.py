@@ -74,7 +74,7 @@ class Configurator:
     def __init__(self): 
         self._cmd = ["cmake"]
     def AddLibType(self, libType : LibType) -> None:
-        self._cmd.append(["-DARX_LIB_STATIC=OFF", "-DARX_LIB_STATIC=ON"][libType.value])
+        self._cmd.append(["-DBUILD_SHARED_LIBS=ON", "-DBUILD_SHARED_LIBS=OFF"][libType.value])
     def AddReleaseType(self, relType : ReleaseType) -> None:
         self._cmd.append(["-DCMAKE_BUILD_TYPE=Debug", "-DCMAKE_BUILD_TYPE=Release"][relType.value])
     def AddBuildTest(self, buildTest : bool) -> None:
@@ -152,7 +152,11 @@ def Test(projType : ProjectType):
 
     folder = folders[SelectVariant("Projects", folders)]
     fullPath = os.path.join(buildFolder, folder)
-    os.system(f'sh -c "cd \"{fullPath}\" && ctest"')
+    if os.name == "nt":
+        configuration = str.split(folder, '_')[1]
+        os.system(f'powershell \"cd \"{fullPath}\"; ctest --build-config {configuration}')
+    else:
+        os.system(f'sh -c "cd \"{fullPath}\" && ctest"')
 
 def SelectAction(projType : ProjectType):
     [Configure, Build, Test][SelectVariant("Commands",  AppOperations)](projType)

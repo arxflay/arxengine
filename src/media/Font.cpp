@@ -7,6 +7,7 @@
 #include "GameApp.h"
 #include "misc/Convertors.h"
 #include <iostream>
+#include <logging/FileLogger.h>
 ARX_NAMESPACE_BEGIN
 
 Font::Font()
@@ -22,7 +23,8 @@ Font::Font(Font &&font)
 {
     using std::swap;
     swap(m_sizeInPixels, font.m_sizeInPixels);
-    swap(m_face, font.m_face);
+    swap(m_face, font.m_face);  
+    swap(m_fontData, font.m_fontData);
 }
 
 Font &Font::operator=(Font &&font)
@@ -30,6 +32,7 @@ Font &Font::operator=(Font &&font)
     using std::swap;
     swap(m_sizeInPixels, font.m_sizeInPixels);
     swap(m_face, font.m_face);
+    swap(m_fontData, font.m_fontData);
     font.UpdateLastChangeTime();
     UpdateLastChangeTime();
 
@@ -42,6 +45,7 @@ Font &Font::operator=(Font &&font)
     auto fontData = GlobalGameApp->GetFontLoader().NewFace(filename, 0);
     font.m_face = std::move(fontData.face);
     font.m_fontData = std::move(fontData.fontBinaryData);
+    FT_Select_Charmap(font.m_face.get(), ft_encoding_unicode);
     font.SetSizeInPt(10);
     return font;
 }
@@ -52,6 +56,7 @@ Font &Font::operator=(Font &&font)
     auto fontData = GlobalGameApp->GetFontLoader().NewFaceFromBinary(binaryData, len, 0);
     font.m_face = std::move(fontData.face);
     font.m_fontData = std::move(fontData.fontBinaryData);
+    FT_Select_Charmap(font.m_face.get(), ft_encoding_unicode);
     font.SetSizeInPt(10);
     return font;
 }
@@ -128,8 +133,12 @@ Image Font::RenderGlyph(char ch)
 
     LoadGlyph(ch);
 
+    FT_Error status = 0;
     if (m_face->glyph->bitmap.buffer == nullptr)
-        FT_Render_Glyph(m_face->glyph, FT_RENDER_MODE_NORMAL);
+        status = FT_Render_Glyph(m_face->glyph, FT_RENDER_MODE_NORMAL);
+    
+    if (status != FT_Err_Ok)
+        GLOG->Debug("Font - failed to render glyph");
 
     Size size(m_face->glyph->bitmap.width, m_face->glyph->bitmap.rows);
     return Image::LoadFromData(size, 1, m_face->glyph->bitmap.buffer);

@@ -42,7 +42,7 @@ struct Position
 };
 
 
-namespace defaults
+namespace constants
 {
     static inline const Position DEFAULT_POSITION = Position{ 1, 1 };
 }

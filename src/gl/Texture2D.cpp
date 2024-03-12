@@ -26,7 +26,7 @@ bool Texture2D::SetData(const Image &image)
     }
     else if (image.IsInvalid())
     {
-        GLOG->Error("Provided image is invalid");
+        GLOG->Error("Texture2D: provided image is invalid");
         return false;
     }
 
@@ -36,8 +36,10 @@ bool Texture2D::SetData(const Image &image)
     //By default opengl reads by four bytes
     glPixelStorei(GL_UNPACK_ALIGNMENT, DetermineBestPackingAlignmentSize(image));
     
+
     //format = how interpret data
-    glTexImage2D(GL_TEXTURE_2D, 0, static_cast<GLint>(ImageChannelsToGL(image)), static_cast<GLsizei>(image.GetSize().width), static_cast<GLsizei>(image.GetSize().height), 0, ImageChannelsToGL(image), GL_UNSIGNED_BYTE, image.GetData().data());
+    GLint format = ImageChannelsToGL(image);
+    glTexImage2D(GL_TEXTURE_2D, 0, format, static_cast<GLsizei>(image.GetSize().width), static_cast<GLsizei>(image.GetSize().height), 0, format, GL_UNSIGNED_BYTE, image.GetData().data());
     glGenerateMipmap(GL_TEXTURE_2D);
     return true;
 }

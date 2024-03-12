@@ -10,7 +10,7 @@
 ARX_NAMESPACE_BEGIN
 class Image;
 
-class Texture2D final: public Texture 
+class ARX_EXPORTS Texture2D final: public Texture 
 {
 public:
     virtual void SetTextureFilteringMode(TextureFilteringMode textureFiltering) override;

@@ -5,7 +5,7 @@
 
 ARX_NAMESPACE_BEGIN
 
-class Pen
+class ARX_EXPORTS Pen
 {
 public:
     Pen(Color color);

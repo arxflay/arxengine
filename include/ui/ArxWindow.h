@@ -16,7 +16,7 @@ class Image;
 
 
 
-class ArxWindow : public UIControl
+class ARX_EXPORTS ArxWindow : public UIControl
 {
 public:
     enum ARX_EXPORTS WindowAttributes : int
@@ -34,7 +34,7 @@ public:
         int bottom;
     };
     
-    ArxWindow(std::string_view title, Size size = defaults::DEFAULT_SIZE, Position position = defaults::DEFAULT_POSITION, int attributes = WindowAttributes::RESIZABLE | WindowAttributes::DECORATED); //, bool isFullScreen= false);
+    ArxWindow(std::string_view title, Size size = constants::DEFAULT_SIZE, Position position = constants::DEFAULT_POSITION, int attributes = WindowAttributes::RESIZABLE | WindowAttributes::DECORATED); //, bool isFullScreen= false);
     
     
     void SetWindowAttributes(int attributes);
@@ -82,7 +82,7 @@ public:
 
     bool IsEnabledClipToBounds() const override;
 
-    //To disable the aspect ratio limit for a window, set both terms to defaults::IGNORE
+    //To disable the aspect ratio limit for a window, set both terms to constants::IGNORE_VALUE
     bool SetWindowAspectRatio(int numer, int denom);
     ArxWindow *Clone() override;
 

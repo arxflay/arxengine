@@ -10,7 +10,7 @@ ARX_NAMESPACE_BEGIN
 class ArxObject;
 using ArxObjectList = UnmovableList<ArxObject*>;
 
-class ArxObject
+class ARX_EXPORTS ArxObject
 {
 public:
     virtual ~ArxObject();

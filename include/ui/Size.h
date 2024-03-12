@@ -39,10 +39,10 @@ struct Size
     float height;
 };
 
-namespace defaults
+namespace constants
 {
     static inline const Size DEFAULT_SIZE = Size(1, 1);
-    static inline const Size IGNORE_SIZE = Size(defaults::IGNORE, defaults::IGNORE);
+    static inline const Size IGNORE_SIZE = Size(constants::IGNORE_VALUE, constants::IGNORE_VALUE);
 }
 
 ARX_NAMESPACE_END

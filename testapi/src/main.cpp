@@ -2,7 +2,6 @@
 #include <misc/Utils.h>
 
 #include <media/Image.h>
-#include <glad/glad.h>
 #include <fstream>
 #include <sstream>
 #include "testdefs.h"
@@ -10,6 +9,7 @@
 #include <logging/FileLogger.h>
 #include <GameApp.h>
 #include <media/SoundPlayer.h>
+#include <cstdlib>
 #include <ui/Color.h>
 #include <ui/ArxWindow.h>
 #include <Timer.h>
@@ -17,16 +17,31 @@
 #include <gl/Texture2D.h>
 #include <media/Font.h>
 #include <ui/KeyEvent.h>
+#include <ArxException.h>
 #include <ui/ImageControl.h>
+#include <iostream>
 
 ARX_NAMESPACE_USE;
 
 int main(int argc, char **argv)
 {
-    IMPLEMENT_GAMEAPP_NO_MAIN_WITH_LOGGER_INSTANCE(GameApp, ret, std::make_unique<FileLogger>(Logger::LoggingLevel::Debug, "/tmp/log.txt")); 
+    std::filesystem::path logPath;
+    #ifdef WIN32
+        logPath = getenv("PROGRAMDATA");
+    #else
+        logPath = getenv("/var/log");
+    #endif
+    
+    logPath = logPath / std::filesystem::path("arxengine");
+#ifdef WIN32
+    (void)std::filesystem::create_directory(logPath);
+#endif
+    logPath = logPath / std::filesystem::path("log.txt");
+    IMPLEMENT_GAMEAPP_NO_MAIN_WITH_LOGGER_INSTANCE(GameApp, ret, std::make_unique<FileLogger>(Logger::LoggingLevel::Debug, logPath.u8string()));
+
     if (ret != static_cast<int>(ArxException::ErrorCode::NoError))
         return ret;
-    
+ 
     ::testing::InitGoogleTest(&argc, argv);
     ret = RUN_ALL_TESTS();
     return ret;
@@ -35,7 +50,7 @@ int main(int argc, char **argv)
 TEST(Image, PositiveLoadImageFilePNG)
 {
     std::filesystem::path testPngPath(TEST_DATA_PATH / std::filesystem::path("test_png.png"));
-    Image img(Image::LoadFromFile(testPngPath.native()));
+    Image img(Image::LoadFromFile(testPngPath.u8string()));
     ASSERT_GT(img.GetData().size(), static_cast<size_t>(0));
     ASSERT_EQ(img.GetSize(), Size(32, 33));
     ASSERT_EQ(img.GetSize().height, 33);
@@ -45,7 +60,7 @@ TEST(Image, PositiveLoadImageFilePNG)
 TEST(Image, PositiveLoadImageFileJPEG)
 {
     std::filesystem::path testJpgPath(TEST_DATA_PATH / std::filesystem::path("test_jpg.jpg"));
-    Image img(Image::LoadFromFile(testJpgPath.native()));
+    Image img(Image::LoadFromFile(testJpgPath.u8string()));
     ASSERT_GT(img.GetData().size(), static_cast<size_t>(0));
     ASSERT_EQ(img.GetSize(), Size(32, 33));
     ASSERT_EQ(img.GetColorChannels(), 3);
@@ -54,7 +69,7 @@ TEST(Image, PositiveLoadImageFileJPEG)
 TEST(Image, PositiveLoadImageBinary)
 {
     std::filesystem::path testJpgPath(TEST_DATA_PATH / std::filesystem::path("test_jpg.jpg"));
-    Image img(Image::LoadFromFile(testJpgPath.native()));
+    Image img(Image::LoadFromFile(testJpgPath.u8string()));
     std::string jpegFileContent;
     {
         std::ifstream f;
@@ -74,7 +89,7 @@ TEST(Image, PositiveLoadImageBinary)
 TEST(Image, NegativeLoadImageFile)
 {
     std::filesystem::path testJpgPath(TEST_DATA_PATH);
-    Image img(Image::LoadFromFile(testJpgPath.native()));
+    Image img(Image::LoadFromFile(testJpgPath.u8string()));
     ASSERT_EQ(img.GetData().size(), static_cast<size_t>(0));
     ASSERT_EQ(img.GetSize(), Size(0, 0));
     ASSERT_EQ(img.GetColorChannels(), 0);
@@ -83,7 +98,7 @@ TEST(Image, NegativeLoadImageFile)
 TEST(Sound, PositiveLoadFromFile1)
 {
     std::filesystem::path testWavPath(TEST_DATA_PATH / std::filesystem::path("test_wav_8bit_44khz.wav"));
-    Sound snd(Sound::LoadFromFile(testWavPath.native(), Sound::Format::UncompressedWAV));
+    Sound snd(Sound::LoadFromFile(testWavPath.u8string(), Sound::Format::UncompressedWAV));
     ASSERT_FALSE(snd.IsInvalid());
     ASSERT_EQ(snd.GetBitDepth(), 8);
     ASSERT_EQ(snd.GetSampleFrequency(), 44100);
@@ -93,7 +108,7 @@ TEST(Sound, PositiveLoadFromFile1)
 TEST(Sound, PositiveLoadFromFile2)
 {
     std::filesystem::path testWavPath(TEST_DATA_PATH / std::filesystem::path("test_wav_16bit_11khz.wav"));
-    Sound snd(Sound::LoadFromFile(testWavPath.native(), Sound::Format::UncompressedWAV));
+    Sound snd(Sound::LoadFromFile(testWavPath.u8string(), Sound::Format::UncompressedWAV));
     ASSERT_FALSE(snd.IsInvalid());
     ASSERT_EQ(snd.GetBitDepth(), 16);
     ASSERT_EQ(snd.GetSampleFrequency(), 11025);
@@ -103,7 +118,7 @@ TEST(Sound, PositiveLoadFromFile2)
 TEST(Sound, NegativeLoadFromFile)
 {
     std::filesystem::path testWavPath(TEST_DATA_PATH);
-    Sound snd(Sound::LoadFromFile(testWavPath.native(), Sound::Format::UncompressedWAV));
+    Sound snd(Sound::LoadFromFile(testWavPath.u8string(), Sound::Format::UncompressedWAV));
     ASSERT_TRUE(snd.IsInvalid());
     ASSERT_EQ(snd.GetBitDepth(), 0);
     ASSERT_EQ(snd.GetSampleFrequency(), 0);
@@ -113,7 +128,7 @@ TEST(Sound, NegativeLoadFromFile)
 TEST(SoundPlayer, DISABLED_PositivePlay)
 {
     std::filesystem::path testWavPath(TEST_DATA_PATH / std::filesystem::path("test_wav_8bit_44khz.wav"));
-    Sound snd(Sound::LoadFromFile(testWavPath.native(), Sound::Format::UncompressedWAV));
+    Sound snd(Sound::LoadFromFile(testWavPath.u8string(), Sound::Format::UncompressedWAV));
 
     SoundPlayer player;
     player.LoadSound(snd);
@@ -123,7 +138,7 @@ TEST(SoundPlayer, DISABLED_PositivePlay)
 TEST(SoundPlayer, DISABLED_PositivePlayMultiple)
 {
     std::filesystem::path testWavPath(TEST_DATA_PATH / std::filesystem::path("test_wav_8bit_44khz.wav"));
-    Sound snd(Sound::LoadFromFile(testWavPath.native(), Sound::Format::UncompressedWAV));
+    Sound snd(Sound::LoadFromFile(testWavPath.u8string(), Sound::Format::UncompressedWAV));
 
     SoundPlayer player;
     player.LoadSound(snd);
@@ -242,7 +257,7 @@ TEST(ArxWindow, DISABLED_PositivePainterTest1)
     win->Show();
     Texture2D *testTexture = new Texture2D(win);
     std::filesystem::path testJpgPath(TEST_DATA_PATH / std::filesystem::path("test_png.png"));
-    Image img(Image::LoadFromFile(testJpgPath.native()));
+    Image img(Image::LoadFromFile(testJpgPath.u8string()));
     win->SetIcon(img);
     testTexture->SetData(img);
     win->SetFixedViewport(640, 360);
@@ -269,7 +284,7 @@ TEST(ArxWindow, DISABLED_PositivePainterTest2)
     win->Show();
     Texture2D *testTexture = new Texture2D(win);
     std::filesystem::path testJpgPath(TEST_DATA_PATH / std::filesystem::path("test_png.png"));
-    Image img(Image::LoadFromFile(testJpgPath.native()));
+    Image img(Image::LoadFromFile(testJpgPath.u8string()));
     win->SetIcon(img);
     testTexture->SetData(img);
     win->GetEventManager().Bind<DrawEvent>([win, testTexture](DrawEvent &e){
@@ -288,10 +303,10 @@ TEST(ArxWindow, DISABLED_PositivePainterTest2)
     GameApp::GetGlobalApp()->Run();
 }
 
-TEST(Font, DISABLED_PositiveLoadFont)
+TEST(Font, PositiveLoadFont)
 {
     std::filesystem::path testFontPath(TEST_DATA_PATH / std::filesystem::path("test-font-roboto.ttf"));
-    Font font(Font::LoadFromFile(testFontPath.native()));
+    Font font(Font::LoadFromFile(testFontPath.u8string()));
     font.SetSizeInPt(30);
     ASSERT_FALSE(font.IsInvalid());
     
@@ -322,10 +337,6 @@ TEST(ArxWindow, DISABLED_PositiveWindowInput)
     win->GetEventManager().Bind<KeyDownEvent>([win](KeyDownEvent &e) {  
         if (e.GetKey() == KeyEvent::Key::Esc)
             win->RequestDelete();
-        else if (e.GetKey() == KeyEvent::Key::L)
-            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        else if (e.GetKey() == KeyEvent::Key::F)
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     });
 
     win->GetEventManager().Bind<KeyHoldEvent>([ &position](KeyHoldEvent &e) {
@@ -361,10 +372,10 @@ TEST(ArxWindow, DISABLED_PositiveImageControl)
     win->Show();
     win->SetFixedViewport(640, 360);
     std::filesystem::path testJpgPath(TEST_DATA_PATH / std::filesystem::path("test_png.png"));
-    Image img(Image::LoadFromFile(testJpgPath.native()));
+    Image img(Image::LoadFromFile(testJpgPath.u8string()));
     ImageControl *ctrl = new ImageControl(win, img, Size(100, 100), Position(100, 100));
     ctrl->SetFilteringMode(Texture::TextureFilteringMode::Linear);
-    ctrl->SetBackgroundColor(defaults::COLOR_BLACK);
+    ctrl->SetBackgroundColor(constants::COLOR_BLACK);
 
     GameApp::GetGlobalApp()->Run();
 }
@@ -375,7 +386,7 @@ TEST(ArxWindow, DISABLED_PositiveImageControlHideShow)
     win->Show();
     win->SetFixedViewport(640, 360);
     std::filesystem::path testJpgPath(TEST_DATA_PATH / std::filesystem::path("test_png.png"));
-    Image img(Image::LoadFromFile(testJpgPath.native()));
+    Image img(Image::LoadFromFile(testJpgPath.u8string()));
     ImageControl *ctrl = new ImageControl(win, img, Size(100, 100), Position(100, 100));
     ctrl->SetFilteringMode(Texture::TextureFilteringMode::Linear);
     ctrl->Hide();
@@ -386,43 +397,19 @@ TEST(ArxWindow, DISABLED_PositiveImageControlHideShow)
 
     GameApp::GetGlobalApp()->Run();
 }
-template<typename T>
-class RawPointer
-{
-public:
-    RawPointer(T *ptr = nullptr)
-        : m_ptr(ptr)
-    {
-    }
 
-    void Replace(T *ptr = nullptr)
-    {
-    }
-
-    T *Get()
-    {
-        return m_ptr;
-    }
-
-    T &operator*()
-    {
-        return m_ptr;
-    }
-private:
-    T *m_ptr;
-};
-
-TEST(ArxWindow, PositiveImageControlTileSize)
+TEST(ArxWindow, DISABLED_PositiveImageControlTileSize)
 {
     ArxWindow *win = new ArxWindow("test", Size(640, 360));
+    win->SetBackgroundColor(Color("#005050"));
     win->Show();
     win->SetFixedViewport(640, 360);
     std::filesystem::path testJpgPath(TEST_DATA_PATH / std::filesystem::path("test_png.png"));
-    Image img(Image::LoadFromFile(testJpgPath.native()));
+    Image img(Image::LoadFromFile(testJpgPath.u8string()));
     ImageControl *ctrl = new ImageControl(win, img, Size(100, 100), Position(100, 100));
     ctrl->SetFilteringMode(Texture::TextureFilteringMode::Linear);
-    ctrl->EnableTilingMode(TileData{3, 10});
-    ctrl->SetBackgroundColor(defaults::COLOR_BLACK);
+    ctrl->EnableTilingMode(TileData{3, 2});
+    ctrl->SetBackgroundColor(constants::COLOR_BLACK);
     win->EnableVSync(true);
     Position pos(100, 100);
     win->GetEventManager().Bind<KeyHoldEvent>([ctrl, &pos](KeyHoldEvent &e) {
@@ -432,9 +419,5 @@ TEST(ArxWindow, PositiveImageControlTileSize)
             pos.y += 1000 * static_cast<float>(GameApp::GetGlobalApp()->GetDeltaTime());
         ctrl->SetPosition(pos);
     });
-
     GameApp::GetGlobalApp()->Run();
 }
-
-
-

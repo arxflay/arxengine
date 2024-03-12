@@ -6,13 +6,14 @@
 #include <functional>
 #include <optional>
 #include <memory>
+#include <vector>
 
 ARX_NAMESPACE_BEGIN
 
 class Event;
 
 template<typename EventType>
-struct ARX_EXPORTS is_event_type
+struct is_event_type
 {
     static const bool value = std::is_base_of_v<Event, std::decay_t<EventType>>;
 };
@@ -30,7 +31,7 @@ using EventHandlersVectorRef = std::reference_wrapper<EventHandlersVector>;
 using EventHandlersVectorCref = std::reference_wrapper<const EventHandlersVector>;
 
 class ArxObject;
-class Event 
+class ARX_EXPORTS Event 
 {
 public:
     friend class EventProcessor; 

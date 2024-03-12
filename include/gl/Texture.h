@@ -10,7 +10,7 @@ ARX_NAMESPACE_BEGIN
 class Image;
 class ArxWindow;
 
-class Texture : public UIObject 
+class ARX_EXPORTS Texture : public UIObject 
 {
 public:
     //https://www.khronos.org/opengl/wiki/Texture

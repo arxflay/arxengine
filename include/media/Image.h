@@ -8,7 +8,7 @@
 
 ARX_NAMESPACE_BEGIN
 
-class Image final
+class ARX_EXPORTS Image final
 {
 public:
     bool operator==(const Image &img) const;
