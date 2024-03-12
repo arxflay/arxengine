@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0...3.10.2)
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/ProjectVersion.cmake")
-project(arxengine VERSION ${VER_MAJOR}.${VER_MINOR} LANGUAGES C CXX)
+project(arxengine VERSION ${VER_MAJOR}.${VER_MINOR} LANGUAGES CXX)
 
 option(ARX_BUILD_TEST "Build testapi" OFF)
 
@@ -58,11 +58,14 @@ if (NOT BUILD_SHARED_LIBS OR "${BUILD_SHARED_LIBS}" STREQUAL "OFF")
 else()
     message(STATUS "Build arxengine as shared library")
     add_library(arxengine SHARED "${SOURCES}")
-    target_compile_definitions(arxengine PUBLIC ARX_SHARED)
+    if(WIN32)
+        target_compile_definitions(arxengine PUBLIC ARX_SHARED)
+    endif()
 endif()
 
-target_compile_options(arxengine PRIVATE "$<${gcc_like_cxx}:-Wall;-Wextra;-Wconversion;-std=c++17>"  
+target_compile_options(arxengine PRIVATE "$<${gcc_like_cxx}:-Wall;-Wextra;-Wconversion;-std=c++17;-fPIC>"  
                                                         "$<${msvc_cxx}:/W3;/wd4251;/wd4996;/std:c++17>")
+
 
 target_compile_options(arxengine INTERFACE "$<${msvc_cxx}:/wd4251;/wd4996>")
 

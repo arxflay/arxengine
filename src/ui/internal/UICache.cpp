@@ -90,6 +90,21 @@ void UICache::InitImageData()
     m_shaderPrograms.insert(std::make_pair(SHADER_PROGRAM_ID::IMAGE, std::move(shader)));
 }
 
+
+constexpr std::string_view TEXT_VERTEX_SHADER = R"(
+    #version 330 core
+    layout (location = 0) in vec2 Pos;
+    uniform mat4 )" MODEL_MATRIX_NAME R"(;
+    uniform mat4 )" VIEW_MATRIX_NAME R"(;
+    uniform mat4 )" PROJECTION_MATRIX_NAME R"(;
+    out vec2 TexPos;
+    void main()
+    {
+        gl_Position = )" PROJECTION_MATRIX_NAME "*" VIEW_MATRIX_NAME "*" MODEL_MATRIX_NAME R"(* vec4(Pos, 0.0f, 1.0f);
+        TexPos = Pos;
+    }
+)";
+
 constexpr std::string_view TEXT_FRAGMENT_SHADER = R"(
     #version 330 core
     in vec2 TexPos;
@@ -106,7 +121,7 @@ constexpr std::string_view TEXT_FRAGMENT_SHADER = R"(
 
 void UICache::InitTextData()
 {
-    Shader shader = Shader::FromData(IMAGE_VERTEX_SHADER, TEXT_FRAGMENT_SHADER, std::nullopt);
+    Shader shader = Shader::FromData(TEXT_VERTEX_SHADER, TEXT_FRAGMENT_SHADER, std::nullopt);
     m_shaderPrograms.insert(std::make_pair(SHADER_PROGRAM_ID::TEXT, std::move(shader)));
 }
 

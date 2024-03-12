@@ -129,8 +129,9 @@ void FontCache::UpdateCacheEntries()
     m_oldChangeTime = font.GetLastChangeTime();
     for(auto &[ch, entry] : m_cache)
     {
+        if (ch != ' ')
+            entry.UpdateTexture(font.RenderGlyph(ch));
         entry.UpdateDimensions(font.GetGlyphDimensions(ch));
-        entry.UpdateTexture(font.RenderGlyph(ch));
     }
 }
 

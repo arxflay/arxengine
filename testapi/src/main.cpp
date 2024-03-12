@@ -29,13 +29,15 @@ int main(int argc, char **argv)
     #ifdef WIN32
         logPath = getenv("PROGRAMDATA");
     #else
-        logPath = getenv("/var/log");
+        logPath = getenv("HOME");
+        logPath = logPath / std::filesystem::path(".local/share");
     #endif
     
     logPath = logPath / std::filesystem::path("arxengine");
-#ifdef WIN32
-    (void)std::filesystem::create_directory(logPath);
-#endif
+    std::cout << logPath << '\n';
+//#ifdef WIN32
+    std::filesystem::create_directory(logPath);
+//#endif
     logPath = logPath / std::filesystem::path("log.txt");
     IMPLEMENT_GAMEAPP_NO_MAIN_WITH_LOGGER_INSTANCE(GameApp, ret, std::make_unique<FileLogger>(Logger::LoggingLevel::Debug, logPath.u8string()));
 
