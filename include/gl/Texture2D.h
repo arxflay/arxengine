@@ -21,10 +21,6 @@ public:
     Texture2D(UIControl *obj);
     bool SetData(const Image &image);
     
-    //for now clone copies only parameters, not texture
-    Texture2D *Clone() override;
-    Texture2D *AllocClone() override;
-
 private:
     TextureFilteringMode m_filteringMode;
     TextureWrapping m_wrappingMode;

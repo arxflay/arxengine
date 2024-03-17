@@ -27,7 +27,6 @@ public:
     const ArxObject *GetParent() const; 
     virtual void Reparent(ArxObject *parent);
 
-    virtual ArxObject *Clone();
     
     //create request in event loop
     void RequestDelete();
@@ -36,7 +35,6 @@ public:
     EventManager &GetEventManager();
 
 private:
-    virtual ArxObject *AllocClone();
     ArxObject *m_parent;
     bool m_destroyCalled;
     ArxObjectList m_children;

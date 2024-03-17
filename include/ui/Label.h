@@ -17,7 +17,6 @@ public:
     void EnableFontSmoothing(bool enable);
 private:
     void OnDraw(DrawEvent &e) override;
-    Label *AllocClone() override;
     std::string m_text;
     Color m_textColor;
 };

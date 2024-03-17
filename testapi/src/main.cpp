@@ -21,6 +21,7 @@
 #include <ui/ImageControl.h>
 #include <ui/MouseEvent.h>
 #include <ui/Label.h>
+#include <ui/BitmapButton.h>
 #include <iostream>
 
 ARX_NAMESPACE_USE;
@@ -519,7 +520,7 @@ TEST(ArxWindow, DISABLED_PositiveMouseInput2)
 }
 
 
-TEST(ArxWindow, PositiveLabel)
+TEST(ArxWindow, DISABLED_PositiveLabel)
 {
     ArxWindow *win = new ArxWindow("test", Size(640, 360));
     win->Show();
@@ -552,6 +553,42 @@ TEST(ArxWindow, PositiveLabel)
     t->SetInterval(std::chrono::seconds(1));
     t->Start(Timer::TimerType::CONTINUOUS);
     
+    win->EnableVSync(true);
+    GameApp::GetGlobalApp()->Run();
+}
+
+TEST(ArxWindow, PositiveBitmapButton)
+{
+    ArxWindow *win = new ArxWindow("test", Size(640, 360));
+    win->Show();
+    win->SetFixedViewport(640, 360);
+    BitmapButton *btn = new BitmapButton(win);
+    btn->SetSize(Size(100, 100));
+    btn->SetText("Hello world");
+    btn->SetNormalImage(Image::LoadFromFile((TEST_DATA_PATH / std::filesystem::path("btn_normal.jpg")).u8string()));
+    btn->SetMouseEnterImage(Image::LoadFromFile((TEST_DATA_PATH / std::filesystem::path("btn_hover.jpg")).u8string()));
+    btn->SetMouseHoldImage(Image::LoadFromFile((TEST_DATA_PATH / std::filesystem::path("btn_hold.jpg")).u8string()));
+
+    std::filesystem::path testFontPath(TEST_DATA_PATH / std::filesystem::path("test-font-roboto.ttf"));
+    Font font(Font::LoadFromFile(testFontPath.u8string()));
+    font.SetSizeInPt(30);
+    ASSERT_FALSE(font.IsInvalid());
+    btn->SetFont(std::move(font));
+    btn->SetText("test");
+    btn->GetEventManager().Bind<MouseEnterEvent>([btn](MouseEnterEvent &e)
+    {
+        (void)btn;
+        std::cout << "Enter" << '\n';
+        e.Skip();
+    });
+
+    btn->GetEventManager().Bind<MouseDownEvent>([btn](MouseDownEvent &e)
+    {
+        (void)btn;
+        std::cout << "Click" << '\n';
+        e.Skip();
+    });
+
     win->EnableVSync(true);
     GameApp::GetGlobalApp()->Run();
 }

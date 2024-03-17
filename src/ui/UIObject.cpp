@@ -47,9 +47,6 @@ const ArxWindow *UIObject::GetWindow() const
     return GetOwnerUIControl()->GetWindow();
 }
 
-ArxObject *UIObject::AllocClone()
-{
-    return new UIObject(GetOwnerUIControl());
-}
+
 
 ARX_NAMESPACE_END

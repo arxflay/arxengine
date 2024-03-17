@@ -84,13 +84,11 @@ public:
     void MoveToFront();
     void MoveToBack();
 
-    UIControl *Clone() override;
 private:
     virtual void OnDraw(DrawEvent &) { /*do nothing*/ };
     
     //this constructor is used for windows
     UIControl();
-    UIControl *AllocClone() override = 0;
 
 private:
     Size m_size;

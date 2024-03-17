@@ -540,21 +540,6 @@ bool ArxWindow::SetWindowAspectRatio(int numer, int denom)
     return true;
 }
 
-ArxWindow *ArxWindow::Clone()
-{
-    std::unique_ptr<ArxWindow> window(static_cast<ArxWindow*>(UIControl::Clone()));
-    window->m_useFixedViewport = m_useFixedViewport;
-    window->m_viewport = m_viewport;
-    window->m_clientSize = m_clientSize;
-    return window.release();
-}
-
-
-ArxWindow *ArxWindow::AllocClone()
-{
-    return new ArxWindow(m_title, m_size, m_position, m_attributes);
-}
-
 void ArxWindow::OnShow(ShowEvent &e)
 {
     if (e.WillBeShown())

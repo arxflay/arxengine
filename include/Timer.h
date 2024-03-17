@@ -45,10 +45,8 @@ public:
             Start(m_timerType);
         }
     }
-    Timer *Clone() override;
 
 private:
-    Timer *AllocClone() override;
     friend class TimerCheckEvent;
     TimerTime m_past;
     TimerTime m_whenStartWasCalled;

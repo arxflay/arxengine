@@ -21,7 +21,6 @@ public:
         void UpdateDimensions(const GlyphDimensions &dimensions);
         FontCacheEntry(FontCacheEntry&&);
 
-        FontCacheEntry Clone();
     private:
         FontCacheEntry(UIControl *obj);
         FontCacheEntry(Texture2D *texture, GlyphDimensions dimensions);
@@ -38,10 +37,8 @@ public:
     void EnableFontSmoothing(bool enable);
     void ManuallyUpdateLastFontChangeTime(Font::ChangeTime_t time);
     bool IsFontSmoothingEnabled() const;
-    FontCache *Clone() override;
 
 private:
-    FontCache *AllocClone() override;
     void UpdateCacheEntries();
     FontCache(FontCache&&) = delete;
     FontCache(const FontCache&) = delete;

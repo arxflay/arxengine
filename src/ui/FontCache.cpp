@@ -37,13 +37,6 @@ void FontCache::FontCacheEntry::UpdateTextureFiltering(Texture::TextureFiltering
     m_texture->SetTextureFilteringMode(filtering);
 }
 
-FontCache::FontCacheEntry FontCache::FontCacheEntry::Clone()
-{
-    Texture2D *texture = static_cast<Texture2D*>(m_texture->Clone());
-    FontCacheEntry entry(texture, m_dimensions);
-    return entry;
-}
-
 FontCache::FontCacheEntry::FontCacheEntry(Texture2D *texture, GlyphDimensions dimensions)
     : m_dimensions(dimensions)
     , m_texture(texture)
@@ -133,20 +126,6 @@ void FontCache::UpdateCacheEntries()
             entry.UpdateTexture(font.RenderGlyph(ch));
         entry.UpdateDimensions(font.GetGlyphDimensions(ch));
     }
-}
-
-FontCache *FontCache::Clone()
-{
-    std::unique_ptr<FontCache> clone(static_cast<FontCache*>(UIObject::Clone()));
-    for(auto &[ch, entry] : m_cache)
-        clone->m_cache.emplace(std::make_pair(ch, entry.Clone()));
-
-    return clone.release();
-}
-
-FontCache *FontCache::AllocClone()
-{
-    return new FontCache(GetOwnerUIControl());
 }
 
 ARX_NAMESPACE_END

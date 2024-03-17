@@ -21,7 +21,6 @@ public:
     bool IsTilingModeEnabled() const;
     bool IsInvalid() const;
 private:
-    ImageControl *AllocClone() override { return nullptr; } /*unsupported*/
     void OnDraw(DrawEvent &e) override;
     Texture2D *m_texture;
     TileData m_tileData;

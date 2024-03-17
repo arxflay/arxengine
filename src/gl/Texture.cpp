@@ -124,16 +124,6 @@ Texture::Texture(UIControl *parent)
         GLOG->Error("failed to create texture, gl_error %d",  glGetError());
 }
 
-Texture *Texture::Clone()
-{
-    std::unique_ptr<Texture> clone(static_cast<Texture*>(UIObject::Clone()));
-    GetWindow()->SetAsCurrentContext();
-    glGenTextures(1, &clone->m_texture);
-    clone->m_textureType = m_textureType;
-    clone->m_textureUnit = m_textureUnit;
-    return clone.release();
-}
-
 Texture::TextureType Texture::GetTextureType() const
 {
     return m_textureType;

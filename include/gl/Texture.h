@@ -91,7 +91,6 @@ public:
     //cleanup
     virtual ~Texture();
 
-    Texture *Clone() override;
 
     bool IsInvalid() const;
     bool IsBound() const;
@@ -113,7 +112,6 @@ protected:
     unsigned int GetTextureHandle();
     void SetTextureType(TextureType textureType);
 private:
-    Texture *AllocClone() override = 0;
 
     unsigned int m_texture;
     TextureType m_textureType;

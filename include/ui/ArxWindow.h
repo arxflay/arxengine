@@ -88,13 +88,11 @@ public:
 
     //To disable the aspect ratio limit for a window, set both terms to constants::IGNORE_VALUE
     bool SetWindowAspectRatio(int numer, int denom);
-    ArxWindow *Clone() override;
 
     void EnableVSync(bool enable);
 
     Position GetCursorPosition();
 private:
-    ArxWindow *AllocClone() override;
     void OnShow(ShowEvent &e);
     void OnDraw(DrawEvent &e) override;
     void RecalculateSizes(Size s);

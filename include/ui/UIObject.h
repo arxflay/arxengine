@@ -25,9 +25,6 @@ public:
 
     const UIControl *GetOwnerUIControl() const;
     const ArxWindow *GetWindow() const;
-
-private:
-    ArxObject *AllocClone() override;
 };
 
 ARX_NAMESPACE_END

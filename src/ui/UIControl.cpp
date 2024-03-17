@@ -97,24 +97,6 @@ Font &UIControl::GetFont()
     return m_font;
 }
 
-UIControl *UIControl::Clone()
-{
-    std::unique_ptr<UIControl> control(static_cast<UIControl*>(ArxObject::Clone()));
-    control->SetSize(m_size);
-    control->SetPosition(m_position);
-    control->m_ownerWindow = GetWindow();
-    control->SetBackgroundColor(GetColor());
-    control->EnableClipToBounds(m_clippingEnabled);
-    control->m_font = m_font;
-    auto fontCacheIt = std::find_if(GetChildren().begin(), GetChildren().end(), [](const ArxObject *obj) { return !!dynamic_cast<const FontCache*>(obj); });
-    if (fontCacheIt == GetChildren().end())
-        throw ArxException(ArxException::ErrorCode::GenericError, "Failed to find error cache");
-    control->m_fontCache = const_cast<FontCache*>(static_cast<const FontCache*>(*fontCacheIt));
-    control->m_fontCache->ManuallyUpdateLastFontChangeTime(m_font.GetLastChangeTime());
-
-    return control.release();
-}
-
 void UIControl::SetFont(Font &&font)
 {
     m_font = std::move(font);

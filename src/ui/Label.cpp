@@ -17,11 +17,6 @@ Color Label::GetTextColor() const { return m_textColor; }
 
 void Label::EnableFontSmoothing(bool enable) { GetFontCache()->EnableFontSmoothing(enable); }
 
-Label *Label::AllocClone() 
-{
-    return new Label(static_cast<UIControl*>(GetParent()), GetText(), GetSize(), GetPosition());
-}
-
 void Label::OnDraw(DrawEvent &e)
 {
     if (!GetFont().IsInvalid())
