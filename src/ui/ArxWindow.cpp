@@ -178,7 +178,7 @@ void ArxWindow::SendMouseEnterExitEvents(UIControl *ctrl, Position pos)
         {
             bool alreadyEntered = m_mouseEnteredControls.count(control);
             bool hitted = control->HitTest(pos);
-            if (hitted && !alreadyEntered)
+            if (hitted && !alreadyEntered && control->IsShown())
             {
                 m_mouseEnteredControls.emplace(control);
                 if (control->GetEventManager().HasNonDefaultEventHandler<MouseEnterEvent>())
@@ -190,8 +190,14 @@ void ArxWindow::SendMouseEnterExitEvents(UIControl *ctrl, Position pos)
                 if (control->GetEventManager().HasNonDefaultEventHandler<MouseExitEvent>())
                     control->GetEventManager().QueueEvent<MouseExitEvent>(std::make_unique<MouseExitEvent>());
             }
+            SendMouseEnterExitEvents(control, pos);
         }
     }
+}
+
+void ArxWindow::SendMouseEnterExitEvents(Position pos)
+{
+    (void)SendMouseEnterExitEvents(this, pos);
 }
 
 void ArxWindow::SendForcefullyMouseExitEvents()
@@ -223,7 +229,7 @@ void ArxWindow::CursorPosCallback(GLFWwindow *win, double xpos, double ypos)
     }
 
     if (arxWin->IsCursorVisible())
-        arxWin->SendMouseEnterExitEvents(arxWin, viewportAffectedPosition);
+        arxWin->SendMouseEnterExitEvents(viewportAffectedPosition);
 }
 
 /*static*/ void ArxWindow::MouseEnterExitCallback(GLFWwindow *win, int enter)
@@ -466,6 +472,9 @@ private:
 
 void ArxWindow::Draw()
 {
+    if (!IsShown())
+        return;
+
     DrawInternal(this);
     std::unique_ptr<SwapBuffersEvent> evt(std::make_unique<SwapBuffersEvent>(m_win.get()));
     GetEventManager().QueueEvent<SwapBuffersEvent>(std::move(evt));
@@ -473,6 +482,9 @@ void ArxWindow::Draw()
 
 void ArxWindow::DrawNowInternal(UIControl *obj)
 {
+    if (!obj->IsShown())
+        return;
+
     DrawEvent evt;
     obj->GetEventManager().ProcessEvent<DrawEvent>(evt);
     for (ArxObject *obj : const_cast<ArxObjectList&>(obj->GetChildren()))
@@ -485,6 +497,8 @@ void ArxWindow::DrawNowInternal(UIControl *obj)
 
 void ArxWindow::DrawNow()
 {
+    if (!IsShown())
+        return;
     DrawInternal(this);
     SwapBuffersEvent event(m_win.get());
     GetEventManager().ProcessEvent<SwapBuffersEvent>(event);

@@ -97,4 +97,5 @@ ArxObject *ArxObject::AllocClone()
     return new ArxObject(GetParent());
 }
 
+
 ARX_NAMESPACE_END

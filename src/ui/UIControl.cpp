@@ -156,4 +156,26 @@ void ShowEvent::SetWillBeShown(bool show)
     m_show = show;
 }
 
+void UIControl::MoveToFront()
+{
+    ArxObject *parent = GetParent();
+    if (parent)
+    {
+        auto &parentChildren = const_cast<ArxObjectList&>(parent->GetChildren());
+        auto childIt = std::find(parentChildren.begin(), parentChildren.end(), this);
+        parentChildren.splice(parentChildren.end(), parentChildren, childIt, std::next(childIt));
+    }
+}
+
+void UIControl::MoveToBack()
+{
+    ArxObject *parent = GetParent();
+    if (parent)
+    {
+        auto &parentChildren = const_cast<ArxObjectList&>(parent->GetChildren());
+        auto childIt = std::find(parentChildren.begin(), parentChildren.end(), this);
+        parentChildren.splice(parentChildren.begin(), parentChildren, childIt, std::next(childIt));
+    }
+}
+
 ARX_NAMESPACE_END

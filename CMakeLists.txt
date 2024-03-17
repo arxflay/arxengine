@@ -43,6 +43,7 @@ list(APPEND SOURCES
     ${SOURCE_PATH}/ui/KeyEvent.cpp
     ${SOURCE_PATH}/ui/ImageControl.cpp
     ${SOURCE_PATH}/ui/MouseEvent.cpp
+    ${SOURCE_PATH}/ui/Label.cpp
 )
 set(CMAKE_EXPORT_COMPILE_COMMANDS True)
 set(gcc_like_cxx "$<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang,GNU,LCC>")

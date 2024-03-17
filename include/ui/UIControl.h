@@ -81,6 +81,9 @@ public:
     void SetFont(Font &&font);
     void SetFont(const Font &font);
 
+    void MoveToFront();
+    void MoveToBack();
+
     UIControl *Clone() override;
 private:
     virtual void OnDraw(DrawEvent &) { /*do nothing*/ };

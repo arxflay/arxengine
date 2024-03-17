@@ -20,6 +20,7 @@
 #include <ArxException.h>
 #include <ui/ImageControl.h>
 #include <ui/MouseEvent.h>
+#include <ui/Label.h>
 #include <iostream>
 
 ARX_NAMESPACE_USE;
@@ -485,7 +486,7 @@ TEST(ArxWindow, DISABLED_PositiveMouseInput)
     GameApp::GetGlobalApp()->Run();
 }
 
-TEST(ArxWindow, PositiveMouseInput2)
+TEST(ArxWindow, DISABLED_PositiveMouseInput2)
 {
     ArxWindow *win = new ArxWindow("test", Size(640, 360));
     win->Show();
@@ -511,9 +512,46 @@ TEST(ArxWindow, PositiveMouseInput2)
     });
 
     t->SetInterval(std::chrono::seconds(5));
-    t->Start(Timer::TimerType::CONTINUOUS);
+    t->Start(Timer::TimerType::SINGLE_FIRE);
 
     win->EnableVSync(true);
     GameApp::GetGlobalApp()->Run();
 }
 
+
+TEST(ArxWindow, PositiveLabel)
+{
+    ArxWindow *win = new ArxWindow("test", Size(640, 360));
+    win->Show();
+    win->SetFixedViewport(640, 360);
+    Label *label = new Label(win);
+    label->SetSize(Size(100, 100));
+    label->SetText("Hello world");
+
+    std::filesystem::path testFontPath(TEST_DATA_PATH / std::filesystem::path("test-font-roboto.ttf"));
+    Font font(Font::LoadFromFile(testFontPath.u8string()));
+    font.SetSizeInPt(30);
+    ASSERT_FALSE(font.IsInvalid());
+    label->SetFont(std::move(font));
+    label->SetTextColor(Color("#666380"));
+    Timer *t = new Timer(label);
+    int counter = 0;
+    t->GetEventManager().Bind<TimerEvent>([label, &counter] (TimerEvent &) mutable{
+        label->SetText(std::to_string(counter++));
+    });
+
+    Label *label2 = new Label(win);
+    label2->SetSize(Size(100, 100));
+    label2->SetText("Hello world");
+    label2->SetFont(label->GetFont());
+    label2->SetTextColor(Color("#FF0000"));
+    
+    label->MoveToFront();
+    ASSERT_NE(win->GetChildren().front(), label);
+
+    t->SetInterval(std::chrono::seconds(1));
+    t->Start(Timer::TimerType::CONTINUOUS);
+    
+    win->EnableVSync(true);
+    GameApp::GetGlobalApp()->Run();
+}

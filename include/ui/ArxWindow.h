@@ -76,6 +76,7 @@ public:
     //accept only RGBA 8byte per channel images
     //nullopt == unset icon
     bool SetIcon(std::optional<std::reference_wrapper<const Image>> img);
+
     
     /* schedules draw event */
     void Draw();
@@ -99,7 +100,7 @@ private:
     void RecalculateSizes(Size s);
     void RegisterWindowFromWindowList();
     void UnregisterWindowFromWindowList();
-
+    void SendMouseEnterExitEvents(Position pos);
     void SendMouseEnterExitEvents(UIControl *ctrl, Position pos);
     void SendForcefullyMouseExitEvents();
 
