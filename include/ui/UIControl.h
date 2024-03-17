@@ -56,7 +56,7 @@ public:
     
     virtual void SetPosition(Position pos);
     virtual Position GetPosition() const;
-    
+
     //returns nullptr if UIControl is ArxWindow
     ArxWindow *GetOwnerWindow();
     const ArxWindow *GetOwnerWindow() const;
@@ -74,18 +74,22 @@ public:
     virtual void EnableClipToBounds(bool enable = true);
     virtual bool IsEnabledClipToBounds() const;
 
+    bool HitTest(Position pos) const;
+
     FontCache *GetFontCache();
     Font &GetFont();
     void SetFont(Font &&font);
     void SetFont(const Font &font);
 
     UIControl *Clone() override;
-
 private:
-    //this constructor is used for windows
     virtual void OnDraw(DrawEvent &) { /*do nothing*/ };
+    
+    //this constructor is used for windows
     UIControl();
     UIControl *AllocClone() override = 0;
+
+private:
     Size m_size;
     Position m_position;
     ArxWindow *m_ownerWindow;

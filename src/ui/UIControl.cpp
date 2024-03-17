@@ -145,6 +145,12 @@ bool ShowEvent::WillBeShown() const
     return m_show;
 }
 
+bool UIControl::HitTest(Position pos) const
+{
+    return pos.x >= m_position.x && pos.x <= m_position.x + GetClientSize().width 
+        && pos.y >= m_position.y && pos.y <= m_position.y + GetClientSize().height; 
+}
+
 void ShowEvent::SetWillBeShown(bool show)
 {
     m_show = show;

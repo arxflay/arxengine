@@ -5,6 +5,7 @@
 #include "UIControl.h"
 #include "Viewport.h"
 #include <string_view>
+#include "ui/MouseEvent.h"
 
 struct GLFWwindow;
 
@@ -12,13 +13,12 @@ ARX_NAMESPACE_BEGIN
 
 class UICache;
 class Image;
-
-
-
+class ShowCursorEvent;
 
 class ARX_EXPORTS ArxWindow : public UIControl
 {
 public:
+    friend class ShowCursorEvent;
     enum ARX_EXPORTS WindowAttributes : int
     {
         RESIZABLE = 0x01, //window becomes resizable if set
@@ -52,7 +52,7 @@ public:
     void SetPosition(Position pos) override;
 
     //non relative window position (multimonitor position)
-    Position GetRealPosition();
+    Position GetRealPosition() const;
 
     void Reparent(ArxObject *parent) override;
     int GetAttributes() const;
@@ -65,10 +65,13 @@ public:
     virtual void SetFixedViewport(float width, float height);
     virtual void RemoveFixedViewport();
 
-    virtual const Viewport &GetViewport();
+    virtual const Viewport &GetViewport() const;
     virtual ~ArxWindow();
 
     UICache *GetUICache();
+
+    void ShowCursor(bool show);
+    bool IsCursorVisible() const;
     
     //accept only RGBA 8byte per channel images
     //nullopt == unset icon
@@ -87,6 +90,8 @@ public:
     ArxWindow *Clone() override;
 
     void EnableVSync(bool enable);
+
+    Position GetCursorPosition();
 private:
     ArxWindow *AllocClone() override;
     void OnShow(ShowEvent &e);
@@ -95,15 +100,36 @@ private:
     void RegisterWindowFromWindowList();
     void UnregisterWindowFromWindowList();
 
+    void SendMouseEnterExitEvents(UIControl *ctrl, Position pos);
+    void SendForcefullyMouseExitEvents();
+
+
     static void PositionCallback(GLFWwindow *win, int x, int y);
     static void CloseCallback(GLFWwindow *win);
     static void RefreshCallback(GLFWwindow *win);
-    static void InputCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+    static void KeyboardInputCallback(GLFWwindow *win, int key, int scancode, int action, int mods);
+    static void MouseInputCallback(GLFWwindow *win, int button, int action, int mods);
+    static void MouseCallback(GLFWwindow *win, int button, int action, int mods);
+    static void CursorPosCallback(GLFWwindow *win, double xpos, double ypos);
+    static void MouseEnterExitCallback(GLFWwindow *win, int enter);
+
+    static void MouseScrollCallback(GLFWwindow *win, int button, int action, int mods);
 
     static void SetGlfwCallbacks(GLFWwindow *win);
 
     static void DrawInternal(UIControl *obj);
     static void DrawNowInternal(UIControl *obj);
+
+    struct PressedMouseButtonRecord
+    {
+        PressedMouseButtonRecord(UIControl *controlIn, MouseButtonEvent::ButtonType buttonTypeIn)
+            : control(controlIn), buttonType(buttonTypeIn)
+        {}
+        UIControl *control;
+        MouseButtonEvent::ButtonType buttonType;
+        bool operator<(const PressedMouseButtonRecord &rec) const { return buttonType < rec.buttonType; }
+        bool operator>(const PressedMouseButtonRecord &rec) const { return buttonType > rec.buttonType; }
+    };
 
 private:
     std::unique_ptr<GLFWwindow, void(*)(GLFWwindow*)> m_win;
@@ -114,6 +140,9 @@ private:
     bool m_useFixedViewport;
     std::unique_ptr<UICache> m_uiCache;
     bool m_vsyncEnabled;
+    bool m_showCursor;
+    std::set<PressedMouseButtonRecord> m_pressedMouseButtons;
+    std::set<UIControl*>  m_mouseEnteredControls;
 };
 
 ARX_NAMESPACE_END

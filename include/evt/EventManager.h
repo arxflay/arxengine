@@ -11,7 +11,7 @@
 #include "logging/Logger.h"
 #include "GameApp.h"
 #include "EventProcessor.h"
-
+#include <iostream>
 ARX_NAMESPACE_BEGIN
 
 namespace detail
@@ -37,7 +37,7 @@ class EventHandler
         }
 
         template<typename EventType>
-        constexpr EventHandler(const std::function<std::enable_if_t<is_event_type_v<EventType>>(EventType&)> &functor) 
+        EventHandler(const std::function<std::enable_if_t<is_event_type_v<EventType>>(EventType&)> &functor) 
         {
             m_func = [functor](Event& evt) constexpr -> void { functor(static_cast<EventType&>(evt)); };
             m_originalFuncAddress = UnwrappedFuncAddrs { reinterpret_cast<uintptr_t>(&functor), 0 };
@@ -181,24 +181,31 @@ public:
     EventManager &operator=(EventManager&&) = delete;
 
     template<typename EventType>
+    std::enable_if_t<is_event_type_v<EventType>, bool> HasNonDefaultEventHandler()
+    {
+        auto eventHandler = m_eventsHandlersMap.FindEventHandlers<EventType>();
+        return eventHandler.has_value() && !eventHandler->get().empty();
+    }
+
+    template<typename EventType>
     void Bind(std::enable_if_t<is_event_type_v<EventType>> (*c_func)(EventType&))    
     {
-        auto eventHandlers = m_eventsHandlersMap.FindOrCreateEventHandlers<EventType>();
-        eventHandlers()->get().emplace_back(c_func);
+        auto &eventHandlers = m_eventsHandlersMap.FindOrCreateEventHandlers<EventType>().value().get();
+        eventHandlers.emplace_back(c_func);
     }
 
     template<typename EventType>
     void Bind(const std::function<std::enable_if_t<is_event_type_v<EventType>>(EventType&)> &functor)
     {
-        auto eventHandlers = m_eventsHandlersMap.FindOrCreateEventHandlers<EventType>();
-        eventHandlers->get().emplace_back(functor);
+        auto &eventHandlers = m_eventsHandlersMap.FindOrCreateEventHandlers<EventType>().value().get();
+        eventHandlers.emplace_back(functor);
     }
 
     template<typename EventType, typename ClassType>
     void Bind(std::enable_if_t<is_event_type_v<EventType>> (ClassType::*memberFunction)(EventType&), ClassType *member)
     {
-        auto eventHandlers = m_eventsHandlersMap.FindOrCreateEventHandlers<EventType>();
-        eventHandlers->get().emplace_back(memberFunction, member);
+        auto &eventHandlers = m_eventsHandlersMap.FindOrCreateEventHandlers<EventType>().value().get();
+        eventHandlers.emplace_back(memberFunction, member);
     }
 private:
     template<typename EventType>

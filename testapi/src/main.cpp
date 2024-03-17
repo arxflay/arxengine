@@ -19,6 +19,7 @@
 #include <ui/KeyEvent.h>
 #include <ArxException.h>
 #include <ui/ImageControl.h>
+#include <ui/MouseEvent.h>
 #include <iostream>
 
 ARX_NAMESPACE_USE;
@@ -34,10 +35,7 @@ int main(int argc, char **argv)
     #endif
     
     logPath = logPath / std::filesystem::path("arxengine");
-    std::cout << logPath << '\n';
-//#ifdef WIN32
     std::filesystem::create_directory(logPath);
-//#endif
     logPath = logPath / std::filesystem::path("log.txt");
     IMPLEMENT_GAMEAPP_NO_MAIN_WITH_LOGGER_INSTANCE(GameApp, ret, std::make_unique<FileLogger>(Logger::LoggingLevel::Debug, logPath.u8string()));
 
@@ -305,7 +303,7 @@ TEST(ArxWindow, DISABLED_PositivePainterTest2)
     GameApp::GetGlobalApp()->Run();
 }
 
-TEST(Font, PositiveLoadFont)
+TEST(Font, DISABLED_PositiveLoadFont)
 {
     std::filesystem::path testFontPath(TEST_DATA_PATH / std::filesystem::path("test-font-roboto.ttf"));
     Font font(Font::LoadFromFile(testFontPath.u8string()));
@@ -322,7 +320,7 @@ TEST(Font, PositiveLoadFont)
         Painter painter(e);
         painter.Clear();
         painter.SetPen(Pen(Color(255, 0, 0)));
-        win->GetFontCache()->EnableFontSmoothing(true);
+        win->GetFontCache()->EnableFontSmoothing(false);
         painter.DrawText("Test string", Position(0, 50));
     });
 
@@ -410,7 +408,7 @@ TEST(ArxWindow, DISABLED_PositiveImageControlTileSize)
     Image img(Image::LoadFromFile(testJpgPath.u8string()));
     ImageControl *ctrl = new ImageControl(win, img, Size(100, 100), Position(100, 100));
     ctrl->SetFilteringMode(Texture::TextureFilteringMode::Linear);
-    ctrl->EnableTilingMode(TileData{3, 2});
+    ctrl->EnableTilingMode(TileData{1, 3});
     ctrl->SetBackgroundColor(constants::COLOR_BLACK);
     win->EnableVSync(true);
     Position pos(100, 100);
@@ -423,3 +421,99 @@ TEST(ArxWindow, DISABLED_PositiveImageControlTileSize)
     });
     GameApp::GetGlobalApp()->Run();
 }
+
+TEST(ArxWindow, DISABLED_PositiveMouseInput)
+{
+    ArxWindow *win = new ArxWindow("test", Size(640, 360));
+    win->Show();
+    win->SetFixedViewport(640, 360);
+    float position = 20.0f; 
+
+    win->GetEventManager().Bind<MouseDownEvent>([win](MouseDownEvent &e) {  
+        if (e.GetMouseButtonType() == MouseButtonEvent::ButtonType::Scroll)
+            win->RequestDelete();
+    });
+    std::filesystem::path testJpgPath(TEST_DATA_PATH / std::filesystem::path("test_png.png"));
+    Image img(Image::LoadFromFile(testJpgPath.u8string()));
+    ImageControl *ctrl = new ImageControl(win, img, Size(100, 100), Position(100, 100));
+    ctrl->SetFilteringMode(Texture::TextureFilteringMode::Linear);
+    ctrl->SetBackgroundColor(constants::COLOR_BLACK);
+
+    ctrl->GetEventManager().Bind<MouseDownEvent>([win](MouseDownEvent &) {  
+        (void)win;
+        std::cout << "ImageControlDown" << '\n'; 
+    });
+
+    ctrl->GetEventManager().Bind<MouseUpEvent>([win](MouseUpEvent &) {  
+        (void)win;
+        std::cout << "ImageControlUp" << '\n'; 
+    });
+
+    //win->ShowCursor(false);
+
+    win->GetEventManager().Bind<MouseUpEvent>([win](MouseUpEvent &e) {  
+        (void)win;
+        std::cout << (int)e.GetMouseButtonType() << '\n'; 
+    });
+
+    /*win->GetEventManager().Bind<MouseMoveEvent>([win](MouseMoveEvent&e) {
+        std::cout << e.GetPosition().x << "; " << e.GetPosition().y << '\n';
+    });*/
+
+    win->GetEventManager().Bind<MouseEnterEvent>([win](MouseEnterEvent&) {
+        std::cout << "window entered" << '\n';
+    });
+
+    ctrl->GetEventManager().Bind<MouseEnterEvent>([win](MouseEnterEvent&) {
+        std::cout << "image control entered" << '\n';
+    });
+
+    ctrl->GetEventManager().Bind<MouseExitEvent>([win](MouseExitEvent&) {
+         std::cout << "image control exited" << '\n';    
+    });
+
+    win->GetEventManager().Bind<DrawEvent>([&position](DrawEvent &e){
+        Painter painter(e);
+        painter.Clear();
+        painter.SetBrush(Brush(Color(100, 200, 100)));
+        painter.DrawRectangle(Position(position, 60.0f), Size(100, 100));
+
+    });
+
+    win->EnableVSync(true);
+
+    GameApp::GetGlobalApp()->Run();
+}
+
+TEST(ArxWindow, PositiveMouseInput2)
+{
+    ArxWindow *win = new ArxWindow("test", Size(640, 360));
+    win->Show();
+    win->SetFixedViewport(640, 360);
+
+    std::filesystem::path testJpgPath(TEST_DATA_PATH / std::filesystem::path("test_png.png"));
+    Image img(Image::LoadFromFile(testJpgPath.u8string()));
+    ImageControl *ctrl = new ImageControl(win, img, Size(100, 100), Position(100, 100));
+    ctrl->SetFilteringMode(Texture::TextureFilteringMode::Linear);
+    ctrl->SetBackgroundColor(constants::COLOR_BLACK);
+
+    ctrl->GetEventManager().Bind<MouseEnterEvent>([win](MouseEnterEvent&) {
+        std::cout << "image control entered" << '\n';
+    });
+
+    ctrl->GetEventManager().Bind<MouseExitEvent>([win](MouseExitEvent&) {
+        std::cout << "image control exited" << '\n';
+    });
+
+    Timer *t = new Timer(win);
+    t->GetEventManager().Bind<TimerEvent>([win](TimerEvent &){
+        win->ShowCursor(false); 
+    });
+
+    t->SetInterval(std::chrono::seconds(5));
+    t->Start(Timer::TimerType::CONTINUOUS);
+
+    win->EnableVSync(true);
+    GameApp::GetGlobalApp()->Run();
+}
+

@@ -149,7 +149,6 @@ def Test(projType : ProjectType):
     if (len(folders) == 0):
         print("Configured projects not found")
         return
-
     folder = folders[SelectVariant("Projects", folders)]
     fullPath = os.path.join(buildFolder, folder)
     if os.name == "nt":
