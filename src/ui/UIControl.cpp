@@ -23,7 +23,16 @@ UIControl::UIControl(UIControl *parent, Size size, Position pos)
 void UIControl::SetBackgroundColor(Color c) { m_backgroundColor = c; }
 Color UIControl::GetColor() const { return m_backgroundColor; }
 
-void UIControl::SetSize(Size s) { m_size = s; }
+void UIControl::SetSize(Size s) 
+{
+    if (GetParent() && GetParent() != GetOwnerWindow())
+    {
+        Size parentSize = static_cast<UIControl*>(GetParent())->GetClientSize();
+        s = Size(std::clamp(s.width, 0.0f, parentSize.width), std::clamp(s.height, 0.0f, parentSize.height));
+    }
+        
+    m_size = s;
+}
 Size UIControl::GetSize() const { return m_size; }
 Size UIControl::GetClientSize() const { return m_size; }
 
@@ -119,7 +128,7 @@ ShowEvent::ShowEvent()
 
 void ShowEvent::HandleEvent() 
 {
-    static_cast<UIControl*>(GetSender())->m_isShown = WillBeShown();    
+    static_cast<UIControl*>(GetSender())->m_isShown = WillBeShown();
 }
 
 bool ShowEvent::WillBeShown() const

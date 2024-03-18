@@ -177,20 +177,24 @@ void ArxWindow::SendMouseEnterExitEvents(UIControl *ctrl, Position pos)
         if (control)
         {
             bool alreadyEntered = m_mouseEnteredControls.count(control);
-            bool hitted = control->HitTest(pos);
-            if (hitted && !alreadyEntered && control->IsShown())
+            bool hitted = false;
+            
+            if (control->IsShown() && (hitted = control->HitTest(pos)))
             {
-                m_mouseEnteredControls.emplace(control);
-                if (control->GetEventManager().HasNonDefaultEventHandler<MouseEnterEvent>())
-                    control->GetEventManager().QueueEvent<MouseEnterEvent>(std::make_unique<MouseEnterEvent>());
-            }
+                if (!alreadyEntered)
+                {
+                    m_mouseEnteredControls.emplace(control);
+                    if (control->GetEventManager().HasNonDefaultEventHandler<MouseEnterEvent>())
+                        control->GetEventManager().QueueEvent<MouseEnterEvent>(std::make_unique<MouseEnterEvent>());
+                }
+                SendMouseEnterExitEvents(control, pos); 
+            }      
             else if (!hitted && alreadyEntered)
             {
                 m_mouseEnteredControls.erase(control);
                 if (control->GetEventManager().HasNonDefaultEventHandler<MouseExitEvent>())
                     control->GetEventManager().QueueEvent<MouseExitEvent>(std::make_unique<MouseExitEvent>());
             }
-            SendMouseEnterExitEvents(control, pos);
         }
     }
 }

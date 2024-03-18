@@ -569,16 +569,32 @@ TEST(ArxWindow, PositiveBitmapButton)
     btn->SetMouseEnterImage(Image::LoadFromFile((TEST_DATA_PATH / std::filesystem::path("btn_hover.jpg")).u8string()));
     btn->SetMouseHoldImage(Image::LoadFromFile((TEST_DATA_PATH / std::filesystem::path("btn_hold.jpg")).u8string()));
 
+    
+    BitmapButton *btn2 = new BitmapButton(btn);
+    btn2->SetSize(Size(50, 50));
+    btn2->SetText("Hello world");
+    btn2->SetNormalImage(Image::LoadFromFile((TEST_DATA_PATH / std::filesystem::path("btn_normal.jpg")).u8string()));
+    btn2->SetMouseEnterImage(Image::LoadFromFile((TEST_DATA_PATH / std::filesystem::path("btn_hover.jpg")).u8string()));
+    btn2->SetMouseHoldImage(Image::LoadFromFile((TEST_DATA_PATH / std::filesystem::path("btn_hold.jpg")).u8string()));
+
+
     std::filesystem::path testFontPath(TEST_DATA_PATH / std::filesystem::path("test-font-roboto.ttf"));
     Font font(Font::LoadFromFile(testFontPath.u8string()));
     font.SetSizeInPt(30);
     ASSERT_FALSE(font.IsInvalid());
     btn->SetFont(std::move(font));
     btn->SetText("test");
-    btn->GetEventManager().Bind<MouseEnterEvent>([btn](MouseEnterEvent &e)
+    btn2->GetEventManager().Bind<MouseEnterEvent>([btn](MouseEnterEvent &e)
     {
         (void)btn;
-        std::cout << "Enter" << '\n';
+        std::cout << "EnterBtn2" << '\n';
+        e.Skip();
+    });
+
+    btn2->GetEventManager().Bind<MouseExitEvent>([btn](MouseExitEvent &e)
+    {
+        (void)btn;
+        std::cout << "ExitBtn2" << '\n';
         e.Skip();
     });
 
@@ -588,6 +604,14 @@ TEST(ArxWindow, PositiveBitmapButton)
         std::cout << "Click" << '\n';
         e.Skip();
     });
+
+    Timer *t = new Timer(win);
+    t->GetEventManager().Bind<TimerEvent>([btn](TimerEvent &){
+        btn->Show(false);       
+    });
+
+    t->SetInterval(std::chrono::seconds(5));
+    t->Start(Timer::TimerType::SINGLE_FIRE);
 
     win->EnableVSync(true);
     GameApp::GetGlobalApp()->Run();
