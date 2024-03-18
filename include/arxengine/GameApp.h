@@ -105,16 +105,16 @@ private:
     }\
     catch(...)\
     {\
-        errCode = ::ARX_NAMESPACE::ArxException::ErrorCode::GenericError;\
+        errCode = static_cast<int>(::ARX_NAMESPACE::ArxException::ErrorCode::GenericError);\
     }\
     return errCode;\
 }
 
-#define IMPLEMENT_GAMEAPP_WITH_LOGGER(App, LoggerClass) MAIN_ENTRY_POINT { \
+#define IMPLEMENT_GAMEAPP_WITH_LOGGER(App, LoggerInstance) MAIN_ENTRY_POINT { \
     int errCode = 0;\
     try\
     {\
-        ::ARX_NAMESPACE::Logger::SetGlobalLogger(std::make_unique<LoggerClass>()); \
+        ::ARX_NAMESPACE::Logger::SetGlobalLogger(LoggerInstance); \
         ::ARX_NAMESPACE::GameApp::SetAppAsGlobal(std::make_unique<App>());\
         errCode = ::ARX_NAMESPACE::GameApp::GetGlobalApp()->Init();\
         if (errCode == static_cast<int>(::ARX_NAMESPACE::ArxException::ErrorCode::NoError))\
@@ -122,7 +122,7 @@ private:
     }\
     catch(...)\
     {\
-        errCode = ::ARX_NAMESPACE::ArxException::ErrorCode::GenericError;\
+        errCode = static_cast<int>(::ARX_NAMESPACE::ArxException::ErrorCode::GenericError);\
     }\
     return errCode;\
 }
