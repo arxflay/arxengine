@@ -1,7 +1,7 @@
-#include "ui/UIObject.h"
-#include "ui/UIControl.h"
-#include "ui/ArxWindow.h"
-#include "ArxException.h"
+#include "arxengine/ui/UIObject.h"
+#include "arxengine/ui/UIControl.h"
+#include "arxengine/ui/ArxWindow.h"
+#include "arxengine/ArxException.h"
 
 ARX_NAMESPACE_BEGIN
 

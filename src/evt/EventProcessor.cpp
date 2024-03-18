@@ -1,8 +1,8 @@
-#include "evt/EventProcessor.h"
-#include "internal/UniversalExceptionHandler.h"
-#include "evt/Event.h"
-#include "evt/EventManager.h"
-#include "ArxObject.h"
+#include "arxengine/evt/EventProcessor.h"
+#include "arxengine/internal/UniversalExceptionHandler.h"
+#include "arxengine/evt/Event.h"
+#include "arxengine/evt/EventManager.h"
+#include "arxengine/ArxObject.h"
 #include <iostream>
 ARX_NAMESPACE_BEGIN
 

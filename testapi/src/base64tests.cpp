@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
-#include <misc/Utils.h>
-#include <media/Image.h>
+#include <arxengine/misc/Utils.h>
+#include <arxengine/media/Image.h>
 #include <filesystem>
 #include <fstream>
 #include "testdefs.h"

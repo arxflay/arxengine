@@ -1,6 +1,6 @@
-#include "ui/FontCache.h"
-#include "ArxException.h"
-#include "ui/UIControl.h"
+#include "arxengine/ui/FontCache.h"
+#include "arxengine/ArxException.h"
+#include "arxengine/ui/UIControl.h"
 #include <iostream>
 ARX_NAMESPACE_BEGIN
 

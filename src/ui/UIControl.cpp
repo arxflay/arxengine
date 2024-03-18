@@ -1,5 +1,5 @@
-#include "ui/UIControl.h"
-#include "ui/ArxWindow.h"
+#include "arxengine/ui/UIControl.h"
+#include "arxengine/ui/ArxWindow.h"
 #include <memory>
 
 ARX_NAMESPACE_BEGIN

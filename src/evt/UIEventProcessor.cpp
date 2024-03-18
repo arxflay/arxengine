@@ -1,5 +1,5 @@
-#include "evt/UIEventProcessor.h"
-#include "ui/ArxWindow.h"
+#include "arxengine/evt/UIEventProcessor.h"
+#include "arxengine/ui/ArxWindow.h"
 
 ARX_NAMESPACE_BEGIN
 

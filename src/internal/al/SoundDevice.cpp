@@ -1,6 +1,6 @@
-#include "internal/al/SoundDevice.h"
+#include "arxengine/internal/al/SoundDevice.h"
 #include <AL/alc.h>
-#include <logging/FileLogger.h>
+#include "arxengine/logging/Logger.h"
 ARX_NAMESPACE_BEGIN
 
 SoundContext::SoundContext()

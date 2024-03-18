@@ -1,4 +1,4 @@
-#include "internal/gl/VBO.h"
+#include "arxengine/internal/gl/VBO.h"
 #include <utility>
 
 ARX_NAMESPACE_BEGIN

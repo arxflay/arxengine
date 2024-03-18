@@ -1,4 +1,4 @@
-#include "internal/gl/VAO.h"
+#include "arxengine/internal/gl/VAO.h"
 #include <utility>
 ARX_NAMESPACE_BEGIN
 

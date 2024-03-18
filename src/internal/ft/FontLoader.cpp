@@ -1,7 +1,7 @@
-#include "internal/ft/FontLoader.h"
+#include "arxengine/internal/ft/FontLoader.h"
 #include <ft2build.h>
-#include "logging/Logger.h"
-#include "misc/Utils.h"
+#include "arxengine/logging/Logger.h"
+#include "arxengine/misc/Utils.h"
 #include FT_FREETYPE_H
 
 ARX_NAMESPACE_BEGIN

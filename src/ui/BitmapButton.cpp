@@ -1,6 +1,6 @@
-#include "ui/BitmapButton.h"
-#include "ui/Painter.h"
-#include "ui/MouseEvent.h"
+#include "arxengine/ui/BitmapButton.h"
+#include "arxengine/ui/Painter.h"
+#include "arxengine/ui/MouseEvent.h"
 
 ARX_NAMESPACE_BEGIN
 

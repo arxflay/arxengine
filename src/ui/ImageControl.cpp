@@ -1,5 +1,5 @@
-#include "ui/ImageControl.h"
-#include "ui/Painter.h"
+#include "arxengine/ui/ImageControl.h"
+#include "arxengine/ui/Painter.h"
 #include <iostream>
 ARX_NAMESPACE_BEGIN
 

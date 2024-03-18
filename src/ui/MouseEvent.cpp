@@ -1,4 +1,4 @@
-#include "ui/MouseEvent.h"
+#include "arxengine/ui/MouseEvent.h"
 ARX_NAMESPACE_BEGIN
 
 void MouseButtonEvent::SetMouseButtonType(ButtonType buttonType) { m_buttonType = buttonType; }

@@ -1,10 +1,10 @@
-#include "internal/WavLoader.h"
+#include "arxengine/internal/WavLoader.h"
 #include <fstream>
 #include <sstream>
-#include "internal/DataExtractor.h"
+#include "arxengine/internal/DataExtractor.h"
 #include <filesystem>
 #include <array>
-#include <logging/Logger.h>
+#include "arxengine/logging/Logger.h"
 ARX_NAMESPACE_BEGIN
 
 ENUM_FROM_TO_STRING_DEFINE_NESTED(WavLoader, WavLoadCode, 

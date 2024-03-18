@@ -1,10 +1,10 @@
-#include "internal/gl/Shader.h"
+#include "arxengine/internal/gl/Shader.h"
 #include <glad/glad.h>
 #include <fstream>
 #include <sstream>
 #include <iostream>
 #include <glm/gtc/type_ptr.hpp>
-#include "logging/Logger.h"
+#include "arxengine/logging/Logger.h"
 #include <utility>
 
 ARX_NAMESPACE_BEGIN

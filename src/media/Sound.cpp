@@ -1,8 +1,8 @@
-#include "media/Sound.h"
+#include "arxengine/media/Sound.h"
 
-#include "internal/WavLoader.h"
+#include "arxengine/internal/WavLoader.h"
 #include <AL/al.h>
-#include <logging/Logger.h>
+#include "arxengine/logging/Logger.h"
 ARX_NAMESPACE_BEGIN
 
 Sound::SoundReproductionType Sound::GetSoundReproductionType() const { return m_soundReproductionType; }

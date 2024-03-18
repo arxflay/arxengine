@@ -1,8 +1,8 @@
-#include "media/Image.h"
+#include "arxengine/media/Image.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include <iostream>
 
-#include "misc/WarningSupressionHelpers.h"
+#include "arxengine/misc/WarningSupressionHelpers.h"
 
 WARNING_PUSH
 #ifdef _MSC_VER

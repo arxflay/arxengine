@@ -1,5 +1,5 @@
-#include "ui/Color.h"
-#include "misc/Utils.h"
+#include "arxengine/ui/Color.h"
+#include "arxengine/misc/Utils.h"
 #include <numeric>
 
 ARX_NAMESPACE_BEGIN

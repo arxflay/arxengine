@@ -1,13 +1,13 @@
-#include "GameApp.h"
+#include "arxengine/GameApp.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include "internal/UniversalExceptionHandler.h"
-#include "logging/Logger.h"
-#include "evt/UIEventProcessor.h"
-#include "ArxObject.h"
-#include "ui/ArxWindow.h"
-#include "internal/al/SoundDevice.h"
-#include "internal/ft/FontLoader.h"
+#include "arxengine/internal/UniversalExceptionHandler.h"
+#include "arxengine/logging/Logger.h"
+#include "arxengine/evt/UIEventProcessor.h"
+#include "arxengine/ArxObject.h"
+#include "arxengine/ui/ArxWindow.h"
+#include "arxengine/internal/al/SoundDevice.h"
+#include "arxengine/internal/ft/FontLoader.h"
 
 ARX_NAMESPACE_BEGIN
 

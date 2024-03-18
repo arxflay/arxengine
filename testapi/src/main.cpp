@@ -1,27 +1,27 @@
 #include <gtest/gtest.h>
-#include <misc/Utils.h>
+#include <arxengine/misc/Utils.h>
 
-#include <media/Image.h>
+#include <arxengine/media/Image.h>
 #include <fstream>
 #include <sstream>
 #include "testdefs.h"
-#include <media/Sound.h>
-#include <logging/FileLogger.h>
-#include <GameApp.h>
-#include <media/SoundPlayer.h>
+#include <arxengine/media/Sound.h>
+#include <arxengine/logging/FileLogger.h>
+#include <arxengine/GameApp.h>
+#include <arxengine/media/SoundPlayer.h>
 #include <cstdlib>
-#include <ui/Color.h>
-#include <ui/ArxWindow.h>
-#include <Timer.h>
-#include <ui/Painter.h>
-#include <gl/Texture2D.h>
-#include <media/Font.h>
-#include <ui/KeyEvent.h>
-#include <ArxException.h>
-#include <ui/ImageControl.h>
-#include <ui/MouseEvent.h>
-#include <ui/Label.h>
-#include <ui/BitmapButton.h>
+#include <arxengine/ui/Color.h>
+#include <arxengine/ui/ArxWindow.h>
+#include <arxengine/Timer.h>
+#include <arxengine/ui/Painter.h>
+#include <arxengine/gl/Texture2D.h>
+#include <arxengine/media/Font.h>
+#include <arxengine/ui/KeyEvent.h>
+#include <arxengine/ArxException.h>
+#include <arxengine/ui/ImageControl.h>
+#include <arxengine/ui/MouseEvent.h>
+#include <arxengine/ui/Label.h>
+#include <arxengine/ui/BitmapButton.h>
 #include <iostream>
 
 ARX_NAMESPACE_USE;

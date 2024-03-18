@@ -1,5 +1,5 @@
-#include "gl/Texture2D.h"
-#include "ui/UIControl.h"
+#include "arxengine/gl/Texture2D.h"
+#include "arxengine/ui/UIControl.h"
 #include <glad/glad.h>
 
 ARX_NAMESPACE_BEGIN

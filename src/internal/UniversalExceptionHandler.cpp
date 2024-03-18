@@ -1,5 +1,5 @@
-#include "internal/UniversalExceptionHandler.h"
-#include "logging/Logger.h"
+#include "arxengine/internal/UniversalExceptionHandler.h"
+#include "arxengine/logging/Logger.h"
 
 ARX_NAMESPACE_BEGIN
 

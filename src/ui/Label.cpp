@@ -1,5 +1,5 @@
-#include "ui/Label.h"
-#include "ui/Painter.h"
+#include "arxengine/ui/Label.h"
+#include "arxengine/ui/Painter.h"
 ARX_NAMESPACE_BEGIN
 
 Label::Label(UIControl *parent, std::string_view text, Size size, Position pos)

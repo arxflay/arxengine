@@ -1,13 +1,12 @@
-#include "media/Font.h"
+#include "arxengine/media/Font.h"
 #include <memory>
 #include <ft2build.h>
 #include FT_FREETYPE_H
-#include <ArxException.h>
-#include "internal/ft/FontLoader.h"
-#include "GameApp.h"
-#include "misc/Convertors.h"
+#include "arxengine/internal/ft/FontLoader.h"
+#include "arxengine/GameApp.h"
+#include "arxengine/misc/Convertors.h"
 #include <iostream>
-#include <logging/FileLogger.h>
+#include "arxengine/logging/Logger.h"
 ARX_NAMESPACE_BEGIN
 
 Font::Font()

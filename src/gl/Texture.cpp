@@ -1,8 +1,7 @@
-#include "gl/Texture.h"
-#include "media/Image.h"
-#include "ui/ArxWindow.h"
+#include "arxengine/gl/Texture.h"
+#include "arxengine/media/Image.h"
+#include "arxengine/ui/ArxWindow.h"
 #include <utility>
-#include <ArxException.h>
 #include <glad/glad.h>
 
 ARX_NAMESPACE_BEGIN

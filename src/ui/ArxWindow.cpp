@@ -1,13 +1,13 @@
-#include "ui/ArxWindow.h"
-#include "ui/internal/UICache.h"
-#include "ui/Painter.h"
+#include "arxengine/ui/ArxWindow.h"
+#include "arxengine/ui/internal/UICache.h"
+#include "arxengine/ui/Painter.h"
 #include <GLFW/glfw3.h>
 #include <glm/ext/matrix_clip_space.hpp>
-#include "media/Image.h"
+#include "arxengine/media/Image.h"
 #include <memory>
 #include <iostream>
-#include "ui/KeyEvent.h"
-#include "ui/MouseEvent.h"
+#include "arxengine/ui/KeyEvent.h"
+#include "arxengine/ui/MouseEvent.h"
 
 ARX_NAMESPACE_BEGIN
 

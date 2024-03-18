@@ -1,4 +1,4 @@
-#include "internal/gl/ClippingArea.h"
+#include "arxengine/internal/gl/ClippingArea.h"
 #include <glad/glad.h>
 ARX_NAMESPACE_BEGIN
 

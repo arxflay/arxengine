@@ -1,13 +1,13 @@
-#include "ui/Painter.h"
-#include "ui/UIControl.h"
+#include "arxengine/ui/Painter.h"
+#include "arxengine/ui/UIControl.h"
 #include <glad/glad.h>
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include "ui/ArxWindow.h"
-#include "internal/gl/ClippingArea.h"
-#include "ui/internal/UICache.h"
-#include "gl/Texture2D.h"
+#include "arxengine/ui/ArxWindow.h"
+#include "arxengine/internal/gl/ClippingArea.h"
+#include "arxengine/ui/internal/UICache.h"
+#include "arxengine/gl/Texture2D.h"
 #include <iostream>
 
 ARX_NAMESPACE_BEGIN

@@ -1,4 +1,4 @@
-#include "ArxObject.h"
+#include "arxengine/ArxObject.h"
 ARX_NAMESPACE_BEGIN
 
 ArxObject::ArxObject(ArxObject *parent)

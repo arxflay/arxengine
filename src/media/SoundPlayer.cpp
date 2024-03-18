@@ -1,11 +1,11 @@
-#include "media/SoundPlayer.h"
-#include "media/Sound.h"
+#include "arxengine/media/SoundPlayer.h"
+#include "arxengine/media/Sound.h"
 #include <AL/al.h>
-#include "logging/Logger.h"
+#include "arxengine/logging/Logger.h"
 #include <AL/alc.h>
 #include <memory>
-#include "GameApp.h"
-#include "internal/al/SoundDevice.h"
+#include "arxengine/GameApp.h"
+#include "arxengine/internal/al/SoundDevice.h"
 
 ARX_NAMESPACE_BEGIN
 

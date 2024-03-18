@@ -1,9 +1,5 @@
 find_package(OpenGL REQUIRED)
-
-if(NOT WIN32)
-    set(CPM_LOCAL_PACKAGES_ONLY True)
-endif()
-
+set(CPM_USE_LOCAL_PACKAGES True)
 set(CPM_SOURCE_CACHE "${CMAKE_CURRENT_LIST_DIR}/third_party/CPM")
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/FetchCPM.cmake")
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/CPM/CPM.cmake")
