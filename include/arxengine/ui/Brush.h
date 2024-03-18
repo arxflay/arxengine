@@ -1,3 +1,7 @@
+/*
+ * @author Alexej Fedorenko
+ */
+
 #ifndef ARX_BRUSH_H
 #define ARX_BRUSH_H
 #include "arxengine/ArxDefines.h"

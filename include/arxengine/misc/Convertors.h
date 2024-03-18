@@ -1,3 +1,7 @@
+/*
+ * @author Alexej Fedorenko
+ */
+
 #ifndef ARX_CONVERTORS
 #define ARX_CONVERTORS
 #include "arxengine/ArxDefines.h"

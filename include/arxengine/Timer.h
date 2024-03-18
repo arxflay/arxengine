@@ -1,3 +1,7 @@
+/*
+ * @author Alexej Fedorenko
+ */
+
 #ifndef ARX_TIMER_H
 #define ARX_TIMER_H
 

@@ -1,3 +1,7 @@
+/*
+ * @author Alexej Fedorenko
+ */
+
 #ifndef ARX_TEXTURE2D_H
 #define ARX_TEXTURE2D_H
 #include "arxengine/ArxDefines.h"

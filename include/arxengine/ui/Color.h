@@ -1,3 +1,7 @@
+/*
+ * @author Alexej Fedorenko
+ */
+
 #ifndef ARX_COLOR_H
 #define ARX_COLOR_H
 #include "arxengine/ArxDefines.h"

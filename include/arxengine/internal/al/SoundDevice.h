@@ -1,3 +1,7 @@
+/*
+ * @author Alexej Fedorenko
+ */
+
 #ifndef ARX_SOUNDDEVICE_H
 #define ARX_SOUNDDEVICE_H
 #include "arxengine/ArxDefines.h"

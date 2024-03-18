@@ -1,3 +1,7 @@
+/*
+ * @author Alexej Fedorenko
+ */
+
 #ifndef ARX_UICACHE_H
 #define ARX_UICACHE_H
 #include "arxengine/ArxDefines.h"

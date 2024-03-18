@@ -1,3 +1,7 @@
+/*
+ * @author Alexej Fedorenko
+ */
+
 #ifndef ARX_ARXOBJECT_H
 #define ARX_ARXOBJECT_H
 #include "ArxDefines.h"

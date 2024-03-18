@@ -1,3 +1,7 @@
+/*
+ * @author Alexej Fedorenko
+ */
+
 #ifndef ARX_ARXDEFINES_H
 #define ARX_ARXDEFINES_H
 #include <cstdint>

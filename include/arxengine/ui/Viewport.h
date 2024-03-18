@@ -1,3 +1,7 @@
+/*
+ * @author Alexej Fedorenko
+ */
+
 #ifndef ARX_VIEWPORT_H
 #define ARX_VIEWPORT_H
 #include "arxengine/ArxDefines.h"

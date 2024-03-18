@@ -1,3 +1,7 @@
+/*
+ * @author Alexej Fedorenko
+ */
+
 #ifndef ARX_ARXWINDOW_H
 #define ARX_ARXWINDOW_H
 

@@ -1,8 +1,10 @@
+/*
+ * @author Alexej Fedorenko
+ */
+
 #ifndef ARX_SCISSORBOX_H
 #define ARX_SCISSORBOX_H
 #include "arxengine/ArxDefines.h"
-#include "arxengine/ui/Position.h"
-#include "arxengine/ui/Size.h"
 #include <optional>
 ARX_NAMESPACE_BEGIN
 

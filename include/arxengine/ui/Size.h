@@ -1,3 +1,7 @@
+/*
+ * @author Alexej Fedorenko
+ */
+
 #ifndef ARX_SIZE_H
 #define ARX_SIZE_H
 #include "arxengine/ArxDefines.h"

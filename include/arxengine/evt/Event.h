@@ -1,3 +1,6 @@
+/*
+ * @author Alexej Fedorenko
+ */
 #ifndef ARX_EVENT_H
 #define ARX_EVENT_H
 

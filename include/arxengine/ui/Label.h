@@ -1,3 +1,7 @@
+/*
+ * @author Alexej Fedorenko
+ */
+
 #ifndef ARX_LABEL_H
 #define ARX_LABEL_H
 #include "arxengine/ui/UIControl.h"

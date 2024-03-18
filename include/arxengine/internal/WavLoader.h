@@ -1,3 +1,7 @@
+/*
+ * @author Alexej Fedorenko
+ */
+
 #ifndef ARX_WAVLOADER_H
 #define ARX_WAVLOADER_H
 #include <cstdint>

@@ -1,3 +1,7 @@
+/*
+ * @author Alexej Fedorenko
+ */
+
 #ifndef ARX_UNIVERSALEXCEPTIONHANDLER_H
 #define ARX_UNIVERSALEXCEPTIONHANDLER_H
 #include "arxengine/ArxDefines.h"

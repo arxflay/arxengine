@@ -1,5 +1,6 @@
 #include "arxengine/internal/gl/ClippingArea.h"
 #include <glad/glad.h>
+#include <algorithm>
 ARX_NAMESPACE_BEGIN
 
 ClippingArea::ClippingArea()

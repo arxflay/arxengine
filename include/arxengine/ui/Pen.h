@@ -1,3 +1,7 @@
+/*
+ * @author Alexej Fedorenko
+ */
+
 #ifndef ARX_PEN_H
 #define ARX_PEN_H
 #include "arxengine/ArxDefines.h"

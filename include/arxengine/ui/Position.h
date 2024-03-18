@@ -1,3 +1,7 @@
+/*
+ * @author Alexej Fedorenko
+ */
+
 #ifndef ARX_POSITION_H
 #define ARX_POSITION_H
 #include "arxengine/ArxDefines.h"

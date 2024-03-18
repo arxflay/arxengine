@@ -1,3 +1,7 @@
+/*
+ * @author Alexej Fedorenko
+ */
+
 #ifndef ARX_GAMEAPP_H
 #define ARX_GAMEAPP_H
 

@@ -1,3 +1,7 @@
+/*
+ * @author Alexej Fedorenko
+ */
+
 #ifndef ARX_MATH_H
 #define ARX_MATH_H
 #include "arxengine/ArxDefines.h"

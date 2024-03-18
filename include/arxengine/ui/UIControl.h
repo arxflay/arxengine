@@ -1,3 +1,7 @@
+/*
+ * @author Alexej Fedorenko
+ */
+
 #ifndef ARX_UICONTROL_H
 #define ARX_UICONTROL_H
 

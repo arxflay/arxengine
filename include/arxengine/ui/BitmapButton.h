@@ -1,3 +1,7 @@
+/*
+ * @author Alexej Fedorenko
+ */
+
 #ifndef ARX_BITMAPBUTTON_H
 #define ARX_BITMAPBUTTON_H
 #include "arxengine/ui/UIControl.h"

@@ -1,3 +1,7 @@
+/*
+ * @author Alexej Fedorenko
+ */
+
 #ifndef ARX_WARNINGSUPRESSIONHELPERS_H
 #define ARX_WARNINGSUPRESSIONHELPERS_H
 

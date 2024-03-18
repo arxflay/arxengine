@@ -1,3 +1,7 @@
+/*
+ * @author Alexej Fedorenko
+ */
+
 #ifndef ARX_EVENT_PROCESSOR
 #define ARX_EVENT_PROCESSOR
 #include "arxengine/ArxDefines.h"

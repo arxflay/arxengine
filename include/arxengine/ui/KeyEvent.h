@@ -1,3 +1,7 @@
+/*
+ * @author Alexej Fedorenko
+ */
+
 #ifndef ARX_KEYEVENT_H
 #define ARX_KEYEVENT_H
 #include "arxengine/ArxDefines.h"

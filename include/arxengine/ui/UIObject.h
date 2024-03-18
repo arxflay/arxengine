@@ -1,3 +1,7 @@
+/*
+ * @author Alexej Fedorenko
+ */
+
 #ifndef ARX_UIOBJECT_H
 #define ARX_UIOBJECT_H
 #include "arxengine/ArxDefines.h"

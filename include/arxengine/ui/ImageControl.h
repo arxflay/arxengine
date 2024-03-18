@@ -1,3 +1,7 @@
+/*
+ * @author Alexej Fedorenko
+ */
+
 #ifndef ARX_IMAGECONTROL_H
 #define ARX_IMAGECONTROL_H
 #include "arxengine/ArxDefines.h"

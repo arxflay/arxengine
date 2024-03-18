@@ -1,3 +1,7 @@
+/*
+ * @author Alexej Fedorenko
+ */
+
 #ifndef ARX_ARXEXCEPTION_H
 #define ARX_ARXEXCEPTION_H
 #include "arxengine/ArxDefines.h"

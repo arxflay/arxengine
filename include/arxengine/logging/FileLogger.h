@@ -1,3 +1,7 @@
+/*
+ * @author Alexej Fedorenko
+ */
+
 #ifndef ARX_FILELOGGER_H
 #define ARX_FILELOGGER_H
 #include "arxengine/logging/Logger.h"

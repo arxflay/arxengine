@@ -1,3 +1,7 @@
+/*
+ * @author Alexej Fedorenko
+ */
+
 #ifndef ARX_DATAEXTRACTOR_H
 #define ARX_DATAEXTRACTOR_H
 #include "arxengine/ArxDefines.h"
@@ -9,7 +13,6 @@
 #include <string_view>
 ARX_NAMESPACE_BEGIN
 
-/*unsafe*/
 class DataExtractor
 {
 public:
@@ -17,7 +20,6 @@ public:
         : m_currentPos(beginPtr), m_end(beginPtr + contentSize)
     {
     }
-    /*throws on error*/
     
     constexpr void ThrowIfOutOfBounds(size_t elSize)
     {

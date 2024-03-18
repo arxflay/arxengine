@@ -1,3 +1,7 @@
+/*
+ * @author Alexej Fedorenko
+ */
+
 #ifndef ARX_VBO_H
 #define ARX_VBO_H
 #include "arxengine/ArxDefines.h"

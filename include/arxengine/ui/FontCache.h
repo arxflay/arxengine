@@ -1,3 +1,7 @@
+/*
+ * @author Alexej Fedorenko
+ */
+
 #ifndef ARX_FONTCACHE_H
 #define ARX_FONTCACHE_H
 #include "arxengine/ArxDefines.h"

@@ -1,3 +1,7 @@
+/*
+ * @author Alexej Fedorenko
+ */
+
 #ifndef ARX_PAINTER_H
 #define ARX_PAINTER_H
 #include "arxengine/ArxDefines.h"
@@ -5,7 +9,6 @@
 #include "arxengine/ui/Viewport.h"
 #include "arxengine/ui/Brush.h"
 #include "arxengine/ui/Pen.h"
-#include "arxengine/gl/Texture.h"
 #include <memory>
 
 ARX_NAMESPACE_BEGIN

@@ -1,3 +1,7 @@
+/*
+ * @author Alexej Fedorenko
+ */
+
 #ifndef ARX_IMAGE_H
 #define ARX_IMAGE_H
 #include "arxengine/ArxDefines.h"
