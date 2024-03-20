@@ -2,7 +2,7 @@
 #include "arxengine/ui/Painter.h"
 ARX_NAMESPACE_BEGIN
 
-Label::Label(UIControl *parent, std::string_view text, Size size, Position pos)
+Label::Label(UIControl *parent, std::string_view text, SizeF size, Position pos)
     : UIControl(parent, size, pos)
     , m_text(text)
     , m_textColor(constants::COLOR_BLACK)

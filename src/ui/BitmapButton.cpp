@@ -12,7 +12,7 @@ const std::string &BitmapButton::GetText() const{ return m_text; }
 void BitmapButton::SetTextColor(Color color) { m_textColor = color; }
 Color BitmapButton::GetTextColor() const { return m_textColor; }
 
-BitmapButton::BitmapButton(UIControl *parent, const Image &img, Size size, Position pos)
+BitmapButton::BitmapButton(UIControl *parent, const Image &img, SizeF size, Position pos)
     : UIControl(parent, size, pos)
     , m_normalTexture(new Texture2D(this))
     , m_mouseEnterTexture(new Texture2D(this))

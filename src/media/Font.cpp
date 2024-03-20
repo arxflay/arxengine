@@ -121,7 +121,7 @@ GlyphDimensions Font::GetGlyphDimensions(char ch)
     dimensions.advance.y = static_cast<float>(m_face->glyph->metrics.vertAdvance) / 64;
     dimensions.bearings.x = static_cast<float>(m_face->glyph->metrics.horiBearingX) / 64;
     dimensions.bearings.y = static_cast<float>(m_face->glyph->metrics.horiBearingY) / 64;
-    dimensions.size = Size(m_face->glyph->bitmap.width, m_face->glyph->bitmap.rows);
+    dimensions.size = SizeUL(m_face->glyph->bitmap.width, m_face->glyph->bitmap.rows);
     return dimensions;
 }
 
@@ -139,7 +139,7 @@ Image Font::RenderGlyph(char ch)
     if (status != FT_Err_Ok)
         GLOG->Debug("Font - failed to render glyph");
 
-    Size size(m_face->glyph->bitmap.width, m_face->glyph->bitmap.rows);
+    SizeUL size(m_face->glyph->bitmap.width, m_face->glyph->bitmap.rows);
     return Image::LoadFromData(size, 1, m_face->glyph->bitmap.buffer);
 }
 

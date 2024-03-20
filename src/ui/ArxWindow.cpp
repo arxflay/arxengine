@@ -13,12 +13,12 @@ ARX_NAMESPACE_BEGIN
 
 namespace
 {
-    Size MakeSizeValid(Size s)
+    SizeF MakeSizeValid(SizeF s)
     {
         if (s.height < 1 || s.width < 1)
-            return constants::DEFAULT_SIZE;
+            return SizeF::DEFAULT_SIZE;
 
-        return Size::Truncate(s);
+        return SizeF(std::truncf(s.width), std::truncf(s.height));
     }
 }
 
@@ -43,7 +43,7 @@ namespace
     arxWin->SetAsCurrentContext();
     int width = 0, height = 0;
     glfwGetWindowSize(arxWin->m_win.get(), &width, &height);
-    arxWin->RecalculateSizes(Size(width, height));
+    arxWin->RecalculateSizes(SizeF(static_cast<float>(width), static_cast<float>(height)));
     glViewport(0, 0, static_cast<GLsizei>(arxWin->GetClientSize().width), static_cast<GLsizei>(arxWin->GetClientSize().height));
 }
 
@@ -257,7 +257,7 @@ void ArxWindow::CursorPosCallback(GLFWwindow *win, double xpos, double ypos)
 }
 
 //uncompelte fullscreen
-ArxWindow::ArxWindow(std::string_view title, Size size, Position position, int attributes) //, bool isFullScreen)
+ArxWindow::ArxWindow(std::string_view title, SizeF size, Position position, int attributes) //, bool isFullScreen)
     : m_win(nullptr, glfwDestroyWindow)
     , m_attributes(attributes)
     , m_title(title)
@@ -282,7 +282,7 @@ ArxWindow::ArxWindow(std::string_view title, Size size, Position position, int a
     }
     else
     {*/
-        Size validSize = MakeSizeValid(size); 
+        SizeF validSize = MakeSizeValid(size); 
         m_win.reset(glfwCreateWindow(static_cast<int>(validSize.width), static_cast<int>(validSize.height), m_title.c_str(), nullptr, nullptr));
     //}
     if (!m_win)
@@ -339,13 +339,13 @@ void ArxWindow::SetTitle(std::string_view title)
     glfwSetWindowTitle(m_win.get(), title.data());
 }
 
-void ArxWindow::SetSize(Size s)
+void ArxWindow::SetSize(SizeF s)
 {
     RecalculateSizes(s);
     glfwSetWindowSize(m_win.get(), static_cast<int>(GetSize().height), static_cast<int>(GetSize().width));
 }
 
-void ArxWindow::RecalculateSizes(Size s)
+void ArxWindow::RecalculateSizes(SizeF s)
 {
     Size newClientSize = MakeSizeValid(s);
     m_clientSize = newClientSize;
@@ -367,7 +367,7 @@ void ArxWindow::UnregisterWindowFromWindowList()
     const_cast<ArxWindowSet&>(GameApp::GetGlobalApp()->GetWindowSet()).erase(this);
 }
 
-Size ArxWindow::GetClientSize() const
+SizeF ArxWindow::GetClientSize() const
 {
     return m_clientSize;
 }

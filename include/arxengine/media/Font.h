@@ -19,7 +19,7 @@ struct GlyphDimensions
 {
     Position advance;
     Position bearings;
-    Size size;
+    SizeUL size;
 };
 
 class ARX_EXPORTS Font final 

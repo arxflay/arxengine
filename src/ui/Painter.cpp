@@ -81,7 +81,7 @@ Painter::Painter(DrawEvent &evt)
 
 }
 
-void Painter::DrawRectangle(Position pos, Size size)
+void Painter::DrawRectangle(Position pos, SizeF size)
 {
     OldClippingAreaGuard clipGuard;
     OldVAOGuard vaoGuard;
@@ -106,7 +106,7 @@ void Painter::DrawRectangle(Position pos, Size size)
     glDrawArrays(GL_TRIANGLES, 0, 6); 
 }
 
-void Painter::DrawTexture2D(Position pos, Size size, const Texture2D *tex, int tileWidthCount, int tileHeightCount)
+void Painter::DrawTexture2D(Position pos, SizeF size, const Texture2D *tex, int tileWidthCount, int tileHeightCount)
 {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -166,7 +166,7 @@ void Painter::DrawText(std::string_view text, Position pos)
         {
             cacheEntry.GetTexture()->Bind();
             glm::mat4 modelMatrix = glm::mat4(1.0f);
-            modelMatrix = glm::translate(modelMatrix, glm::vec3(drawingPos.x, drawingPos.y + cacheEntry.GetGlyphDimensions().bearings.y - cacheEntry.GetGlyphDimensions().size.height, 0.0f));
+            modelMatrix = glm::translate(modelMatrix, glm::vec3(drawingPos.x, drawingPos.y + cacheEntry.GetGlyphDimensions().bearings.y - static_cast<float>(cacheEntry.GetGlyphDimensions().size.height), 0.0f));
             modelMatrix = glm::scale(modelMatrix, glm::vec3(cacheEntry.GetGlyphDimensions().size.width, cacheEntry.GetGlyphDimensions().size.height, 0.0f));
             shader.SetTransformMatrices(modelMatrix, viewMatrix, GetViewport().projectionMatrix);
             glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -176,7 +176,7 @@ void Painter::DrawText(std::string_view text, Position pos)
     glDisable(GL_BLEND);
 }
 
-Position Painter::CalculateDrawPosition(Position drawPos, Size drawSize)
+Position Painter::CalculateDrawPosition(Position drawPos, SizeF drawSize)
 {
     Position senderPos = GetSenderPosition(m_sender); //draw offset, because sender could be positioned somewhereElse
     ArxWindow *window = m_sender->GetWindow();

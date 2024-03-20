@@ -3,7 +3,7 @@
 #include <iostream>
 ARX_NAMESPACE_BEGIN
 
-ImageControl::ImageControl(UIControl *parent, const Image &image, Size size, Position pos)
+ImageControl::ImageControl(UIControl *parent, const Image &image, SizeF size, Position pos)
     : UIControl(parent, size, pos)
     , m_texture(new Texture2D(this))
     , m_tileData({1, 1})

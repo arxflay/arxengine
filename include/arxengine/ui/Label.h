@@ -11,7 +11,7 @@ ARX_NAMESPACE_BEGIN
 class Label : public UIControl
 {
 public:
-    Label(UIControl *parent, std::string_view text = "", Size size = constants::DEFAULT_SIZE, Position pos = constants::DEFAULT_POSITION);
+    Label(UIControl *parent, std::string_view text = "", SizeF size = SizeF::DEFAULT_SIZE, Position pos = constants::DEFAULT_POSITION);
     void SetText(std::string_view text); 
     const std::string &GetText() const;
 

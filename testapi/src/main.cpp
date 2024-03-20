@@ -54,8 +54,7 @@ TEST(Image, PositiveLoadImageFilePNG)
     std::filesystem::path testPngPath(TEST_DATA_PATH / std::filesystem::path("test_png.png"));
     Image img(Image::LoadFromFile(testPngPath.u8string()));
     ASSERT_GT(img.GetData().size(), static_cast<size_t>(0));
-    ASSERT_EQ(img.GetSize(), Size(32, 33));
-    ASSERT_EQ(img.GetSize().height, 33);
+    ASSERT_EQ(img.GetSize(), SizeUL(32, 33));
     ASSERT_EQ(img.GetColorChannels(), 4);
 }
 
@@ -64,7 +63,7 @@ TEST(Image, PositiveLoadImageFileJPEG)
     std::filesystem::path testJpgPath(TEST_DATA_PATH / std::filesystem::path("test_jpg.jpg"));
     Image img(Image::LoadFromFile(testJpgPath.u8string()));
     ASSERT_GT(img.GetData().size(), static_cast<size_t>(0));
-    ASSERT_EQ(img.GetSize(), Size(32, 33));
+    ASSERT_EQ(img.GetSize(), SizeUL(32, 33));
     ASSERT_EQ(img.GetColorChannels(), 3);
 }
 
@@ -93,7 +92,7 @@ TEST(Image, NegativeLoadImageFile)
     std::filesystem::path testJpgPath(TEST_DATA_PATH);
     Image img(Image::LoadFromFile(testJpgPath.u8string()));
     ASSERT_EQ(img.GetData().size(), static_cast<size_t>(0));
-    ASSERT_EQ(img.GetSize(), Size(0, 0));
+    ASSERT_EQ(img.GetSize(), SizeUL(0, 0));
     ASSERT_EQ(img.GetColorChannels(), 0);
 }
 
@@ -199,14 +198,14 @@ TEST(Color, PositiveColorToNormalizedColor)
 
 TEST(ArxWindow, DISABLED_PositiveShowWin)
 {
-    ArxWindow *win = new ArxWindow("test", Size(300, 300), Position(8, 6));
+    ArxWindow *win = new ArxWindow("test", SizeF(300, 300), Position(8, 6));
     win->Show();
     GameApp::GetGlobalApp()->Run();
 }
 
 TEST(ArxWindow, DISABLED_PositiveRainbowWin)
 {
-    ArxWindow *win = new ArxWindow("test", Size(300, 300));
+    ArxWindow *win = new ArxWindow("test", SizeF(300, 300));
     win->Show();
     Timer *t = new Timer(win);
     t->GetEventManager().Bind<TimerEvent>([win](TimerEvent &){
@@ -220,7 +219,7 @@ TEST(ArxWindow, DISABLED_PositiveRainbowWin)
 
 TEST(ArxWindow, DISABLED_PositiveEndAfter2Seconds)
 {
-    ArxWindow *win = new ArxWindow("test", Size(300, 300));
+    ArxWindow *win = new ArxWindow("test", SizeF(300, 300));
     win->Show();
     Timer *t = new Timer(win);
     t->GetEventManager().Bind<TimerEvent>([errCode=0](TimerEvent &){ GameApp::GetGlobalApp()->Exit(errCode); });
@@ -231,7 +230,7 @@ TEST(ArxWindow, DISABLED_PositiveEndAfter2Seconds)
 
 TEST(ArxWindow, DISABLED_PositiveMultiWindow)
 {
-    ArxWindow *win = new ArxWindow("test", Size(300, 300));
+    ArxWindow *win = new ArxWindow("test", SizeF(300, 300));
     win->Show();
     Timer *t = new Timer(win);
     t->GetEventManager().Bind<TimerEvent>([win](TimerEvent &){
@@ -240,7 +239,7 @@ TEST(ArxWindow, DISABLED_PositiveMultiWindow)
     t->SetInterval(std::chrono::seconds(1));
     t->Start(Timer::TimerType::CONTINUOUS);
 
-    ArxWindow *win2 = new ArxWindow("test", Size(300, 300), Position(300, 1));
+    ArxWindow *win2 = new ArxWindow("test", SizeF(300, 300), Position(300, 1));
     win2->Show();
     Timer *t2 = new Timer(win2);
     t2->GetEventManager().Bind<TimerEvent>([win2](TimerEvent &){
@@ -255,7 +254,7 @@ TEST(ArxWindow, DISABLED_PositiveMultiWindow)
 
 TEST(ArxWindow, DISABLED_PositivePainterTest1)
 {
-    ArxWindow *win = new ArxWindow("test", Size(640, 360));
+    ArxWindow *win = new ArxWindow("test", SizeF(640, 360));
     win->Show();
     Texture2D *testTexture = new Texture2D(win);
     std::filesystem::path testJpgPath(TEST_DATA_PATH / std::filesystem::path("test_png.png"));
@@ -269,12 +268,12 @@ TEST(ArxWindow, DISABLED_PositivePainterTest1)
         Painter painter(e);
         painter.Clear();
         painter.SetBrush(Brush(Color(100, 200, 100)));
-        painter.DrawRectangle(Position(60, 60), Size(100, 100));
+        painter.DrawRectangle(Position(60, 60), SizeF(100, 100));
         painter.SetBrush(Brush(Color(10, 50, 100)));
-        painter.DrawRectangle(Position(0, 0), Size(40, 40));
+        painter.DrawRectangle(Position(0, 0), SizeF(40, 40));
         painter.SetBrush(Brush(Color(0, 0, 0)));
-        painter.DrawRectangle(Position(150, 200), Size(60, 60));
-        painter.DrawTexture2D(Position(0, 0), Size(100, 100), testTexture);
+        painter.DrawRectangle(Position(150, 200), SizeF(60, 60));
+        painter.DrawTexture2D(Position(0, 0), SizeF(100, 100), testTexture);
     });
 
     GameApp::GetGlobalApp()->Run();
@@ -282,7 +281,7 @@ TEST(ArxWindow, DISABLED_PositivePainterTest1)
 
 TEST(ArxWindow, DISABLED_PositivePainterTest2)
 {
-    ArxWindow *win = new ArxWindow("test", Size(300, 300));
+    ArxWindow *win = new ArxWindow("test", SizeF(300, 300));
     win->Show();
     Texture2D *testTexture = new Texture2D(win);
     std::filesystem::path testJpgPath(TEST_DATA_PATH / std::filesystem::path("test_png.png"));
@@ -294,12 +293,12 @@ TEST(ArxWindow, DISABLED_PositivePainterTest2)
         Painter painter(e);
         painter.Clear();
         painter.SetBrush(Brush(Color(100, 200, 100)));
-        painter.DrawRectangle(Position(60, 60), Size(100, 100));
+        painter.DrawRectangle(Position(60, 60), SizeF(100, 100));
         painter.SetBrush(Brush(Color(10, 50, 100)));
-        painter.DrawRectangle(Position(0, 0), Size(40, 40));
+        painter.DrawRectangle(Position(0, 0), SizeF(40, 40));
         painter.SetBrush(Brush(Color(0, 0, 0)));
-        painter.DrawRectangle(Position(150, 200), Size(60, 60));
-        painter.DrawTexture2D(Position(0, 0), Size(100, 100), testTexture);
+        painter.DrawRectangle(Position(150, 200), SizeF(60, 60));
+        painter.DrawTexture2D(Position(0, 0), SizeF(100, 100), testTexture);
     });
 
     GameApp::GetGlobalApp()->Run();
@@ -312,7 +311,7 @@ TEST(Font, DISABLED_PositiveLoadFont)
     font.SetSizeInPt(30);
     ASSERT_FALSE(font.IsInvalid());
     
-    ArxWindow *win = new ArxWindow("test", Size(640, 360));
+    ArxWindow *win = new ArxWindow("test", SizeF(640, 360));
     win->Show();
     win->SetFont(std::move(font));
     win->SetFixedViewport(640, 360);
@@ -331,7 +330,7 @@ TEST(Font, DISABLED_PositiveLoadFont)
 
 TEST(ArxWindow, DISABLED_PositiveWindowInput)
 {
-    ArxWindow *win = new ArxWindow("test", Size(640, 360));
+    ArxWindow *win = new ArxWindow("test", SizeF(640, 360));
     win->Show();
     win->SetFixedViewport(640, 360);
     float position = 20.0f; 
@@ -359,7 +358,7 @@ TEST(ArxWindow, DISABLED_PositiveWindowInput)
         Painter painter(e);
         painter.Clear();
         painter.SetBrush(Brush(Color(100, 200, 100)));
-        painter.DrawRectangle(Position(position, 60.0f), Size(100, 100));
+        painter.DrawRectangle(Position(position, 60.0f), SizeF(100, 100));
 
     });
 
@@ -370,12 +369,12 @@ TEST(ArxWindow, DISABLED_PositiveWindowInput)
 
 TEST(ArxWindow, DISABLED_PositiveImageControl)
 {
-    ArxWindow *win = new ArxWindow("test", Size(640, 360));
+    ArxWindow *win = new ArxWindow("test", SizeF(640, 360));
     win->Show();
     win->SetFixedViewport(640, 360);
     std::filesystem::path testJpgPath(TEST_DATA_PATH / std::filesystem::path("test_png.png"));
     Image img(Image::LoadFromFile(testJpgPath.u8string()));
-    ImageControl *ctrl = new ImageControl(win, img, Size(100, 100), Position(100, 100));
+    ImageControl *ctrl = new ImageControl(win, img, SizeF(100, 100), Position(100, 100));
     ctrl->SetFilteringMode(Texture::TextureFilteringMode::Linear);
     ctrl->SetBackgroundColor(constants::COLOR_BLACK);
 
@@ -384,12 +383,12 @@ TEST(ArxWindow, DISABLED_PositiveImageControl)
 
 TEST(ArxWindow, DISABLED_PositiveImageControlHideShow)
 {
-    ArxWindow *win = new ArxWindow("test", Size(640, 360));
+    ArxWindow *win = new ArxWindow("test", SizeF(640, 360));
     win->Show();
     win->SetFixedViewport(640, 360);
     std::filesystem::path testJpgPath(TEST_DATA_PATH / std::filesystem::path("test_png.png"));
     Image img(Image::LoadFromFile(testJpgPath.u8string()));
-    ImageControl *ctrl = new ImageControl(win, img, Size(100, 100), Position(100, 100));
+    ImageControl *ctrl = new ImageControl(win, img, SizeF(100, 100), Position(100, 100));
     ctrl->SetFilteringMode(Texture::TextureFilteringMode::Linear);
     ctrl->Hide();
     Timer *t = new Timer(win);
@@ -402,13 +401,13 @@ TEST(ArxWindow, DISABLED_PositiveImageControlHideShow)
 
 TEST(ArxWindow, DISABLED_PositiveImageControlTileSize)
 {
-    ArxWindow *win = new ArxWindow("test", Size(640, 360));
+    ArxWindow *win = new ArxWindow("test", SizeF(640, 360));
     win->SetBackgroundColor(Color("#005050"));
     win->Show();
     win->SetFixedViewport(640, 360);
     std::filesystem::path testJpgPath(TEST_DATA_PATH / std::filesystem::path("test_png.png"));
     Image img(Image::LoadFromFile(testJpgPath.u8string()));
-    ImageControl *ctrl = new ImageControl(win, img, Size(100, 100), Position(100, 100));
+    ImageControl *ctrl = new ImageControl(win, img, SizeF(100, 100), Position(100, 100));
     ctrl->SetFilteringMode(Texture::TextureFilteringMode::Linear);
     ctrl->EnableTilingMode(TileData{1, 3});
     ctrl->SetBackgroundColor(constants::COLOR_BLACK);
@@ -426,7 +425,7 @@ TEST(ArxWindow, DISABLED_PositiveImageControlTileSize)
 
 TEST(ArxWindow, DISABLED_PositiveMouseInput)
 {
-    ArxWindow *win = new ArxWindow("test", Size(640, 360));
+    ArxWindow *win = new ArxWindow("test", SizeF(640, 360));
     win->Show();
     win->SetFixedViewport(640, 360);
     float position = 20.0f; 
@@ -437,7 +436,7 @@ TEST(ArxWindow, DISABLED_PositiveMouseInput)
     });
     std::filesystem::path testJpgPath(TEST_DATA_PATH / std::filesystem::path("test_png.png"));
     Image img(Image::LoadFromFile(testJpgPath.u8string()));
-    ImageControl *ctrl = new ImageControl(win, img, Size(100, 100), Position(100, 100));
+    ImageControl *ctrl = new ImageControl(win, img, SizeF(100, 100), Position(100, 100));
     ctrl->SetFilteringMode(Texture::TextureFilteringMode::Linear);
     ctrl->SetBackgroundColor(constants::COLOR_BLACK);
 
@@ -462,23 +461,23 @@ TEST(ArxWindow, DISABLED_PositiveMouseInput)
         std::cout << e.GetPosition().x << "; " << e.GetPosition().y << '\n';
     });*/
 
-    win->GetEventManager().Bind<MouseEnterEvent>([win](MouseEnterEvent&) {
+    win->GetEventManager().Bind<MouseEnterEvent>(std::function<void(MouseEnterEvent&)>([](MouseEnterEvent&) {
         std::cout << "window entered" << '\n';
-    });
+    }));
 
-    ctrl->GetEventManager().Bind<MouseEnterEvent>([win](MouseEnterEvent&) {
+    ctrl->GetEventManager().Bind<MouseEnterEvent>(std::function<void(MouseEnterEvent&)>([](MouseEnterEvent&) {
         std::cout << "image control entered" << '\n';
-    });
+    }));
 
-    ctrl->GetEventManager().Bind<MouseExitEvent>([win](MouseExitEvent&) {
+    ctrl->GetEventManager().Bind<MouseExitEvent>(std::function<void(MouseExitEvent&)>([](MouseExitEvent&) {
          std::cout << "image control exited" << '\n';    
-    });
+    }));
 
     win->GetEventManager().Bind<DrawEvent>([&position](DrawEvent &e){
         Painter painter(e);
         painter.Clear();
         painter.SetBrush(Brush(Color(100, 200, 100)));
-        painter.DrawRectangle(Position(position, 60.0f), Size(100, 100));
+        painter.DrawRectangle(Position(position, 60.0f), SizeF(100, 100));
 
     });
 
@@ -489,23 +488,24 @@ TEST(ArxWindow, DISABLED_PositiveMouseInput)
 
 TEST(ArxWindow, DISABLED_PositiveMouseInput2)
 {
-    ArxWindow *win = new ArxWindow("test", Size(640, 360));
+    ArxWindow *win = new ArxWindow("test", SizeF(640, 360));
     win->Show();
     win->SetFixedViewport(640, 360);
 
     std::filesystem::path testJpgPath(TEST_DATA_PATH / std::filesystem::path("test_png.png"));
     Image img(Image::LoadFromFile(testJpgPath.u8string()));
-    ImageControl *ctrl = new ImageControl(win, img, Size(100, 100), Position(100, 100));
+    ImageControl *ctrl = new ImageControl(win, img, SizeF(100, 100), Position(100, 100));
     ctrl->SetFilteringMode(Texture::TextureFilteringMode::Linear);
     ctrl->SetBackgroundColor(constants::COLOR_BLACK);
 
-    ctrl->GetEventManager().Bind<MouseEnterEvent>([win](MouseEnterEvent&) {
+    ctrl->GetEventManager().Bind<MouseEnterEvent>(std::function<void(MouseEnterEvent&)>([](MouseEnterEvent&) {
+        
         std::cout << "image control entered" << '\n';
-    });
+    }));
 
-    ctrl->GetEventManager().Bind<MouseExitEvent>([win](MouseExitEvent&) {
+    ctrl->GetEventManager().Bind<MouseExitEvent>(std::function<void(MouseExitEvent&)>([](MouseExitEvent&) {
         std::cout << "image control exited" << '\n';
-    });
+    }));
 
     Timer *t = new Timer(win);
     t->GetEventManager().Bind<TimerEvent>([win](TimerEvent &){
@@ -522,11 +522,11 @@ TEST(ArxWindow, DISABLED_PositiveMouseInput2)
 
 TEST(ArxWindow, DISABLED_PositiveLabel)
 {
-    ArxWindow *win = new ArxWindow("test", Size(640, 360));
+    ArxWindow *win = new ArxWindow("test", SizeF(640, 360));
     win->Show();
     win->SetFixedViewport(640, 360);
     Label *label = new Label(win);
-    label->SetSize(Size(100, 100));
+    label->SetSize(SizeF(100, 100));
     label->SetText("Hello world");
 
     std::filesystem::path testFontPath(TEST_DATA_PATH / std::filesystem::path("test-font-roboto.ttf"));
@@ -542,7 +542,7 @@ TEST(ArxWindow, DISABLED_PositiveLabel)
     });
 
     Label *label2 = new Label(win);
-    label2->SetSize(Size(100, 100));
+    label2->SetSize(SizeF(100, 100));
     label2->SetText("Hello world");
     label2->SetFont(label->GetFont());
     label2->SetTextColor(Color("#FF0000"));
@@ -559,11 +559,11 @@ TEST(ArxWindow, DISABLED_PositiveLabel)
 
 TEST(ArxWindow, PositiveBitmapButton)
 {
-    ArxWindow *win = new ArxWindow("test", Size(640, 360));
+    ArxWindow *win = new ArxWindow("test", SizeF(640, 360));
     win->Show();
     win->SetFixedViewport(640, 360);
     BitmapButton *btn = new BitmapButton(win);
-    btn->SetSize(Size(100, 100));
+    btn->SetSize(SizeF(100, 100));
     btn->SetText("Hello world");
     btn->SetNormalImage(Image::LoadFromFile((TEST_DATA_PATH / std::filesystem::path("btn_normal.jpg")).u8string()));
     btn->SetMouseEnterImage(Image::LoadFromFile((TEST_DATA_PATH / std::filesystem::path("btn_hover.jpg")).u8string()));
@@ -571,7 +571,7 @@ TEST(ArxWindow, PositiveBitmapButton)
 
     
     BitmapButton *btn2 = new BitmapButton(btn);
-    btn2->SetSize(Size(50, 50));
+    btn2->SetSize(SizeF(50, 50));
     btn2->SetText("Hello world");
     btn2->SetNormalImage(Image::LoadFromFile((TEST_DATA_PATH / std::filesystem::path("btn_normal.jpg")).u8string()));
     btn2->SetMouseEnterImage(Image::LoadFromFile((TEST_DATA_PATH / std::filesystem::path("btn_hover.jpg")).u8string()));

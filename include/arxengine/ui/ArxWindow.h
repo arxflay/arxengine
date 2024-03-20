@@ -38,7 +38,7 @@ public:
         int bottom;
     };
     
-    ArxWindow(std::string_view title, Size size = constants::DEFAULT_SIZE, Position position = constants::DEFAULT_POSITION, int attributes = WindowAttributes::RESIZABLE | WindowAttributes::DECORATED); //, bool isFullScreen= false);
+    ArxWindow(std::string_view title, SizeF size = SizeF::DEFAULT_SIZE, Position position = constants::DEFAULT_POSITION, int attributes = WindowAttributes::RESIZABLE | WindowAttributes::DECORATED); //, bool isFullScreen= false);
     
     
     void SetWindowAttributes(int attributes);
@@ -47,10 +47,10 @@ public:
     void SetTitle(std::string_view title);
 
     //Sets ClientSize and calculates size with win borders 
-    void SetSize(Size s) override;
+    void SetSize(SizeF s) override;
 
     //returns size without window borders
-    Size GetClientSize() const override;
+    SizeF GetClientSize() const override;
 
     //position is relative to main monitor
     void SetPosition(Position pos) override;
@@ -99,13 +99,12 @@ public:
 private:
     void OnShow(ShowEvent &e);
     void OnDraw(DrawEvent &e) override;
-    void RecalculateSizes(Size s);
+    void RecalculateSizes(SizeF s);
     void RegisterWindowFromWindowList();
     void UnregisterWindowFromWindowList();
     void SendMouseEnterExitEvents(Position pos);
     void SendMouseEnterExitEvents(UIControl *ctrl, Position pos);
     void SendForcefullyMouseExitEvents();
-
 
     static void PositionCallback(GLFWwindow *win, int x, int y);
     static void CloseCallback(GLFWwindow *win);
@@ -136,7 +135,7 @@ private:
 
 private:
     std::unique_ptr<GLFWwindow, void(*)(GLFWwindow*)> m_win;
-    Size m_clientSize;
+    SizeF m_clientSize;
     int m_attributes;
     std::string m_title;
     Viewport m_viewport;

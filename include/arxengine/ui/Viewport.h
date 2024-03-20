@@ -14,11 +14,10 @@ ARX_NAMESPACE_BEGIN
 struct Viewport
 {
     glm::mat4 projectionMatrix;
-    arx::Size size;
-
+    SizeF size;
 };
 
-static inline Position GetViewportAffectedPosition(const Viewport &viewPort, Size windowSize, Position pos)
+static inline Position GetViewportAffectedPosition(const Viewport &viewPort, SizeF windowSize, Position pos)
 {
     pos.x *=  viewPort.size.width / windowSize.width;
     pos.y *= viewPort.size.height / windowSize.height;

@@ -45,18 +45,18 @@ friend class ArxWindow;
 friend class DrawEvent;
 friend class ShowEvent;
 public:
-    UIControl(UIControl *parent, Size size = constants::DEFAULT_SIZE, Position pos = constants::DEFAULT_POSITION);
+    UIControl(UIControl *parent, SizeF size = SizeF::DEFAULT_SIZE, Position pos = constants::DEFAULT_POSITION);
     
     virtual void SetBackgroundColor(Color c);
     virtual Color GetColor() const;
 
-    virtual void SetSize(Size s);
+    virtual void SetSize(SizeF s);
     
     //size with borders (limits)
-    virtual Size GetSize() const;
+    virtual SizeF GetSize() const;
 
     //size available for client
-    virtual Size GetClientSize() const;
+    virtual SizeF GetClientSize() const;
     
     virtual void SetPosition(Position pos);
     virtual Position GetPosition() const;
@@ -95,7 +95,7 @@ private:
     UIControl();
 
 private:
-    Size m_size;
+    SizeF m_size;
     Position m_position;
     ArxWindow *m_ownerWindow;
     Color m_backgroundColor;

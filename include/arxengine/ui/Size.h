@@ -7,9 +7,13 @@
 #include "arxengine/ArxDefines.h"
 #include "arxengine/misc/Math.h"
 #include <type_traits>
+#include <glm/vec2.hpp>
 
 ARX_NAMESPACE_BEGIN
 
+
+
+template<typename T>
 struct Size
 {
     Size()
@@ -17,37 +21,58 @@ struct Size
     {
     }
     
-    template<typename T>
-    Size(std::enable_if_t<std::is_arithmetic_v<T>, T> inWidth, T inHeight)
-        : width(static_cast<float>(inWidth)), height(static_cast<float>(inHeight))
+    Size(T widthIn, T heightIn)
+        : width(widthIn), height(heightIn)
     {
     }
 
-    static Size Truncate(Size s)
+    friend Size<T> operator+(const Size<T> &s1, const Size<T> &s2)
     {
-        s.height = std::truncf(s.height);
-        s.width = std::truncf(s.width);
-        return s;
+        return Size<T>(s1.width + s2.width, s1.height + s2.height);
     }
 
-    friend Size operator+(Size s1, Size s2)
+    friend Size<T> operator+(const glm::vec<2, T> &vec, const Size<T> &s)
     {
-        return Size(s1.width + s2.width, s1.height + s2.height);
+        return Size<T>(vec.x + s.width, vec.y + s.height);
+    }
+
+    friend Size<T> operator+(const Size<T> &s, const glm::vec<2, T> &vec)
+    {
+        return Size<T>(vec.x + s.width, vec.y + s.height);
     }
     
-    bool operator==(Size size) const
+    bool operator==(const Size<T> &size) const
     {
-        return AreEqualFloat(width, size.width) && AreEqualFloat(height, size.height);
+        return AreNumsEqual(width, size.width) && AreNumsEqual(height, size.height);
     }
-    float width;
-    float height;
+
+    bool operator!=(const Size<T> &size) const
+    {
+        return !(*this == size);
+    }
+
+    void *GetPtr() 
+    { 
+        return (void*)(this); 
+    }
+
+    std::enable_if_t<std::is_arithmetic_v<T>, T> width;
+    T height;
+
+    static const Size<T> DEFAULT_SIZE;
+    static const Size<T> IGNORE_SIZE; 
 };
 
-namespace constants
-{
-    static inline const Size DEFAULT_SIZE = Size(1, 1);
-    static inline const Size IGNORE_SIZE = Size(constants::IGNORE_VALUE, constants::IGNORE_VALUE);
-}
+template<typename T>
+const Size<T> Size<T>::DEFAULT_SIZE = Size<T>(1, 1);
+
+template<typename T>
+const Size<T> Size<T>::IGNORE_SIZE = Size<T>(constants::IGNORE_VALUE, constants::IGNORE_VALUE);
+
+using SizeF = Size<float>;
+using SizeI = Size<int32_t>;
+using SizeU = Size<uint32_t>;
+using SizeUL = Size<uint64_t>;
 
 ARX_NAMESPACE_END
 

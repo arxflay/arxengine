@@ -16,7 +16,7 @@ class MouseUpEvent;
 class BitmapButton : public UIControl
 {
 public:
-    BitmapButton(UIControl *parent, const Image &img = {}, Size size = constants::DEFAULT_SIZE, Position pos = constants::DEFAULT_POSITION);
+    BitmapButton(UIControl *parent, const Image &img = {}, SizeF size = SizeF::DEFAULT_SIZE, Position pos = constants::DEFAULT_POSITION);
     void SetMouseEnterImage(const Image &img);
     void SetMouseHoldImage(const Image &img);
     void SetNormalImage(const Image &img);

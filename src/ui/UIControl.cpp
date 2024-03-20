@@ -4,7 +4,7 @@
 
 ARX_NAMESPACE_BEGIN
 
-UIControl::UIControl(UIControl *parent, Size size, Position pos)
+UIControl::UIControl(UIControl *parent, SizeF size, Position pos)
     : m_size(size)
     , m_position(pos)
     , m_backgroundColor(constants::COLOR_WHITE)
@@ -23,7 +23,7 @@ UIControl::UIControl(UIControl *parent, Size size, Position pos)
 void UIControl::SetBackgroundColor(Color c) { m_backgroundColor = c; }
 Color UIControl::GetColor() const { return m_backgroundColor; }
 
-void UIControl::SetSize(Size s) 
+void UIControl::SetSize(SizeF s) 
 {
     if (GetParent() && GetParent() != GetOwnerWindow())
     {
@@ -33,8 +33,8 @@ void UIControl::SetSize(Size s)
         
     m_size = s;
 }
-Size UIControl::GetSize() const { return m_size; }
-Size UIControl::GetClientSize() const { return m_size; }
+SizeF UIControl::GetSize() const { return m_size; }
+SizeF UIControl::GetClientSize() const { return m_size; }
 
 void UIControl::SetPosition(Position pos) { m_position = pos; }
 Position UIControl::GetPosition() const { return m_position; }
@@ -70,7 +70,7 @@ void UIControl::Hide()
 }
 
 UIControl::UIControl()
-    : m_size(constants::DEFAULT_SIZE)
+    : m_size(SizeF::DEFAULT_SIZE)
     , m_position(constants::DEFAULT_POSITION)
     , m_ownerWindow(nullptr)
     , m_backgroundColor(constants::COLOR_WHITE)

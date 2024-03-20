@@ -10,9 +10,22 @@
 
 ARX_NAMESPACE_BEGIN
 
-static inline bool AreEqualFloat(float a, float b)
+template<typename T>
+static inline std::enable_if_t<std::is_arithmetic_v<T>, bool> AreNumsEqual(const T &a, const T &b)
+{
+    return a == b;
+}
+
+template<>
+inline bool AreNumsEqual<float>(const float &a, const float &b)
 {
     return std::fabs(a - b) <= std::numeric_limits<float>::epsilon();
+}
+
+template<>
+inline bool AreNumsEqual<double>(const double &a, const double &b)
+{
+    return std::abs(a - b) <= std::numeric_limits<double>::epsilon();
 }
 
 ARX_NAMESPACE_END
