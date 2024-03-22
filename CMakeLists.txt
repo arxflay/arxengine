@@ -45,6 +45,11 @@ list(APPEND ARX_SOURCES
     ${ARX_SOURCE_PATH}/ui/MouseEvent.cpp
     ${ARX_SOURCE_PATH}/ui/Label.cpp
     ${ARX_SOURCE_PATH}/ui/BitmapButton.cpp
+    ${ARX_SOURCE_PATH}/Json.cpp
+    ${ARX_SOURCE_PATH}/internal/json/DefaultJsonLexer.cpp
+    ${ARX_SOURCE_PATH}/internal/json/DefaultJsonParser.cpp
+    ${ARX_SOURCE_PATH}/internal/json/DefaultJsonConvertor.cpp
+
 )
 set(CMAKE_EXPORT_COMPILE_COMMANDS True)
 set(gcc_like_cxx "$<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang,GNU,LCC>")

@@ -30,7 +30,11 @@ public:
         FailedToConstructUIControl  = 11,
         FailedToConstructArxWindow  = 12,
         GameAppIsRunning            = 13,
-        GameAppAlreadyScheduledExit = 14
+        GameAppAlreadyScheduledExit = 14,
+        JsonValueTypeMismatch       = 15,
+        DefaultJsonLexerFailure     = 16,
+        DefaultJsonConvertorFailure = 17
+        
     };
 
     ArxException();

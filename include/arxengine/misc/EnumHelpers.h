@@ -25,9 +25,9 @@
 #define ENUM_TO_STRING_DEFINE(EnumName, ...) const char *StringFrom##EnumName(EnumName ourEnum)\
 {\
     static const char *conversions[]{ __VA_ARGS__ };\
-    if (static_cast<int>(ourEnum) > (sizeof(conversions) / sizeof(char*)))\
+    if (static_cast<size_t>(ourEnum) > (sizeof(conversions) / sizeof(char*)))\
         throw ::ARX_NAMESPACE::ArxException(::ARX_NAMESPACE::ArxException::ErrorCode::EnumToStringError, "Failed to convert enum " #EnumName " to string"); \
-    return conversions[static_cast<int>(ourEnum)];\
+    return conversions[static_cast<size_t>(ourEnum)];\
 }
 
 #define ENUM_FROM_TO_STRING_DECLARE(EnumName)\

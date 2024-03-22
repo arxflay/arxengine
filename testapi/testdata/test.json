@@ -1,0 +1,10 @@
+{
+    "name": "test",
+    "age" : 22,
+    "happy" : true,
+    "testArr" : [10.5, {
+            "id" : 0
+        }
+    ],
+    "testObj" : null
+}

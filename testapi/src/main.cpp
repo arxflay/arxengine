@@ -23,6 +23,7 @@
 #include <arxengine/ui/Label.h>
 #include <arxengine/ui/BitmapButton.h>
 #include <iostream>
+#include <arxengine/Json.h>
 
 ARX_NAMESPACE_USE;
 
@@ -195,6 +196,48 @@ TEST(Color, PositiveColorToNormalizedColor)
     Color c(128, 255, 30, 11);
     ASSERT_EQ(c.GetNormalizedColorRGBA(), glm::vec4(c.r / 255.0, c.g / 255.0, c.b / 255.0, c.a / 255.0));
 }
+
+TEST(Json, DISABLED_PositiveJsonInitializerList)
+{
+    Json j = Json {
+        {"name", "test"},
+        {"age", 22 },
+        {"happy", true },
+    };
+    
+    std::string name;
+    int age = 0;
+    bool happy = false;
+    ASSERT_NO_THROW(name = j["name"].Get<std::string>());
+    ASSERT_STREQ(name.data(), "test");
+    ASSERT_NO_THROW(age = j["age"].Get<int>());
+    ASSERT_EQ(age, 22);
+    ASSERT_NO_THROW(happy = j["happy"].Get<bool>());
+    ASSERT_TRUE(happy);
+}
+
+TEST(Json, PositiveJsonLoadFromFile)
+{
+    Json j(Json::FromFile((TEST_DATA_PATH / "test.json").u8string())); 
+    std::string name;
+    int age = 0;
+    bool happy = false;
+    ASSERT_NO_THROW(name = j["name"].Get<std::string>());
+    ASSERT_STREQ(name.data(), "test");
+    ASSERT_NO_THROW(age = j["age"].Get<int>());
+    ASSERT_EQ(age, 22);
+    ASSERT_NO_THROW(happy = j["happy"].Get<bool>());
+    ASSERT_TRUE(happy);
+
+    Json &arr = j["testArr"];
+    double val0 = arr[0].Get<double>();
+    ASSERT_EQ(val0, 10.5);
+    int val1 = arr[1]["id"].Get<int>();
+    ASSERT_EQ(val1, 0);
+
+    std::cout << Json::ToJsonStr(j) << '\n';
+}
+
 
 TEST(ArxWindow, DISABLED_PositiveShowWin)
 {
@@ -616,3 +659,4 @@ TEST(ArxWindow, PositiveBitmapButton)
     win->EnableVSync(true);
     GameApp::GetGlobalApp()->Run();
 }
+

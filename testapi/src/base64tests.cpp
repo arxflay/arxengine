@@ -3,7 +3,7 @@
 #include <arxengine/media/Image.h>
 #include <filesystem>
 #include <fstream>
-#include "testdefs.h"
+//#include "testdefs.h"
 
 ARX_NAMESPACE_USE;
 #ifdef TEST_BASE64
