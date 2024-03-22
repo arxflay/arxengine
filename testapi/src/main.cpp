@@ -612,7 +612,20 @@ TEST(ArxWindow, PositiveBitmapButton)
     btn->SetMouseEnterImage(Image::LoadFromFile((TEST_DATA_PATH / std::filesystem::path("btn_hover.jpg")).u8string()));
     btn->SetMouseHoldImage(Image::LoadFromFile((TEST_DATA_PATH / std::filesystem::path("btn_hold.jpg")).u8string()));
 
-    
+    BitmapButton *btn3 = new BitmapButton(win);
+    btn3->SetSize(SizeF(50, 50));
+    btn3->SetPosition(Position(10, 10));
+    btn3->SetText("Hello world");
+    btn3->SetNormalImage(Image::LoadFromFile((TEST_DATA_PATH / std::filesystem::path("btn_normal.jpg")).u8string()));
+    btn3->SetMouseEnterImage(Image::LoadFromFile((TEST_DATA_PATH / std::filesystem::path("btn_hover.jpg")).u8string()));
+    btn3->SetMouseHoldImage(Image::LoadFromFile((TEST_DATA_PATH / std::filesystem::path("btn_hold.jpg")).u8string()));
+    btn3->GetEventManager().Bind<MouseDownEvent>([btn](MouseDownEvent &e)
+    {
+        (void)btn;
+        std::cout << "EnterBtn3" << '\n';
+        e.Skip();
+    });
+
     BitmapButton *btn2 = new BitmapButton(btn);
     btn2->SetSize(SizeF(50, 50));
     btn2->SetText("Hello world");
@@ -647,14 +660,6 @@ TEST(ArxWindow, PositiveBitmapButton)
         std::cout << "Click" << '\n';
         e.Skip();
     });
-
-    Timer *t = new Timer(win);
-    t->GetEventManager().Bind<TimerEvent>([btn](TimerEvent &){
-        btn->Show(false);       
-    });
-
-    t->SetInterval(std::chrono::seconds(5));
-    t->Start(Timer::TimerType::SINGLE_FIRE);
 
     win->EnableVSync(true);
     GameApp::GetGlobalApp()->Run();

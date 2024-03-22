@@ -111,9 +111,10 @@ namespace
 {
     UIControl *FindCandidateForMouseInput(UIControl *candidate, Position pos)
     {
-        for (ArxObject *obj : candidate->GetChildren())
+        const auto &children = candidate->GetChildren();
+        for (auto it = children.rbegin(); it != children.rend(); it++)
         {
-            UIControl *control = dynamic_cast<UIControl*>(obj); 
+            UIControl *control = dynamic_cast<UIControl*>(*it); 
             if (control && control->IsShown() && control->HitTest(pos))
                 return FindCandidateForMouseInput(control, pos);
         }
@@ -171,9 +172,10 @@ bool ArxWindow::IsCursorVisible() const
 
 void ArxWindow::SendMouseEnterExitEvents(UIControl *ctrl, Position pos)
 {
-    for (ArxObject *obj : ctrl->GetChildren())
+    const auto &children = ctrl->GetChildren();
+    for (auto it = children.rbegin(); it != children.rend(); it++)
     {
-        UIControl *control = dynamic_cast<UIControl*>(obj);
+        UIControl *control = dynamic_cast<UIControl*>(*it);
         if (control)
         {
             bool alreadyEntered = m_mouseEnteredControls.count(control);
