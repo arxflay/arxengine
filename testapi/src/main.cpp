@@ -607,6 +607,7 @@ TEST(ArxWindow, PositiveBitmapButton)
     win->SetFixedViewport(640, 360);
     BitmapButton *btn = new BitmapButton(win);
     btn->SetSize(SizeF(100, 100));
+    btn->SetPosition(Position(100, 100));
     btn->SetText("Hello world");
     btn->SetNormalImage(Image::LoadFromFile((TEST_DATA_PATH / std::filesystem::path("btn_normal.jpg")).u8string()));
     btn->SetMouseEnterImage(Image::LoadFromFile((TEST_DATA_PATH / std::filesystem::path("btn_hover.jpg")).u8string()));
@@ -614,11 +615,11 @@ TEST(ArxWindow, PositiveBitmapButton)
 
     BitmapButton *btn3 = new BitmapButton(win);
     btn3->SetSize(SizeF(50, 50));
-    btn3->SetPosition(Position(10, 10));
+    btn3->SetPosition(Position(30, 10));
     btn3->SetText("Hello world");
-    btn3->SetNormalImage(Image::LoadFromFile((TEST_DATA_PATH / std::filesystem::path("btn_normal.jpg")).u8string()));
-    btn3->SetMouseEnterImage(Image::LoadFromFile((TEST_DATA_PATH / std::filesystem::path("btn_hover.jpg")).u8string()));
-    btn3->SetMouseHoldImage(Image::LoadFromFile((TEST_DATA_PATH / std::filesystem::path("btn_hold.jpg")).u8string()));
+    btn3->SetNormalImage(Image::LoadFromFile((TEST_DATA_PATH / std::filesystem::path("btn_hover.jpg")).u8string()));
+    btn3->SetMouseEnterImage(Image::LoadFromFile((TEST_DATA_PATH / std::filesystem::path("btn_hold.jpg")).u8string()));
+    btn3->SetMouseHoldImage(Image::LoadFromFile((TEST_DATA_PATH / std::filesystem::path("btn_normal.jpg")).u8string()));
     btn3->GetEventManager().Bind<MouseDownEvent>([btn](MouseDownEvent &e)
     {
         (void)btn;
@@ -632,7 +633,6 @@ TEST(ArxWindow, PositiveBitmapButton)
     btn2->SetNormalImage(Image::LoadFromFile((TEST_DATA_PATH / std::filesystem::path("btn_normal.jpg")).u8string()));
     btn2->SetMouseEnterImage(Image::LoadFromFile((TEST_DATA_PATH / std::filesystem::path("btn_hover.jpg")).u8string()));
     btn2->SetMouseHoldImage(Image::LoadFromFile((TEST_DATA_PATH / std::filesystem::path("btn_hold.jpg")).u8string()));
-
 
     std::filesystem::path testFontPath(TEST_DATA_PATH / std::filesystem::path("test-font-roboto.ttf"));
     Font font(Font::LoadFromFile(testFontPath.u8string()));

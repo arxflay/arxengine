@@ -48,10 +48,10 @@ void ArxObject::RequestDelete()
     if (!IsDestroyCalled())
     {
         m_destroyCalled = true;
-
+        
         for (ArxObject *obj : m_children)
             obj->RequestDelete();
-
+        
         auto evt = std::unique_ptr<DeleteEvent>(new DeleteEvent{});
         m_eventManager.QueueEvent<DeleteEvent>(std::move(evt));
     }

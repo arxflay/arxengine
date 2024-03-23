@@ -22,6 +22,7 @@ BitmapButton::BitmapButton(UIControl *parent, const Image &img, SizeF size, Posi
     , m_isLeftMouseBtnDown(false)
     , m_isMouseEntered(false)
 {
+    SetCanRecieveMouseEvents(true);
     m_normalTexture->SetData(img);
     m_mouseEnterTexture->SetData(img);
     m_mouseHoldTexture->SetData(img);
@@ -75,11 +76,11 @@ void BitmapButton::OnMouseUp(MouseUpEvent &e)
 void BitmapButton::OnDraw(DrawEvent &e)
 {
     Painter p(e);
-    p.DrawTexture2D(GetPosition(), GetClientSize(), m_currentTexture);
+    p.DrawTexture2D(Position(0, 0), GetClientSize(), m_currentTexture);
     if (!GetFont().IsInvalid())
     {
         p.SetPen(m_textColor);
-        p.DrawText(GetText(), Position(GetPosition().x, GetSize().height / 2));
+        p.DrawText(GetText(), Position(0, GetSize().height / 2));
     }
 }
 

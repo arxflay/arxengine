@@ -87,8 +87,8 @@ private:
         ArxWindow *win = static_cast<ArxWindow*>(GetSender());
         m_showCursor = m_shouldShowCursor;
         glfwSetInputMode(m_win, GLFW_CURSOR, m_showCursor ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
-        if (!m_showCursor && !win->m_mouseEnteredControls.empty())
-            win->SendForcefullyMouseExitEvents();
+        if (!m_showCursor && win->m_lastMouseEnterReciever != nullptr)
+            win->ForgetMouseEnteredControl(win->m_lastMouseEnterReciever, true);
     }
     GLFWwindow *m_win;
     bool m_shouldShowCursor;
@@ -107,117 +107,85 @@ Position ArxWindow::GetCursorPosition()
     return Position(x, y);
 }
 
-namespace
-{
-    UIControl *FindCandidateForMouseInput(UIControl *candidate, Position pos)
-    {
-        const auto &children = candidate->GetChildren();
-        for (auto it = children.rbegin(); it != children.rend(); it++)
-        {
-            UIControl *control = dynamic_cast<UIControl*>(*it); 
-            if (control && control->IsShown() && control->HitTest(pos))
-                return FindCandidateForMouseInput(control, pos);
-        }
-
-        return candidate;
-    }
-        
-    UIControl *FindCandidateForMouseInput(ArxWindow *win)
-    {
-        if (!win->IsCursorVisible())
-            return win;
-
-        Position viewportAffectedPosition = GetViewportAffectedPosition(win->GetViewport(), win->GetClientSize(), win->GetCursorPosition());
-        return FindCandidateForMouseInput(win, viewportAffectedPosition);    
-    }
-}
-
 bool ArxWindow::IsCursorVisible() const
 {
     return m_showCursor;
 }
 
+/*static*/UIControl *ArxWindow::FindClickEventCandidate(UIControl *parent, Position pos)
+{
+    for (UIControl *ctrl : parent->GetMouseEventRecievers())
+        if (ctrl->IsShown() && ctrl->HitTest(pos))
+            return FindClickEventCandidate(ctrl, pos);
+
+    return parent;
+}
+
+void ArxWindow::SendMouseDownEvent(Position pos, MouseButtonEvent::ButtonType button)
+{
+    UIControl *candidate = !IsCursorVisible() ? this : FindClickEventCandidate(this, pos);
+    if(candidate->GetEventManager().HasNonDefaultEventHandler<MouseDownEvent>())
+    {
+        std::unique_ptr<MouseDownEvent> mouseEvent = std::make_unique<MouseDownEvent>(); 
+        mouseEvent->SetMouseButtonType(button);
+        candidate->GetEventManager().QueueEvent<MouseDownEvent>(std::move(mouseEvent));
+    }
+    m_pressedMouseButtons.emplace(button, candidate);
+}
+
+void ArxWindow::SendMouseUpEvent(MouseButtonEvent::ButtonType button)
+{
+    auto it = m_pressedMouseButtons.find(static_cast<MouseButtonEvent::ButtonType>(button));
+    if (it != m_pressedMouseButtons.end())
+    {
+        if(it->second->CanRecieveMouseEvents() && it->second->GetEventManager().HasNonDefaultEventHandler<MouseUpEvent>())
+        {
+            std::unique_ptr<MouseUpEvent> mouseEvent = std::make_unique<MouseUpEvent>(); 
+            mouseEvent->SetMouseButtonType(it->first);
+            it->second->GetEventManager().QueueEvent<MouseUpEvent>(std::move(mouseEvent));
+        }
+        m_pressedMouseButtons.erase(it);
+    }
+}
+
 /*static*/ void ArxWindow::MouseInputCallback(GLFWwindow *win, int button, int action, int)
 {
     ArxWindow *arxWin = static_cast<ArxWindow*>(glfwGetWindowUserPointer(win));
-    std::unique_ptr<MouseButtonEvent> mouseEvent;
+    MouseButtonEvent::ButtonType btnType = static_cast<MouseButtonEvent::ButtonType>(button);
+    
     switch(action)
     {
         case GLFW_PRESS:
-            {
-                UIControl *candidate = FindCandidateForMouseInput(arxWin);
-                mouseEvent = std::make_unique<MouseDownEvent>();
-                mouseEvent->SetMouseButtonType(static_cast<MouseButtonEvent::ButtonType>(button));
-                candidate->GetEventManager().QueueEvent<MouseDownEvent>(std::move(mouseEvent));
-                arxWin->m_pressedMouseButtons.emplace(candidate, static_cast<MouseButtonEvent::ButtonType>(button));
-            }
+            arxWin->SendMouseDownEvent(GetViewportAffectedPosition(arxWin->GetViewport(), arxWin->GetClientSize(), arxWin->GetCursorPosition()), btnType); 
             break;
         case GLFW_RELEASE:
-            {
-                auto it = arxWin->m_pressedMouseButtons.find({nullptr, static_cast<MouseButtonEvent::ButtonType>(button)});
-                if (it != arxWin->m_pressedMouseButtons.end())
-                {
-                    arxWin->m_pressedMouseButtons.erase(it);
-                    mouseEvent = std::make_unique<MouseUpEvent>();
-                    UIControl *control = it->control;
-                    mouseEvent->SetMouseButtonType(static_cast<MouseButtonEvent::ButtonType>(button));
-                    control->GetEventManager().QueueEvent<MouseUpEvent>(std::move(mouseEvent));
-                }
-            }
+            arxWin->SendMouseUpEvent(btnType);
             break;
         default:
             break;
     }
 }
 
-void ArxWindow::SendMouseEnterExitEvents(UIControl *ctrl, Position pos)
+void ArxWindow::SendMouseEnterExitEvents(UIControl *parent, Position pos)
 {
-    const auto &children = ctrl->GetChildren();
-    for (auto it = children.rbegin(); it != children.rend(); it++)
+    bool foundMouseEnterReciever = false;
+    
+    for (UIControl *ctrl : parent->GetMouseEventRecievers())
     {
-        UIControl *control = dynamic_cast<UIControl*>(*it);
-        if (control)
+        if (ctrl->IsShown() && (foundMouseEnterReciever = ctrl->HitTest(pos)))
         {
-            bool alreadyEntered = m_mouseEnteredControls.count(control);
-            bool hitted = false;
-            
-            if (control->IsShown() && (hitted = control->HitTest(pos)))
-            {
-                if (!alreadyEntered)
-                {
-                    m_mouseEnteredControls.emplace(control);
-                    if (control->GetEventManager().HasNonDefaultEventHandler<MouseEnterEvent>())
-                        control->GetEventManager().QueueEvent<MouseEnterEvent>(std::make_unique<MouseEnterEvent>());
-                }
-                SendMouseEnterExitEvents(control, pos); 
-            }      
-            else if (!hitted && alreadyEntered)
-            {
-                m_mouseEnteredControls.erase(control);
-                if (control->GetEventManager().HasNonDefaultEventHandler<MouseExitEvent>())
-                    control->GetEventManager().QueueEvent<MouseExitEvent>(std::make_unique<MouseExitEvent>());
-            }
+            SendMouseEnterExitEvents(ctrl, pos);
+            break;
         }
     }
-}
-
-void ArxWindow::SendMouseEnterExitEvents(Position pos)
-{
-    (void)SendMouseEnterExitEvents(this, pos);
-}
-
-void ArxWindow::SendForcefullyMouseExitEvents()
-{
-    for (UIControl *control : m_mouseEnteredControls)
+    
+    if (!foundMouseEnterReciever && parent != m_lastMouseEnterReciever)
     {
-        if (control->GetEventManager().HasNonDefaultEventHandler<MouseExitEvent>())
-        {
-            std::unique_ptr<MouseExitEvent> evt = std::make_unique<MouseExitEvent>();
-            evt->SetWasForced(true);
-            control->GetEventManager().QueueEvent<MouseExitEvent>(std::make_unique<MouseExitEvent>());
-        }
+        ForgetMouseEnteredControl(m_lastMouseEnterReciever, true);
+        if (parent->GetEventManager().HasNonDefaultEventHandler<MouseEnterEvent>())
+            parent->GetEventManager().QueueEvent<MouseEnterEvent>(std::make_unique<MouseEnterEvent>());
+        m_lastMouseEnterReciever = parent;
     }
-    m_mouseEnteredControls.clear();
 }
 
 void ArxWindow::CursorPosCallback(GLFWwindow *win, double xpos, double ypos)
@@ -235,16 +203,16 @@ void ArxWindow::CursorPosCallback(GLFWwindow *win, double xpos, double ypos)
     }
 
     if (arxWin->IsCursorVisible())
-        arxWin->SendMouseEnterExitEvents(viewportAffectedPosition);
+        arxWin->SendMouseEnterExitEvents(arxWin, viewportAffectedPosition);
 }
 
 /*static*/ void ArxWindow::MouseEnterExitCallback(GLFWwindow *win, int enter)
 {
     ArxWindow *arxWin = static_cast<ArxWindow*>(glfwGetWindowUserPointer(win));
-    if (enter && arxWin->GetEventManager().HasNonDefaultEventHandler<MouseEnterEvent>())
-        arxWin->GetEventManager().QueueEvent<MouseEnterEvent>(std::make_unique<MouseEnterEvent>());
-    else if (arxWin->GetEventManager().HasNonDefaultEventHandler<MouseExitEvent>())
-        arxWin->GetEventManager().QueueEvent<MouseExitEvent>(std::make_unique<MouseExitEvent>());
+    if (enter && arxWin->GetEventManager().HasNonDefaultEventHandler<WindowEnterEvent>())
+        arxWin->GetEventManager().QueueEvent<WindowEnterEvent>(std::make_unique<WindowEnterEvent>());
+    else if (arxWin->GetEventManager().HasNonDefaultEventHandler<WindowExitEvent>())
+        arxWin->GetEventManager().QueueEvent<WindowExitEvent>(std::make_unique<WindowExitEvent>());
 }
 
 /*static*/ void ArxWindow::SetGlfwCallbacks(GLFWwindow *win)
@@ -253,20 +221,19 @@ void ArxWindow::CursorPosCallback(GLFWwindow *win, double xpos, double ypos)
     glfwSetWindowPosCallback(win, ArxWindow::PositionCallback);
     glfwSetWindowRefreshCallback(win, ArxWindow::RefreshCallback);
     glfwSetKeyCallback(win, ArxWindow::KeyboardInputCallback);
-    glfwSetMouseButtonCallback(win, ArxWindow::MouseInputCallback);
-    glfwSetCursorPosCallback(win, ArxWindow::CursorPosCallback);
-    glfwSetCursorEnterCallback(win, ArxWindow::MouseEnterExitCallback);
 }
 
 //uncompelte fullscreen
 ArxWindow::ArxWindow(std::string_view title, SizeF size, Position position, int attributes) //, bool isFullScreen)
-    : m_win(nullptr, glfwDestroyWindow)
+    : UIControl()
+    , m_win(nullptr, glfwDestroyWindow)
     , m_attributes(attributes)
     , m_title(title)
     , m_useFixedViewport(false)
     , m_uiCache(std::make_unique<UICache>())
     , m_vsyncEnabled(false)
     , m_showCursor(true)
+    , m_lastMouseEnterReciever(nullptr)
 {
     glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
     glfwWindowHint(GLFW_FOCUS_ON_SHOW, GLFW_TRUE);
@@ -303,6 +270,7 @@ ArxWindow::ArxWindow(std::string_view title, SizeF size, Position position, int 
     RecalculateSizes(validSize);
     SetPosition(position);
     SetGlfwCallbacks(m_win.get());
+    SetCanRecieveMouseEvents(true);
 
     GetEventManager().Bind<ShowEvent>(&ArxWindow::OnShow, this);
     m_viewport = Viewport{glm::ortho(0.0f, size.width, 0.0f, size.height), size };
@@ -562,6 +530,59 @@ void ArxWindow::EnableVSync(bool enable)
     //wait for monitor refresh
     glfwSwapInterval(enable);
     m_vsyncEnabled = enable;
+}
+
+void ArxWindow::SetCanRecieveMouseEvents(bool canRecieve)
+{
+    if (CanRecieveMouseEvents() == canRecieve)
+        return;
+
+    m_canRecieveMouseEvents = canRecieve;
+
+    if (m_canRecieveMouseEvents)
+    {
+        glfwSetMouseButtonCallback(m_win.get(), ArxWindow::MouseInputCallback);
+        glfwSetCursorPosCallback(m_win.get(), ArxWindow::CursorPosCallback);
+        glfwSetCursorEnterCallback(m_win.get(), ArxWindow::MouseEnterExitCallback);
+    }
+    else 
+    {
+        glfwSetMouseButtonCallback(nullptr, ArxWindow::MouseInputCallback);
+        glfwSetCursorPosCallback(nullptr, ArxWindow::CursorPosCallback);
+        glfwSetCursorEnterCallback(nullptr, ArxWindow::MouseEnterExitCallback);
+    }
+}
+
+void ArxWindow::ForgetMouseEnteredControl(UIControl *ctrl, bool sendMouseExitEvent)
+{
+    if (m_lastMouseEnterReciever != nullptr && m_lastMouseEnterReciever == ctrl)
+    {
+        if (sendMouseExitEvent && m_lastMouseEnterReciever->CanRecieveMouseEvents() && m_lastMouseEnterReciever->GetEventManager().HasNonDefaultEventHandler<MouseExitEvent>())
+            m_lastMouseEnterReciever->GetEventManager().QueueEvent<MouseExitEvent>(std::make_unique<MouseExitEvent>());
+        m_lastMouseEnterReciever = nullptr;
+    }
+}
+
+void ArxWindow::ForgetPressedMouseButtons(UIControl *ctrl, bool sendMouseUpEvent)
+{
+    bool found = true;
+
+    while(found)
+    {
+        auto it = std::find_if(m_pressedMouseButtons.begin(), m_pressedMouseButtons.end(), [ctrl](const std::pair<MouseButtonEvent::ButtonType, UIControl*> &p) { 
+            return p.second == ctrl; 
+        });
+        if ((found = (it != m_pressedMouseButtons.end())))
+        {
+            if (sendMouseUpEvent)
+            {
+                std::unique_ptr<MouseUpEvent> mouseEvent = std::make_unique<MouseUpEvent>(); 
+                mouseEvent->SetMouseButtonType(it->first);
+                it->second->GetEventManager().QueueEvent<MouseUpEvent>(std::move(mouseEvent));
+            }
+            m_pressedMouseButtons.erase(it);
+        }
+    }
 }
 
 

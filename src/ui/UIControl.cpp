@@ -1,7 +1,7 @@
 #include "arxengine/ui/UIControl.h"
 #include "arxengine/ui/ArxWindow.h"
 #include <memory>
-
+#include "arxengine/ui/Painter.h"
 ARX_NAMESPACE_BEGIN
 
 UIControl::UIControl(UIControl *parent, SizeF size, Position pos)
@@ -11,6 +11,7 @@ UIControl::UIControl(UIControl *parent, SizeF size, Position pos)
     , m_clippingEnabled(true)
     , m_fontCache(new FontCache(this))
     , m_isShown(true)
+    , m_canRecieveMouseEvents(false)
 {
     if (!parent)
         throw ArxException(ArxException::ErrorCode::GenericError, "UIControl parent is null");
@@ -33,6 +34,54 @@ void UIControl::SetSize(SizeF s)
         
     m_size = s;
 }
+
+bool UIControl::CanRecieveMouseEvents() const { return m_canRecieveMouseEvents; }
+
+void UIControl::SetCanRecieveMouseEvents(bool canRecieve)
+{
+    if (m_canRecieveMouseEvents == canRecieve)
+        return;
+        
+    UIControl *parent = static_cast<UIControl*>(GetParent());
+    auto &recieversList = parent->m_mouseEventRecievers;
+    auto &parentChildren = parent->GetChildren();
+    if (canRecieve)
+    {
+        if (parentChildren.back() == this)
+            recieversList.push_front(this);
+        else if (parentChildren.front() == this || recieversList.empty())
+            recieversList.push_back(this);
+        else
+        {
+            ///VERY EXPENSIVE OPERATION
+            //AVOID FOR NOW
+            auto thisChildIt = std::find(parentChildren.begin(), parentChildren.end(), this);
+            bool foundControlBehind = false;
+            for (auto recieversListIt = recieversList.begin(); recieversListIt != recieversList.end(); recieversListIt++)
+            {
+                auto it = std::find(parentChildren.begin(), parentChildren.end(), *recieversListIt);
+                if (std::distance(thisChildIt, it) < 0) //this reciever is before this element
+                {
+                    foundControlBehind = true;
+                    recieversList.insert(recieversListIt, this);
+                    break;
+                }
+            }
+
+            if (!foundControlBehind)
+                recieversList.push_back(this);
+        }
+    }
+    else
+    {
+        GetOwnerWindow()->ForgetMouseEnteredControl(this, true);
+        GetOwnerWindow()->ForgetPressedMouseButtons(this, true);
+        recieversList.remove(this);
+    }
+
+    m_canRecieveMouseEvents = canRecieve;
+}
+
 SizeF UIControl::GetSize() const { return m_size; }
 SizeF UIControl::GetClientSize() const { return m_size; }
 
@@ -77,8 +126,8 @@ UIControl::UIControl()
     , m_clippingEnabled(false)
     , m_fontCache(new FontCache(this))
     , m_isShown(false)
+    , m_canRecieveMouseEvents(false)
 {
-
 }
 
 void DrawEvent::HandleEvent()
@@ -128,7 +177,13 @@ ShowEvent::ShowEvent()
 
 void ShowEvent::HandleEvent() 
 {
-    static_cast<UIControl*>(GetSender())->m_isShown = WillBeShown();
+    UIControl *sender = static_cast<UIControl*>(GetSender());
+    if (sender->m_isShown && !WillBeShown() && sender->GetOwnerWindow())
+    {
+        sender->GetOwnerWindow()->ForgetMouseEnteredControl(sender, true);            
+        sender->GetOwnerWindow()->ForgetPressedMouseButtons(sender, true);
+    }
+    sender->m_isShown = WillBeShown();
 }
 
 bool ShowEvent::WillBeShown() const
@@ -136,10 +191,23 @@ bool ShowEvent::WillBeShown() const
     return m_show;
 }
 
+Position UIControl::GetParentsPosition() const
+{
+    const UIControl *parent = static_cast<const UIControl*>(GetParent());
+    Position parentsPos(0, 0);
+    while (parent && parent->GetParent())
+    {
+        parentsPos += parent->GetPosition();
+        parent = static_cast<const UIControl*>(parent->GetParent());
+    }
+    return parentsPos;
+}
+
 bool UIControl::HitTest(Position pos) const
 {
-    return pos.x >= m_position.x && pos.x <= m_position.x + GetClientSize().width 
-        && pos.y >= m_position.y && pos.y <= m_position.y + GetClientSize().height; 
+    Position ctrlPos = (GetParent() ? GetPosition() + GetParentsPosition() : Position(0, 0));
+    return pos.x >= ctrlPos.x && pos.x <= ctrlPos.x + GetClientSize().width 
+        && pos.y >= ctrlPos.y && pos.y <= ctrlPos.y + GetClientSize().height; 
 }
 
 void ShowEvent::SetWillBeShown(bool show)
@@ -155,6 +223,12 @@ void UIControl::MoveToFront()
         auto &parentChildren = const_cast<ArxObjectList&>(parent->GetChildren());
         auto childIt = std::find(parentChildren.begin(), parentChildren.end(), this);
         parentChildren.splice(parentChildren.end(), parentChildren, childIt, std::next(childIt));
+        if (m_canRecieveMouseEvents)
+        {
+            auto &recieversList = static_cast<UIControl*>(GetParent())->m_mouseEventRecievers;
+            auto receiverIt = std::find(recieversList.begin(), recieversList.end(), this);
+            recieversList.splice(recieversList.begin(), recieversList, receiverIt, std::next(receiverIt));
+        }
     }
 }
 
@@ -166,7 +240,34 @@ void UIControl::MoveToBack()
         auto &parentChildren = const_cast<ArxObjectList&>(parent->GetChildren());
         auto childIt = std::find(parentChildren.begin(), parentChildren.end(), this);
         parentChildren.splice(parentChildren.begin(), parentChildren, childIt, std::next(childIt));
+        if (m_canRecieveMouseEvents)
+        {
+            auto &recieversList = static_cast<UIControl*>(GetParent())->m_mouseEventRecievers;
+            auto receiverIt = std::find(recieversList.begin(), recieversList.end(), this);
+            recieversList.splice(recieversList.end(), recieversList, receiverIt, std::next(receiverIt));
+        }
     }
+}
+
+UIControl::~UIControl()
+{
+    if (GetOwnerWindow())
+    {
+        GetOwnerWindow()->ForgetMouseEnteredControl(this, false);
+        GetOwnerWindow()->ForgetPressedMouseButtons(this, false);
+    }
+}
+
+void UIControl::OnDraw(DrawEvent &e)
+{
+   Painter painter(e);
+   painter.SetBrush(GetColor());
+   painter.Clear();
+}
+
+const UIControlList &UIControl::GetMouseEventRecievers() const
+{
+    return m_mouseEventRecievers;
 }
 
 ARX_NAMESPACE_END

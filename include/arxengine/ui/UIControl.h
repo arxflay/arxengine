@@ -26,6 +26,10 @@ private:
     void HandleEvent() override;
 };
 
+
+/*
+ * @descriptions controls that bind their own handler should call e.Skip()!
+ */
 class ARX_EXPORTS ShowEvent : public Event
 {
 friend class UIControl; 
@@ -38,6 +42,7 @@ private:
     bool m_show;
 };
 
+using UIControlList = std::list<UIControl*>;
 
 class ARX_EXPORTS UIControl : public ArxObject
 {
@@ -61,6 +66,8 @@ public:
     virtual void SetPosition(Position pos);
     virtual Position GetPosition() const;
 
+    Position GetParentsPosition() const;
+
     //returns nullptr if UIControl is ArxWindow
     ArxWindow *GetOwnerWindow();
     const ArxWindow *GetOwnerWindow() const;
@@ -72,6 +79,9 @@ public:
     void Show(bool visible = true);
     void Hide();
     bool IsShown() const;
+
+    bool CanRecieveMouseEvents() const;
+    virtual void SetCanRecieveMouseEvents(bool canRecieve);
 
     //only UIControl can be parent
     void Reparent(ArxObject *parent) override;
@@ -88,12 +98,14 @@ public:
     void MoveToFront();
     void MoveToBack();
 
+    virtual ~UIControl();
+
+    const UIControlList &GetMouseEventRecievers() const;
 private:
-    virtual void OnDraw(DrawEvent &) { /*do nothing*/ };
+    virtual void OnDraw(DrawEvent &);
     
     //this constructor is used for windows
     UIControl();
-
 private:
     SizeF m_size;
     Position m_position;
@@ -103,6 +115,8 @@ private:
     Font m_font;
     FontCache *m_fontCache;
     bool m_isShown;
+    UIControlList m_mouseEventRecievers;
+    bool m_canRecieveMouseEvents;
 };
 
 ARX_NAMESPACE_END

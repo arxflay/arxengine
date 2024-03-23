@@ -15,6 +15,19 @@ struct GLFWwindow;
 
 ARX_NAMESPACE_BEGIN
 
+
+class WindowEnterEvent : public Event
+{
+private:
+    void HandleEvent() {};
+};
+
+class WindowExitEvent : public Event
+{
+private:
+    void HandleEvent(){};
+};
+
 class UICache;
 class Image;
 class ShowCursorEvent;
@@ -40,7 +53,7 @@ public:
     
     ArxWindow(std::string_view title, SizeF size = SizeF::DEFAULT_SIZE, Position position = constants::DEFAULT_POSITION, int attributes = WindowAttributes::RESIZABLE | WindowAttributes::DECORATED); //, bool isFullScreen= false);
     
-    
+
     void SetWindowAttributes(int attributes);
     
     std::string_view GetTitle();
@@ -62,6 +75,8 @@ public:
     int GetAttributes() const;
     virtual WindowBorders GetWindowBorders() const;
 
+    void SetCanRecieveMouseEvents(bool canRecieve) override;
+
     ArxWindow *GetWindow() override;
     const ArxWindow *GetWindow() const override;
     void SetAsCurrentContext() const;
@@ -80,6 +95,9 @@ public:
     //accept only RGBA 8byte per channel images
     //nullopt == unset icon
     bool SetIcon(std::optional<std::reference_wrapper<const Image>> img);
+
+    void ForgetMouseEnteredControl(UIControl *ctrl, bool sendMouseExitEvent);
+    void ForgetPressedMouseButtons(UIControl *ctrl, bool sendMouseUpEvent);
 
     
     /* schedules draw event */
@@ -102,9 +120,10 @@ private:
     void RecalculateSizes(SizeF s);
     void RegisterWindowFromWindowList();
     void UnregisterWindowFromWindowList();
-    void SendMouseEnterExitEvents(Position pos);
     void SendMouseEnterExitEvents(UIControl *ctrl, Position pos);
-    void SendForcefullyMouseExitEvents();
+    static UIControl *FindClickEventCandidate(UIControl *ctrl, Position pos);
+    void SendMouseDownEvent(Position pos, MouseButtonEvent::ButtonType button);
+    void SendMouseUpEvent(MouseButtonEvent::ButtonType button);
 
     static void PositionCallback(GLFWwindow *win, int x, int y);
     static void CloseCallback(GLFWwindow *win);
@@ -122,17 +141,6 @@ private:
     static void DrawInternal(UIControl *obj);
     static void DrawNowInternal(UIControl *obj);
 
-    struct PressedMouseButtonRecord
-    {
-        PressedMouseButtonRecord(UIControl *controlIn, MouseButtonEvent::ButtonType buttonTypeIn)
-            : control(controlIn), buttonType(buttonTypeIn)
-        {}
-        UIControl *control;
-        MouseButtonEvent::ButtonType buttonType;
-        bool operator<(const PressedMouseButtonRecord &rec) const { return buttonType < rec.buttonType; }
-        bool operator>(const PressedMouseButtonRecord &rec) const { return buttonType > rec.buttonType; }
-    };
-
 private:
     std::unique_ptr<GLFWwindow, void(*)(GLFWwindow*)> m_win;
     SizeF m_clientSize;
@@ -143,8 +151,8 @@ private:
     std::unique_ptr<UICache> m_uiCache;
     bool m_vsyncEnabled;
     bool m_showCursor;
-    std::set<PressedMouseButtonRecord> m_pressedMouseButtons;
-    std::set<UIControl*>  m_mouseEnteredControls;
+    std::map<MouseButtonEvent::ButtonType, UIControl*> m_pressedMouseButtons;
+    UIControl *m_lastMouseEnterReciever;
 };
 
 ARX_NAMESPACE_END

@@ -20,8 +20,7 @@ namespace
 
     Position GetSenderPosition(UIControl *obj)
     {
-        //position is only required if it's an element inside window
-        return (obj->GetOwnerWindow() == nullptr) ? Position(0, 0) : obj->GetPosition(); 
+        return (obj->GetParent() ? (obj->GetPosition() + obj->GetParentsPosition()) : Position(0, 0)); 
     }
 
     ClippingArea::ClipBox CreateClipBox(UIControl *obj)
