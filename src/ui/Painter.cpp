@@ -28,6 +28,13 @@ namespace
         ArxWindow *window = obj->GetWindow();
         Position senderPos = GetSenderPosition(obj);
         Size senderSize = obj->GetClientSize();
+        if (obj->GetParent() != obj->GetOwnerWindow())
+        {
+            Position relativeSenderPos = obj->GetPosition();
+            SizeF parentSize = static_cast<UIControl*>(obj->GetParent())->GetSize();
+            senderSize.width = std::clamp(senderSize.width, 0.0f, parentSize.width - relativeSenderPos.x);
+            senderSize.height = std::clamp(senderSize.width, 0.0f, parentSize.width - relativeSenderPos.y);
+        }
         Size windowSize = window->GetClientSize();
         Size viewPortSize = window->GetViewport().size;
         
@@ -62,6 +69,7 @@ namespace
         clipBox.y = static_cast<int>(clipPosition.y);
         clipBox.width = static_cast<int>(clipSize.width);
         clipBox.height = static_cast<int>(clipSize.height);
+
         return clipBox;
     }
 

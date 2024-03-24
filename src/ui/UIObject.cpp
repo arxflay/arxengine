@@ -21,7 +21,7 @@ void UIObject::Reparent(ArxObject *parent)
     if (!uiControl)
         throw ArxException(ArxException::ErrorCode::GenericError, "Failed to set parent for UIObject, parent is not an UIControl");
 
-    if (GetWindow() != GetOwnerUIControl()->GetWindow())
+    if (GetWindow() != uiControl->GetOwnerWindow())
         throw ArxException(ArxException::ErrorCode::GenericError, "Can't change owner window in UIObject");
 
     ArxObject::Reparent(parent);

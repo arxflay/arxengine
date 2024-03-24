@@ -5,20 +5,20 @@
 ARX_NAMESPACE_BEGIN
 
 UIControl::UIControl(UIControl *parent, SizeF size, Position pos)
-    : m_size(size)
+    : ArxObject(nullptr)
+    , m_size(size)
     , m_position(pos)
     , m_backgroundColor(constants::COLOR_WHITE)
     , m_clippingEnabled(true)
-    , m_fontCache(new FontCache(this))
     , m_isShown(true)
     , m_canRecieveMouseEvents(false)
 {
-    if (!parent)
+    if (parent == nullptr)
         throw ArxException(ArxException::ErrorCode::GenericError, "UIControl parent is null");
 
+    m_fontCache = new FontCache(this);
     ArxObject::Reparent(parent);
     m_ownerWindow = parent->GetWindow();
-
 }
 
 void UIControl::SetBackgroundColor(Color c) { m_backgroundColor = c; }
@@ -26,7 +26,7 @@ Color UIControl::GetColor() const { return m_backgroundColor; }
 
 void UIControl::SetSize(SizeF s) 
 {
-    if (GetParent() && GetParent() != GetOwnerWindow())
+    if (GetParent() != GetOwnerWindow())
     {
         Size parentSize = static_cast<UIControl*>(GetParent())->GetClientSize();
         s = Size(std::clamp(s.width, 0.0f, parentSize.width), std::clamp(s.height, 0.0f, parentSize.height));
@@ -97,10 +97,10 @@ const ArxWindow *UIControl::GetWindow() const { return GetOwnerWindow(); }
 void UIControl::Reparent(ArxObject *parent)
 {
     UIControl *uiobjParent = dynamic_cast<UIControl*>(parent);
-    if (!uiobjParent)
+    if (uiobjParent == nullptr)
         throw ArxException(ArxException::ErrorCode::GenericError, "UIControl parent is not UIControl or is null");
  
-    if (uiobjParent->GetWindow() != GetWindow())
+    if (uiobjParent->GetOwnerWindow() != GetOwnerWindow())
         throw ArxException(ArxException::ErrorCode::GenericError, "UIControl window change is not allowed");
 
     ArxObject::Reparent(parent);

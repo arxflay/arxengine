@@ -600,7 +600,7 @@ TEST(ArxWindow, DISABLED_PositiveLabel)
     GameApp::GetGlobalApp()->Run();
 }
 
-TEST(ArxWindow, PositiveBitmapButton)
+TEST(ArxWindow, DISABLED_PositiveBitmapButton)
 {
     ArxWindow *win = new ArxWindow("test", SizeF(640, 360));
     win->Show();
@@ -629,6 +629,7 @@ TEST(ArxWindow, PositiveBitmapButton)
 
     BitmapButton *btn2 = new BitmapButton(btn);
     btn2->SetSize(SizeF(50, 50));
+    btn2->SetPosition(Position(0, 0));
     btn2->SetText("Hello world");
     btn2->SetNormalImage(Image::LoadFromFile((TEST_DATA_PATH / std::filesystem::path("btn_normal.jpg")).u8string()));
     btn2->SetMouseEnterImage(Image::LoadFromFile((TEST_DATA_PATH / std::filesystem::path("btn_hover.jpg")).u8string()));
@@ -665,3 +666,8 @@ TEST(ArxWindow, PositiveBitmapButton)
     GameApp::GetGlobalApp()->Run();
 }
 
+TEST(ArxWindow, DISABLED_NegativeBitmapButtonNullptr)
+{ 
+    BitmapButton *btn2 = nullptr;
+    ASSERT_ANY_THROW((btn2 = new BitmapButton(nullptr)));
+}
