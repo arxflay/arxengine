@@ -270,16 +270,16 @@ const UIControlList &UIControl::GetMouseEventRecievers() const
     return m_mouseEventRecievers;
 }
 
-Position UIControl::CalculateTextPosition(const TextExtent &textExtent, VerticalTextAlignment verticalAlignment, HorizontalTextAlignment horizontalAlignment)
+Position UIControl::CalculateTextPosition(const TextExtent &textExtent, VerticalTextAlignment verticalAlignment, HorizontalTextAlignment horizontalAlignment, int paddingX, int paddingY)
 {
-    Position pos(0, 0);
+    Position pos(paddingX, paddingY);
     switch(horizontalAlignment)
     {
         case HorizontalTextAlignment::Center:
-            pos.x = (GetClientSize().width - textExtent.widthSum) / 2;
+            pos.x += (GetClientSize().width - textExtent.widthSum) / 2;
             break;
         case HorizontalTextAlignment::Right:
-            pos.x = GetClientSize().width - textExtent.widthSum;
+            pos.x += GetClientSize().width - textExtent.widthSum;
             break;
         case HorizontalTextAlignment::Left:
             break;
@@ -288,13 +288,13 @@ Position UIControl::CalculateTextPosition(const TextExtent &textExtent, Vertical
     switch(verticalAlignment)
     {
         case VerticalTextAlignment::Center:
-            pos.y = (GetClientSize().height + (textExtent.yMax - textExtent.yMin)) / 2;
+            pos.y += (GetClientSize().height + (textExtent.yMax - textExtent.yMin)) / 2;
             break;
         case VerticalTextAlignment::Bottom:
-            pos.y = GetClientSize().height - textExtent.yMin;
+            pos.y += GetClientSize().height - textExtent.yMin;
             break;
         case VerticalTextAlignment::Top:
-            pos.y = textExtent.yMax;
+            pos.y += textExtent.yMax;
             break;
     }
 

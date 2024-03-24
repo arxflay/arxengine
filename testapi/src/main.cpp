@@ -609,8 +609,9 @@ TEST(ArxWindow, PositiveBitmapButton)
     btn->SetSize(SizeF(200, 200));
     btn->SetPosition(Position(100, 100));
     btn->SetText("tegi");
-    btn->SetHorizontalTextAlignment(HorizontalTextAlignment::Right);
-    btn->SetVerticalTextAlignment(VerticalTextAlignment::Bottom);
+    btn->SetHorizontalTextAlignment(HorizontalTextAlignment::Center);
+    btn->SetVerticalTextAlignment(VerticalTextAlignment::Center);
+    btn->SetTextAlignmentPaddingX(50);
     btn->SetNormalImage(Image::LoadFromFile((TEST_DATA_PATH / std::filesystem::path("btn_normal.jpg")).u8string()));
     btn->SetMouseEnterImage(Image::LoadFromFile((TEST_DATA_PATH / std::filesystem::path("btn_hover.jpg")).u8string()));
     btn->SetMouseHoldImage(Image::LoadFromFile((TEST_DATA_PATH / std::filesystem::path("btn_hold.jpg")).u8string()));

@@ -40,6 +40,8 @@ BitmapButton::BitmapButton(UIControl *parent, const Image &img, SizeF size, Posi
     , m_verticalTextAlignment(VerticalTextAlignment::Center)
     , m_horizontalTextAlignment(HorizontalTextAlignment::Center)
     , m_lastFontChange(GetFont().GetLastChangeTime())
+    , m_textPaddingX(0)
+    , m_textPaddingY(0)
 {
     SetCanRecieveMouseEvents(true);
     m_normalTexture->SetData(img);
@@ -102,7 +104,7 @@ void BitmapButton::OnDraw(DrawEvent &e)
         if (GetFont().GetLastChangeTime() != GetFontCache()->GetLastFontChangeTime())
             m_textExtent = GetFont().GetTextExtent(GetText());
 
-        p.DrawText(GetText(), CalculateTextPosition(m_textExtent, m_verticalTextAlignment, m_horizontalTextAlignment));
+        p.DrawText(GetText(), CalculateTextPosition(m_textExtent, m_verticalTextAlignment, m_horizontalTextAlignment, m_textPaddingX, m_textPaddingY));
     }
 }
 

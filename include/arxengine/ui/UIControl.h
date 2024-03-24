@@ -112,7 +112,7 @@ public:
     const UIControlList &GetMouseEventRecievers() const;
 
 protected:
-    Position CalculateTextPosition(const TextExtent &textExtent, VerticalTextAlignment verticalAlignment, HorizontalTextAlignment horizontalAlignment);
+    Position CalculateTextPosition(const TextExtent &textExtent, VerticalTextAlignment verticalAlignment, HorizontalTextAlignment horizontalAlignment, int paddingX, int paddingY);
 
 private:
     virtual void OnDraw(DrawEvent &);
