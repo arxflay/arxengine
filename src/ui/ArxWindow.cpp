@@ -55,19 +55,28 @@ namespace
     switch(action)
     {
         case GLFW_PRESS:
-            keyEvent = std::make_unique<KeyDownEvent>();
-            keyEvent->SetKey(static_cast<KeyEvent::Key>(key));
-            arxWin->GetEventManager().QueueEvent<KeyDownEvent>(std::move(keyEvent));
+            if (arxWin->GetEventManager().HasNonDefaultEventHandler<KeyDownEvent>())
+            {
+                keyEvent = std::make_unique<KeyDownEvent>();
+                keyEvent->SetKey(static_cast<KeyEvent::Key>(key));
+                arxWin->GetEventManager().QueueEvent<KeyDownEvent>(std::move(keyEvent));
+            }
             break;
         case GLFW_RELEASE:
-            keyEvent = std::make_unique<KeyUpEvent>();
-            keyEvent->SetKey(static_cast<KeyEvent::Key>(key));
-            arxWin->GetEventManager().QueueEvent<KeyUpEvent>(std::move(keyEvent));
+            if (arxWin->GetEventManager().HasNonDefaultEventHandler<KeyUpEvent>())
+            {
+                keyEvent = std::make_unique<KeyUpEvent>();
+                keyEvent->SetKey(static_cast<KeyEvent::Key>(key));
+                arxWin->GetEventManager().QueueEvent<KeyUpEvent>(std::move(keyEvent));
+            }
             break;
         case GLFW_REPEAT:
-            keyEvent = std::make_unique<KeyHoldEvent>();
-            keyEvent->SetKey(static_cast<KeyEvent::Key>(key));
-            arxWin->GetEventManager().QueueEvent<KeyHoldEvent>(std::move(keyEvent));
+            if (arxWin->GetEventManager().HasNonDefaultEventHandler<KeyHoldEvent>())
+            {
+                keyEvent = std::make_unique<KeyHoldEvent>();
+                keyEvent->SetKey(static_cast<KeyEvent::Key>(key));
+                arxWin->GetEventManager().QueueEvent<KeyHoldEvent>(std::move(keyEvent));
+            }
             break;
         default:
             break;
@@ -92,9 +101,12 @@ private:
             win->ForgetMouseEnteredControl(win->m_lastMouseEnterReciever, true);
             for (auto &[key, control] : win->m_pressedMouseButtons)
             {
-                std::unique_ptr<MouseUpEvent> mouseUp = std::make_unique<MouseUpEvent>();
-                mouseUp->SetMouseButtonType(key);
-                control->GetEventManager().QueueEvent<MouseUpEvent>(std::move(mouseUp));
+                if (control->GetEventManager().HasNonDefaultEventHandler<MouseUpEvent>())
+                {
+                    std::unique_ptr<MouseUpEvent> mouseUp = std::make_unique<MouseUpEvent>();
+                    mouseUp->SetMouseButtonType(key);
+                    control->GetEventManager().QueueEvent<MouseUpEvent>(std::move(mouseUp));
+                }
             }
             win->m_pressedMouseButtons.clear();
         }
@@ -583,7 +595,7 @@ void ArxWindow::ForgetPressedMouseButtons(UIControl *ctrl, bool sendMouseUpEvent
         });
         if ((found = (it != m_pressedMouseButtons.end())))
         {
-            if (sendMouseUpEvent)
+            if (sendMouseUpEvent && it->second->GetEventManager().HasNonDefaultEventHandler<MouseUpEvent>())
             {
                 std::unique_ptr<MouseUpEvent> mouseEvent = std::make_unique<MouseUpEvent>(); 
                 mouseEvent->SetMouseButtonType(it->first);
