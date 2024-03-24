@@ -92,6 +92,9 @@ public:
     bool CanRecieveMouseEvents() const;
     virtual void SetCanRecieveMouseEvents(bool canRecieve);
 
+    bool CanBeAffectedByCamera() const;
+    void SetCanBeAffectedByCamera(bool canBeAffectedByCamera);
+
     //only UIControl can be parent
     void Reparent(ArxObject *parent) override;
     virtual void EnableClipToBounds(bool enable = true);
@@ -130,6 +133,7 @@ private:
     bool m_isShown;
     UIControlList m_mouseEventRecievers;
     bool m_canRecieveMouseEvents;
+    bool m_canBeAffectedByCamera;
 };
 
 ARX_NAMESPACE_END

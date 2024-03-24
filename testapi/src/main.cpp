@@ -612,6 +612,8 @@ TEST(ArxWindow, PositiveBitmapButton)
     btn->SetHorizontalTextAlignment(HorizontalTextAlignment::Center);
     btn->SetVerticalTextAlignment(VerticalTextAlignment::Center);
     btn->SetTextAlignmentPaddingX(50);
+    btn->SetCanBeAffectedByCamera(true);
+    win->SetCameraPos(Position(99, 50));
     btn->SetNormalImage(Image::LoadFromFile((TEST_DATA_PATH / std::filesystem::path("btn_normal.jpg")).u8string()));
     btn->SetMouseEnterImage(Image::LoadFromFile((TEST_DATA_PATH / std::filesystem::path("btn_hover.jpg")).u8string()));
     btn->SetMouseHoldImage(Image::LoadFromFile((TEST_DATA_PATH / std::filesystem::path("btn_hold.jpg")).u8string()));

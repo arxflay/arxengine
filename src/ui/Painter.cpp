@@ -20,7 +20,10 @@ namespace
 
     Position GetSenderPosition(UIControl *obj)
     {
-        return (obj->GetParent() ? (obj->GetPosition() + obj->GetParentsPosition()) : Position(0, 0)); 
+        if (obj->GetParent())
+            return obj->GetPosition() + obj->GetParentsPosition();
+   
+        return Position(0, 0); 
     }
 
     ClippingArea::ClipBox CreateClipBox(UIControl *obj)
@@ -28,6 +31,12 @@ namespace
         ArxWindow *window = obj->GetWindow();
         Position senderPos = GetSenderPosition(obj);
         Size senderSize = obj->GetClientSize();
+        if (obj->CanBeAffectedByCamera())
+        {
+            senderPos.x -= window->GetCameraPos().x;
+            senderPos.y += window->GetCameraPos().y; //'+' because y axis is inverted
+        }
+
         if (obj->GetParent() != obj->GetOwnerWindow())
         {
             Position relativeSenderPos = obj->GetPosition();
@@ -103,6 +112,11 @@ void Painter::DrawRectangle(Position pos, SizeF size)
     modelMatrix = glm::translate(modelMatrix, glm::vec3(drawPos.x, drawPos.y, 0.0f));
     modelMatrix = glm::scale(modelMatrix, glm::vec3(size.width, size.height, 0.0f));
     glm::mat4 viewMatrix = glm::mat4(1.0f);
+    if (GetSender()->CanBeAffectedByCamera())
+    {
+        Position cameraPos = GetSender()->GetWindow()->GetCameraPos();
+        viewMatrix =  glm::translate(viewMatrix, glm::vec3(-cameraPos.x, -cameraPos.y, 0.0f));
+    }
         
     VAO &rectVao = GetUICache(m_sender)->GetVAOMap().at(UICache::VAO_ID::RECTANGLE);
     rectVao.Bind();
@@ -130,6 +144,11 @@ void Painter::DrawTexture2D(Position pos, SizeF size, const Texture2D *tex, int 
     modelMatrix = glm::translate(modelMatrix, glm::vec3(drawingPos.x, drawingPos.y, 0.0f));
     modelMatrix = glm::scale(modelMatrix, glm::vec3(size.width, size.height, 0.0f));
     glm::mat4 viewMatrix = glm::mat4(1.0f);
+    if (GetSender()->CanBeAffectedByCamera())
+    {
+        Position cameraPos = GetSender()->GetWindow()->GetCameraPos();
+        viewMatrix =  glm::translate(viewMatrix, glm::vec3(-cameraPos.x, -cameraPos.y, 0.0f));
+    }
 
     tex->Bind();
     VAO &rectVao = GetUICache(m_sender)->GetVAOMap().at(UICache::VAO_ID::RECTANGLE);
@@ -156,6 +175,11 @@ void Painter::DrawText(std::string_view text, Position pos)
     }
 
     glm::mat4 viewMatrix = glm::mat4(1.0f);
+    if (GetSender()->CanBeAffectedByCamera())
+    {
+        Position cameraPos = GetSender()->GetWindow()->GetCameraPos();
+        viewMatrix = glm::translate(viewMatrix, glm::vec3(-cameraPos.x, -cameraPos.y, 0.0f));
+    }
     
     VAO &rectVao = GetUICache(m_sender)->GetVAOMap().at(UICache::VAO_ID::RECTANGLE);
     rectVao.Bind();

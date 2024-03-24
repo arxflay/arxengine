@@ -12,6 +12,7 @@ UIControl::UIControl(UIControl *parent, SizeF size, Position pos)
     , m_clippingEnabled(true)
     , m_isShown(true)
     , m_canRecieveMouseEvents(false)
+    , m_canBeAffectedByCamera(false)
 {
     if (parent == nullptr)
         throw ArxException(ArxException::ErrorCode::GenericError, "UIControl parent is null");
@@ -119,15 +120,17 @@ void UIControl::Hide()
 }
 
 UIControl::UIControl()
-    : m_size(SizeF::DEFAULT_SIZE)
+    : ArxObject(nullptr)
+    , m_size(SizeF::DEFAULT_SIZE)
     , m_position(constants::DEFAULT_POSITION)
     , m_ownerWindow(nullptr)
     , m_backgroundColor(constants::COLOR_WHITE)
     , m_clippingEnabled(false)
-    , m_fontCache(new FontCache(this))
     , m_isShown(false)
     , m_canRecieveMouseEvents(false)
+    , m_canBeAffectedByCamera(false)
 {
+    m_fontCache = new FontCache(this);
 }
 
 void DrawEvent::HandleEvent()
@@ -205,7 +208,17 @@ Position UIControl::GetParentsPosition() const
 
 bool UIControl::HitTest(Position pos) const
 {
-    Position ctrlPos = (GetParent() ? GetPosition() + GetParentsPosition() : Position(0, 0));
+    Position ctrlPos;
+    if (GetParent())
+    {
+        ctrlPos = GetPosition() + GetParentsPosition();
+        if (CanBeAffectedByCamera())
+        {
+            ctrlPos.x -= GetOwnerWindow()->GetCameraPos().x;
+            ctrlPos.y += GetOwnerWindow()->GetCameraPos().y; //inversed y axis
+        }
+    }    
+
     return pos.x >= ctrlPos.x && pos.x <= ctrlPos.x + GetClientSize().width 
         && pos.y >= ctrlPos.y && pos.y <= ctrlPos.y + GetClientSize().height; 
 }
@@ -299,6 +312,16 @@ Position UIControl::CalculateTextPosition(const TextExtent &textExtent, Vertical
     }
 
     return pos;
+}
+
+bool UIControl::CanBeAffectedByCamera() const
+{
+    return m_canBeAffectedByCamera;
+}
+
+void UIControl::SetCanBeAffectedByCamera(bool canBeAffectedByCamera)
+{
+    m_canBeAffectedByCamera = canBeAffectedByCamera;
 }
 
 ARX_NAMESPACE_END

@@ -53,7 +53,6 @@ public:
     
     ArxWindow(std::string_view title, SizeF size = SizeF::DEFAULT_SIZE, Position position = constants::DEFAULT_POSITION, int attributes = WindowAttributes::RESIZABLE | WindowAttributes::DECORATED); //, bool isFullScreen= false);
     
-
     void SetWindowAttributes(int attributes);
     
     std::string_view GetTitle();
@@ -114,6 +113,9 @@ public:
     void EnableVSync(bool enable);
 
     Position GetCursorPosition();
+
+    void SetCameraPos(Position cameraPos);
+    const Position &GetCameraPos() const;
 private:
     void OnShow(ShowEvent &e);
     void OnDraw(DrawEvent &e) override;
@@ -153,6 +155,7 @@ private:
     bool m_showCursor;
     std::map<MouseButtonEvent::ButtonType, UIControl*> m_pressedMouseButtons;
     UIControl *m_lastMouseEnterReciever;
+    Position m_cameraPos;
 };
 
 ARX_NAMESPACE_END

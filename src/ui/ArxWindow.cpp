@@ -255,6 +255,7 @@ ArxWindow::ArxWindow(std::string_view title, SizeF size, Position position, int 
     , m_vsyncEnabled(false)
     , m_showCursor(true)
     , m_lastMouseEnterReciever(nullptr)
+    , m_cameraPos(0, 0)
 {
     glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
     glfwWindowHint(GLFW_FOCUS_ON_SHOW, GLFW_TRUE);
@@ -605,6 +606,13 @@ void ArxWindow::ForgetPressedMouseButtons(UIControl *ctrl, bool sendMouseUpEvent
         }
     }
 }
+
+void ArxWindow::SetCameraPos(Position cameraPos)
+{
+    m_cameraPos = cameraPos;
+}
+
+const Position &ArxWindow::GetCameraPos() const { return m_cameraPos; }
 
 
 
