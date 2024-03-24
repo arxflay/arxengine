@@ -600,15 +600,17 @@ TEST(ArxWindow, DISABLED_PositiveLabel)
     GameApp::GetGlobalApp()->Run();
 }
 
-TEST(ArxWindow, DISABLED_PositiveBitmapButton)
+TEST(ArxWindow, PositiveBitmapButton)
 {
     ArxWindow *win = new ArxWindow("test", SizeF(640, 360));
     win->Show();
     win->SetFixedViewport(640, 360);
     BitmapButton *btn = new BitmapButton(win);
-    btn->SetSize(SizeF(100, 100));
+    btn->SetSize(SizeF(200, 200));
     btn->SetPosition(Position(100, 100));
-    btn->SetText("Hello world");
+    btn->SetText("tegi");
+    btn->SetHorizontalTextAlignment(HorizontalTextAlignment::Right);
+    btn->SetVerticalTextAlignment(VerticalTextAlignment::Bottom);
     btn->SetNormalImage(Image::LoadFromFile((TEST_DATA_PATH / std::filesystem::path("btn_normal.jpg")).u8string()));
     btn->SetMouseEnterImage(Image::LoadFromFile((TEST_DATA_PATH / std::filesystem::path("btn_hover.jpg")).u8string()));
     btn->SetMouseHoldImage(Image::LoadFromFile((TEST_DATA_PATH / std::filesystem::path("btn_hold.jpg")).u8string()));
@@ -628,7 +630,7 @@ TEST(ArxWindow, DISABLED_PositiveBitmapButton)
     });
 
     BitmapButton *btn2 = new BitmapButton(btn);
-    btn2->SetSize(SizeF(50, 50));
+    btn2->SetSize(SizeF(0, 0));
     btn2->SetPosition(Position(0, 0));
     btn2->SetText("Hello world");
     btn2->SetNormalImage(Image::LoadFromFile((TEST_DATA_PATH / std::filesystem::path("btn_normal.jpg")).u8string()));
@@ -640,7 +642,6 @@ TEST(ArxWindow, DISABLED_PositiveBitmapButton)
     font.SetSizeInPt(30);
     ASSERT_FALSE(font.IsInvalid());
     btn->SetFont(std::move(font));
-    btn->SetText("test");
     btn2->GetEventManager().Bind<MouseEnterEvent>([btn](MouseEnterEvent &e)
     {
         (void)btn;

@@ -171,5 +171,20 @@ Font &Font::operator=(const Font &f)
     return *this;
 }
 
+TextExtent Font::GetTextExtent(std::string_view text) 
+{
+    TextExtent textExtent{};
+    for (size_t i = 0; i < text.size(); i++)
+    {
+        GlyphDimensions dimensions = GetGlyphDimensions(text[i]);
+        textExtent.maxHeight = std::max(static_cast<float>(dimensions.size.height), textExtent.maxHeight);
+        float yMin = static_cast<float>(dimensions.size.height) - dimensions.bearings.y;
+        textExtent.yMin = std::max(textExtent.yMin, yMin);
+        textExtent.yMax = std::max(static_cast<float>(dimensions.size.height) - yMin, textExtent.yMax); 
+        textExtent.widthSum += dimensions.advance.x + static_cast<float>(dimensions.bearings.x);
+    }
+    return textExtent;
+}
+
 
 ARX_NAMESPACE_END

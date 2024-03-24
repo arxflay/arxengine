@@ -24,6 +24,18 @@ public:
     const std::string &GetText() const;
     void SetTextColor(Color);
     Color GetTextColor() const;
+
+    void SetVerticalTextAlignment(VerticalTextAlignment verticalAlignment);
+    void SetHorizontalTextAlignment(HorizontalTextAlignment horizontalAlignment);
+    void SetTextAlignmentPaddingX(int x);
+    void SetTextAlignmentPaddingY(int y);
+
+    VerticalTextAlignment GetVerticalTextAlignment() const;
+    HorizontalTextAlignment GetHorizontalTextAlignment() const;
+    int GetTextAlignmentPaddingX() const;
+    int GetTextAlignmentPaddingY() const;
+
+
 private:
     void OnDraw(DrawEvent &e) override;
     void OnMouseEnter(MouseEnterEvent &e);
@@ -39,6 +51,12 @@ private:
     Color m_textColor;
     bool m_isLeftMouseBtnDown;
     bool m_isMouseEntered;
+    TextExtent m_textExtent;
+    VerticalTextAlignment m_verticalTextAlignment;
+    HorizontalTextAlignment m_horizontalTextAlignment;
+    Font::ChangeTime_t m_lastFontChange;
+    int m_textPaddingX;
+    int m_textPaddingY;
 };
 
 

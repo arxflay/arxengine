@@ -26,7 +26,6 @@ private:
     void HandleEvent() override;
 };
 
-
 /*
  * @descriptions controls that bind their own handler should call e.Skip()!
  */
@@ -43,6 +42,16 @@ private:
 };
 
 using UIControlList = std::list<UIControl*>;
+
+enum class VerticalTextAlignment
+{
+    Top, Center, Bottom
+};
+
+enum class HorizontalTextAlignment
+{
+    Left, Center, Right
+};
 
 class ARX_EXPORTS UIControl : public ArxObject
 {
@@ -101,6 +110,10 @@ public:
     virtual ~UIControl();
 
     const UIControlList &GetMouseEventRecievers() const;
+
+protected:
+    Position CalculateTextPosition(const TextExtent &textExtent, VerticalTextAlignment verticalAlignment, HorizontalTextAlignment horizontalAlignment);
+
 private:
     virtual void OnDraw(DrawEvent &);
     

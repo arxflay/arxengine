@@ -270,4 +270,35 @@ const UIControlList &UIControl::GetMouseEventRecievers() const
     return m_mouseEventRecievers;
 }
 
+Position UIControl::CalculateTextPosition(const TextExtent &textExtent, VerticalTextAlignment verticalAlignment, HorizontalTextAlignment horizontalAlignment)
+{
+    Position pos(0, 0);
+    switch(horizontalAlignment)
+    {
+        case HorizontalTextAlignment::Center:
+            pos.x = (GetClientSize().width - textExtent.widthSum) / 2;
+            break;
+        case HorizontalTextAlignment::Right:
+            pos.x = GetClientSize().width - textExtent.widthSum;
+            break;
+        case HorizontalTextAlignment::Left:
+            break;
+    }
+
+    switch(verticalAlignment)
+    {
+        case VerticalTextAlignment::Center:
+            pos.y = (GetClientSize().height + (textExtent.yMax - textExtent.yMin)) / 2;
+            break;
+        case VerticalTextAlignment::Bottom:
+            pos.y = GetClientSize().height - textExtent.yMin;
+            break;
+        case VerticalTextAlignment::Top:
+            pos.y = textExtent.yMax;
+            break;
+    }
+
+    return pos;
+}
+
 ARX_NAMESPACE_END

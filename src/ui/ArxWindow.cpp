@@ -88,7 +88,16 @@ private:
         m_showCursor = m_shouldShowCursor;
         glfwSetInputMode(m_win, GLFW_CURSOR, m_showCursor ? GLFW_CURSOR_NORMAL : GLFW_CURSOR_DISABLED);
         if (!m_showCursor && win->m_lastMouseEnterReciever != nullptr)
+        {
             win->ForgetMouseEnteredControl(win->m_lastMouseEnterReciever, true);
+            for (auto &[key, control] : win->m_pressedMouseButtons)
+            {
+                std::unique_ptr<MouseUpEvent> mouseUp = std::make_unique<MouseUpEvent>();
+                mouseUp->SetMouseButtonType(key);
+                control->GetEventManager().QueueEvent<MouseUpEvent>(std::move(mouseUp));
+            }
+            win->m_pressedMouseButtons.clear();
+        }
     }
     GLFWwindow *m_win;
     bool m_shouldShowCursor;

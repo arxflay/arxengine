@@ -39,8 +39,8 @@ public:
     //creates cache entry if character doesnt exists
     const FontCache::FontCacheEntry &GetCacheEntry(char ch);
     void EnableFontSmoothing(bool enable);
-    void ManuallyUpdateLastFontChangeTime(Font::ChangeTime_t time);
     bool IsFontSmoothingEnabled() const;
+    const Font::ChangeTime_t &GetLastFontChangeTime() const;
 
 private:
     void UpdateCacheEntries();

@@ -22,6 +22,14 @@ struct GlyphDimensions
     SizeUL size;
 };
 
+struct TextExtent
+{
+    float maxHeight;
+    float widthSum;
+    float yMin;
+    float yMax;
+};
+
 class ARX_EXPORTS Font final 
 {
 public:
@@ -43,6 +51,7 @@ public:
     GlyphDimensions GetGlyphDimensions(char ch);
     Image RenderGlyph(char ch);
     const ChangeTime_t &GetLastChangeTime();
+    TextExtent GetTextExtent(std::string_view text);
 
 private:
     void LoadGlyph(char ch);

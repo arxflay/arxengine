@@ -7,10 +7,26 @@ ARX_NAMESPACE_BEGIN
 void BitmapButton::SetMouseEnterImage(const Image &img){ m_mouseEnterTexture->SetData(img); }
 void BitmapButton::SetMouseHoldImage(const Image &img) { m_mouseHoldTexture->SetData(img); }
 void BitmapButton::SetNormalImage(const Image &img) { m_normalTexture->SetData(img); }
-void BitmapButton::SetText(std::string_view text) { m_text = text; }
+
+void BitmapButton::SetText(std::string_view text) 
+{ 
+    m_text = text;
+    m_textExtent = GetFont().GetTextExtent(text);
+}
+
 const std::string &BitmapButton::GetText() const{ return m_text; }
 void BitmapButton::SetTextColor(Color color) { m_textColor = color; }
 Color BitmapButton::GetTextColor() const { return m_textColor; }
+
+void BitmapButton::SetVerticalTextAlignment(VerticalTextAlignment verticalAlignment) { m_verticalTextAlignment = verticalAlignment; }
+void BitmapButton::SetHorizontalTextAlignment(HorizontalTextAlignment horizontalAlignment) { m_horizontalTextAlignment = horizontalAlignment; }
+void BitmapButton::SetTextAlignmentPaddingX(int x) { m_textPaddingX = x; }
+void BitmapButton::SetTextAlignmentPaddingY(int y) { m_textPaddingY = y; }
+
+VerticalTextAlignment BitmapButton::GetVerticalTextAlignment() const { return m_verticalTextAlignment; }
+HorizontalTextAlignment BitmapButton::GetHorizontalTextAlignment() const { return m_horizontalTextAlignment; }
+int BitmapButton::GetTextAlignmentPaddingX() const { return m_textPaddingX; }
+int BitmapButton::GetTextAlignmentPaddingY() const { return m_textPaddingY; }
 
 BitmapButton::BitmapButton(UIControl *parent, const Image &img, SizeF size, Position pos)
     : UIControl(parent, size, pos)
@@ -21,6 +37,9 @@ BitmapButton::BitmapButton(UIControl *parent, const Image &img, SizeF size, Posi
     , m_textColor(constants::COLOR_BLACK)
     , m_isLeftMouseBtnDown(false)
     , m_isMouseEntered(false)
+    , m_verticalTextAlignment(VerticalTextAlignment::Center)
+    , m_horizontalTextAlignment(HorizontalTextAlignment::Center)
+    , m_lastFontChange(GetFont().GetLastChangeTime())
 {
     SetCanRecieveMouseEvents(true);
     m_normalTexture->SetData(img);
@@ -80,7 +99,10 @@ void BitmapButton::OnDraw(DrawEvent &e)
     if (!GetFont().IsInvalid())
     {
         p.SetPen(m_textColor);
-        p.DrawText(GetText(), Position(0, GetSize().height / 2));
+        if (GetFont().GetLastChangeTime() != GetFontCache()->GetLastFontChangeTime())
+            m_textExtent = GetFont().GetTextExtent(GetText());
+
+        p.DrawText(GetText(), CalculateTextPosition(m_textExtent, m_verticalTextAlignment, m_horizontalTextAlignment));
     }
 }
 

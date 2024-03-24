@@ -95,11 +95,6 @@ const FontCache::FontCacheEntry &FontCache::GetCacheEntry(char ch)
     return it->second;
 }
 
-void FontCache::ManuallyUpdateLastFontChangeTime(Font::ChangeTime_t time)
-{
-    m_oldChangeTime = time;
-}
-
 void FontCache::EnableFontSmoothing(bool enable)
 {
     Texture::TextureFilteringMode filtering = enable ? Texture::TextureFilteringMode::Linear : Texture::TextureFilteringMode::Nearest;
@@ -126,6 +121,11 @@ void FontCache::UpdateCacheEntries()
             entry.UpdateTexture(font.RenderGlyph(ch));
         entry.UpdateDimensions(font.GetGlyphDimensions(ch));
     }
+}
+
+const Font::ChangeTime_t &FontCache::GetLastFontChangeTime() const
+{
+    return m_oldChangeTime;
 }
 
 ARX_NAMESPACE_END
