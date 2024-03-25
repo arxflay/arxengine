@@ -39,3 +39,4 @@ cmake/CPM/*
 libs/third_party/CPM/*
 
 vgcore.*
+installers/*

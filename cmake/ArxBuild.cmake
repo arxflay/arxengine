@@ -32,13 +32,13 @@
     file(COPY \"${ARX_SET_HEADERS_INCLUDE_DIR_PATH}\" DESTINATION \"${HEADER_CACHE_FOLDER}\")
     file(RENAME \"${HEADER_CACHE_FOLDER}/\${FOLDER_NAME}\" \"${HEADER_CACHE_FOLDER}/${HEADER_PUBLIC_FOLDER_NAME}\")
     file(GLOB_RECURSE INCLUDE_DIR_FILES LIST_DIRECTORIES TRUE \"${ARX_SET_HEADERS_INCLUDE_DIR_PATH}/*\")
-    foreach (folder \"\${INCLUDE_DIR_FILES}\")
+    foreach (folder \${INCLUDE_DIR_FILES})
         if (IS_DIRECTORY \"\${folder}\")
             list(APPEND INCLUDE_DIR_DIRS \"\${folder}\")
         endif()
     endforeach()
 
-    foreach (folder \"\${INCLUDE_DIR_DIRS}\")
+    foreach (folder \${INCLUDE_DIR_DIRS})
         get_filename_component(FOLDER_NAME \"\${folder}\" NAME)
         if (\"\${FOLDER_NAME}\" STREQUAL \"${ARX_SET_HEADERS_PRIVATE_FOLDER_NAME}\")
             string(REPLACE \"${ARX_SET_HEADERS_INCLUDE_DIR_PATH}\" \"${HEADER_PUBLIC_FOLDER}\" PUBLIC_PATH_DEST \"\${folder}\")
@@ -53,7 +53,7 @@
         COMMAND ${CMAKE_COMMAND} -P "${ARX_SET_HEADER_PATH}")
     add_dependencies("${ARX_SET_HEADERS_TARGET}" copy_headers)
     
-    target_include_directories("${ARX_SET_HEADERS_TARGET}" PUBLIC "$<INSTALL_INTERFACE:include/arxengine>" "$<BUILD_INTERFACE:${HEADER_PUBLIC_FOLDER}>")
+    target_include_directories("${ARX_SET_HEADERS_TARGET}" PUBLIC "${HEADER_PUBLIC_FOLDER}")
     target_include_directories("${ARX_SET_HEADERS_TARGET}" PRIVATE "${HEADER_PRIVATE_FOLDER}")
     
 endmacro()

@@ -54,7 +54,7 @@ list(APPEND ARX_SOURCES
 set(CMAKE_EXPORT_COMPILE_COMMANDS True)
 set(gcc_like_cxx "$<COMPILE_LANG_AND_ID:CXX,ARMClang,AppleClang,Clang,GNU,LCC>")
 set(msvc_cxx "$<COMPILE_LANG_AND_ID:CXX,MSVC>")
-set(OpenGL_GL_PREFERENCE LEGACY CACHE STRING "")
+set(OpenGL_GL_PREFERENCE LEGACY)
 
 if (NOT BUILD_SHARED_LIBS)
     option(BUILD_SHARED_LIBS "Build as static library" OFF)
@@ -74,7 +74,6 @@ endif()
 target_compile_options(arxengine PRIVATE "$<${gcc_like_cxx}:-Wall;-Wextra;-Wconversion;-std=c++17;-fPIC>"  
                                                         "$<${msvc_cxx}:/W3;/wd4251;/wd4996;/std:c++17>")
 
-
 target_compile_options(arxengine INTERFACE "$<${msvc_cxx}:/wd4251;/wd4996>")
 
 include("${CMAKE_CURRENT_SOURCE_DIR}/libs/ProjectLibs.cmake")
@@ -83,7 +82,7 @@ if (WIN32)
     target_link_libraries(arxengine PRIVATE glfw stb_image OpenAL freetype glad OpenGL::GL)
     target_link_libraries(arxengine PUBLIC glm::glm)
 else()
-    target_link_libraries(arxengine PRIVATE glfw stb_image openal Freetype::Freetype glad OpenGL::GL)
+    target_link_libraries(arxengine PRIVATE glfw stb_image OpenAL::OpenAL Freetype::Freetype glad OpenGL::GL)
     target_link_libraries(arxengine PUBLIC glm::glm m pthread)
 endif()
 
@@ -91,6 +90,48 @@ if (${ARX_BUILD_TEST})
     enable_testing()
     add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/testapi")
 endif()
+
 add_definitions(-DGLFW_INCLUDE_NONE)
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/ArxBuild.cmake")
 arx_set_headers(TARGET arxengine INCLUDE_DIR_PATH "${CMAKE_CURRENT_SOURCE_DIR}/include" PRIVATE_FOLDER_NAME internal)
+
+include(InstallRequiredSystemLibraries)
+include(GNUInstallDirs)
+
+if(WIN32)
+    set(CPACK_GENERATOR NSIS)
+else()
+    set(CPACK_GENERATOR TGZ)
+endif()
+
+set(CPACK_PACKAGE_NAME arxengine)
+set(CPACK_PACKAGE_VENDOR arxflay)
+set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/LICENSE)
+set(CPACK_PACKAGE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+set(CPACK_PACKAGE_VERSION_MAJOR ${VER_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR ${VER_MINOR})
+set(CPACK_PACKAGE_VERSION ${VER_MAJOR}.${VER_MINOR})
+set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${PKG_VER_NAME}")
+set(CPACK_PACKAGE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/installers/${CPACK_GENERATOR}")
+set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Alexej Fedorenko(arxflay)")
+set_target_properties(arxengine PROPERTIES VERSION ${VER_MAJOR}.${VER_MINOR} SOVERSION ${VER_MAJOR})
+set_target_properties(arxengine PROPERTIES DEBUG_POSTFIX "d")
+
+if (NOT ARX_DISABLE_INSTALL)
+    install(TARGETS arxengine
+        LIBRARY
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE                     
+            DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/arx_header_cache/arxengine_public_headers/arxengine DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+    if (UNIX) #set default prefix as usr
+        set(CMAKE_INSTALL_PREFIX "/usr")
+    endif()
+endif()
+
+
+#this must be a last entry in this file
+include(CPack)
+

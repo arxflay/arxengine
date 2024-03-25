@@ -1,10 +1,12 @@
 find_package(OpenGL REQUIRED)
-set(CPM_USE_LOCAL_PACKAGES True)
 set(CPM_SOURCE_CACHE "${CMAKE_CURRENT_LIST_DIR}/third_party/CPM")
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/FetchCPM.cmake")
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/CPM/CPM.cmake")
-CPMAddPackage("gh:g-truc/glm#0.9.9.8")
-CPMAddPackage(NAME glfw3
+CPMFindPackage(NAME glm
+    GITHUB_REPOSITORY g-truc/glm
+    VERSION 0.9.9.8
+    GIT_TAG 0.9.9.8) 
+CPMFindPackage(NAME glfw3
     GITHUB_REPOSITORY glfw/glfw
     VERSION 3.3.1
     GIT_TAG ecda86fa4f89ecdd364e5a1a22645030fe0ced6e
@@ -15,7 +17,7 @@ CPMAddPackage(NAME glfw3
         "BUILD_SHARED_LIBS OFF"
         "BUILD_STATIC_LIBS ON")
 
-CPMAddPackage(NAME Freetype
+CPMFindPackage(NAME Freetype
     GITHUB_REPOSITORY freetype/freetype
     VERSION 2.12.1
     GIT_TAG e8ebfe988b5f57bfb9a3ecb13c70d9791bce9ecf
@@ -29,7 +31,7 @@ CPMAddPackage(NAME Freetype
         "FT_DISABLE_BROTLI ON"
         "FT_ENABLE_ERROR_STRINGS ON"
         "FT_CONFIG_OPTION_ERROR_STRINGS")
-CPMAddPackage(NAME OpenAL
+CPMFindPackage(NAME OpenAL
     GITHUB_REPOSITORY kcat/openal-soft
     VERSION 1.22.1
     GIT_TAG 05f5faf2655f4a51c69bfaacd4f67a740429f0dc
@@ -43,7 +45,7 @@ add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/third_party/glad")
 add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/third_party/stb_image")
 
 if (${ARX_BUILD_TEST})
-    CPMAddPackage(NAME GTest
+    CPMFindPackage(NAME GTest
         GITHUB_REPOSITORY google/googletest
         VERSION 1.12.0
         GIT_TAG f8d7d77c06936315286eb55f8de22cd23c188571
