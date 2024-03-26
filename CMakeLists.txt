@@ -95,11 +95,10 @@ add_definitions(-DGLFW_INCLUDE_NONE)
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/ArxBuild.cmake")
 arx_set_headers(TARGET arxengine INCLUDE_DIR_PATH "${CMAKE_CURRENT_SOURCE_DIR}/include" PRIVATE_FOLDER_NAME internal)
 
-include(InstallRequiredSystemLibraries)
 include(GNUInstallDirs)
 
 if(WIN32)
-    set(CPACK_GENERATOR NSIS)
+    set(CPACK_GENERATOR ZIP)
 else()
     set(CPACK_GENERATOR TGZ)
 endif()
@@ -112,18 +111,13 @@ set(CPACK_PACKAGE_VERSION_MAJOR ${VER_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR ${VER_MINOR})
 set(CPACK_PACKAGE_VERSION ${VER_MAJOR}.${VER_MINOR})
 set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${PKG_VER_NAME}")
-set(CPACK_PACKAGE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/installers/${CPACK_GENERATOR}")
 set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Alexej Fedorenko(arxflay)")
 set_target_properties(arxengine PROPERTIES VERSION ${VER_MAJOR}.${VER_MINOR} SOVERSION ${VER_MAJOR})
 set_target_properties(arxengine PROPERTIES DEBUG_POSTFIX "d")
 
 if (NOT ARX_DISABLE_INSTALL)
-    install(TARGETS arxengine
-        LIBRARY
-            DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        ARCHIVE                     
-            DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    install(TARGETS arxengine)
     install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/arx_header_cache/arxengine_public_headers/arxengine DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
     if (UNIX) #set default prefix as usr
