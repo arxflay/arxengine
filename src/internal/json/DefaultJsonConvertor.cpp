@@ -19,7 +19,7 @@ std::string DefaultJsonConvertor::ToJsonStr(const Json &j) const
     return out;
 }
 
-std::string DefaultJsonConvertor::ToJsonStrRec(const Json &j, uint depth) const
+std::string DefaultJsonConvertor::ToJsonStrRec(const Json &j, unsigned int depth) const
 {
     std::string retVal;
     switch(j.GetType())
@@ -31,10 +31,10 @@ std::string DefaultJsonConvertor::ToJsonStrRec(const Json &j, uint depth) const
             retVal += j.Get<bool>() ? "true" : "false";
             break;
         case JsonValueType::UInt:
-            retVal +=  std::to_string(j.Get<uint>());
+            retVal +=  std::to_string(j.Get<uint64_t>());
             break;
         case JsonValueType::Int:
-            retVal +=  std::to_string(j.Get<int>());
+            retVal +=  std::to_string(j.Get<int64_t>());
             break;
         case JsonValueType::Floating:
             retVal +=  std::to_string(j.Get<double>());
@@ -43,7 +43,7 @@ std::string DefaultJsonConvertor::ToJsonStrRec(const Json &j, uint depth) const
             {
                 retVal += "{";
                 retVal += '\n';
-                uint counter = 0;
+                unsigned int counter = 0;
                 for (const auto &[key, storedObject] : j.GetConstRef<JsonObjectMap>())
                 {
                     retVal += std::string(depth + 1, '\t');
@@ -64,7 +64,7 @@ std::string DefaultJsonConvertor::ToJsonStrRec(const Json &j, uint depth) const
         case JsonValueType::Array:
             {
                 retVal += "[";
-                uint counter = 0;
+                unsigned int counter = 0;
                 for (const auto &storedObject : j.GetConstRef<std::vector<Json>>())
                 {
                     retVal += ToJsonStrRec(storedObject, depth + 1);

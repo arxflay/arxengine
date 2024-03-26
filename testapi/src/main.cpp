@@ -365,7 +365,7 @@ TEST(Font, DISABLED_PositiveLoadFont)
         painter.Clear();
         painter.SetPen(Pen(Color(255, 0, 0)));
         win->GetFontCache()->EnableFontSmoothing(false);
-        painter.DrawText("Test string", Position(0, 50));
+        painter.RenderText("Test string", Position(0, 50));
     });
 
     GameApp::GetGlobalApp()->Run();

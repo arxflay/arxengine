@@ -20,6 +20,11 @@
 #define ARX_EXPORTS
 #endif
 
+#if WIN32
+#define NOMINMAX
+#define WIN32_LEAN_AND_MEAN
+#endif
+
 ARX_NAMESPACE_BEGIN
 namespace constants
 {

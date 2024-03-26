@@ -24,7 +24,7 @@ void Label::OnDraw(DrawEvent &e)
         Painter p(e);
         //for now only centered position is supported
         p.SetPen(Pen(GetTextColor()));
-        p.DrawText(GetText(), Position(GetPosition().x, GetPosition().y + (GetSize().height / 2)));
+        p.RenderText(GetText(), Position(GetPosition().x, GetPosition().y + (GetSize().height / 2)));
     }
 }
 

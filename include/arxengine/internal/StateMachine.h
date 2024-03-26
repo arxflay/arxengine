@@ -12,7 +12,7 @@ class StateMachine
 {
 public:
 
-    StateMachine(uint beginState, std::initializer_list<typename std::vector<std::function<RetT(StateMachine<RetT, InstanceT, Ts...> &, Ts...)>>::value_type> transitions)
+    StateMachine(unsigned int beginState, std::initializer_list<typename std::vector<std::function<RetT(StateMachine<RetT, InstanceT, Ts...> &, Ts...)>>::value_type> transitions)
         : m_state(beginState), m_transitions(std::move(transitions)), m_functor(m_transitions[m_state])
     {
     }
@@ -32,11 +32,11 @@ public:
         m_instance = instance;
     }
 
-    void SetState(uint state) { m_state = state; m_functor = m_transitions.at(state); }
-    uint GetState() { return m_state; }
+    void SetState(unsigned int state) { m_state = state; m_functor = m_transitions.at(state); }
+    unsigned int GetState() { return m_state; }
 
 private:
-    uint m_state;
+    unsigned int m_state;
     InstanceT *m_instance;
     
     std::vector<std::function<RetT(StateMachine<RetT, InstanceT, Ts...> &, Ts...)>> m_transitions;
@@ -48,7 +48,7 @@ class StateMachine<RetT, void, Ts...>
 {
 public:
 
-    StateMachine(uint beginState, std::initializer_list<typename std::vector<std::function<RetT(StateMachine<RetT, Ts...> &, Ts...)>>::value_type> transitions)
+    StateMachine(unsigned int beginState, std::initializer_list<typename std::vector<std::function<RetT(StateMachine<RetT, Ts...> &, Ts...)>>::value_type> transitions)
         : m_transitions(transitions), m_state(beginState), m_functor(m_transitions[m_state])
     {
     }
@@ -58,11 +58,11 @@ public:
         m_functor(*this, value...);
     }
 
-    void SetState(uint state) { m_state = state; m_functor = m_transitions.at(state); }
-    uint GetState() { return m_state; }
+    void SetState(unsigned int state) { m_state = state; m_functor = m_transitions.at(state); }
+    unsigned int GetState() { return m_state; }
 
 private:
-    uint m_state;
+    unsigned int m_state;
     
     std::vector<std::function<RetT(StateMachine<RetT, Ts...> &, Ts...)>> m_transitions;
     std::function<RetT(StateMachine<RetT, Ts...> &, Ts...)> m_functor;

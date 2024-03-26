@@ -104,7 +104,7 @@ void BitmapButton::OnDraw(DrawEvent &e)
         if (GetFont().GetLastChangeTime() != GetFontCache()->GetLastFontChangeTime())
             m_textExtent = GetFont().GetTextExtent(GetText());
 
-        p.DrawText(GetText(), CalculateTextPosition(m_textExtent, m_verticalTextAlignment, m_horizontalTextAlignment, m_textPaddingX, m_textPaddingY));
+        p.RenderText(GetText(), CalculateTextPosition(m_textExtent, m_verticalTextAlignment, m_horizontalTextAlignment, m_textPaddingX, m_textPaddingY));
     }
 }
 

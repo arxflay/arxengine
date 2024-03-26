@@ -16,13 +16,13 @@ struct GLFWwindow;
 ARX_NAMESPACE_BEGIN
 
 
-class WindowEnterEvent : public Event
+class ARX_EXPORTS WindowEnterEvent : public Event
 {
 private:
     void HandleEvent() {};
 };
 
-class WindowExitEvent : public Event
+class ARX_EXPORTS WindowExitEvent : public Event
 {
 private:
     void HandleEvent(){};

@@ -5,7 +5,7 @@
 #ifndef ARX_PEN_H
 #define ARX_PEN_H
 #include "arxengine/ArxDefines.h"
-#include "Color.h"
+#include "arxengine/ui/Color.h"
 
 ARX_NAMESPACE_BEGIN
 

@@ -23,7 +23,7 @@ public:
     Painter(DrawEvent &evt);
     void DrawRectangle(Position pos, SizeF size);
     void DrawTexture2D(Position pos, SizeF size, const Texture2D *tex, int tileWidthCount = 1, int tileHeightCount = 1);
-    void DrawText(std::string_view text, Position pos);
+    void RenderText(std::string_view text, Position pos);
     void SetBrush(const Brush &brush);
     void SetPen(const Pen &pen);
 

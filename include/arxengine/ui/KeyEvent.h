@@ -43,19 +43,19 @@ private:
     Key m_key;
 };
 
-class KeyDownEvent final : public KeyEvent
+class ARX_EXPORTS KeyDownEvent final : public KeyEvent
 {
 private:
     void HandleEvent() override {}
 };
 
-class KeyHoldEvent final : public KeyEvent
+class ARX_EXPORTS KeyHoldEvent final : public KeyEvent
 {
 private:
     void HandleEvent() override {}
 };
 
-class KeyUpEvent final : public KeyEvent
+class ARX_EXPORTS KeyUpEvent final : public KeyEvent
 {
 private:
     void HandleEvent() override {}

@@ -162,7 +162,7 @@ void Painter::DrawTexture2D(Position pos, SizeF size, const Texture2D *tex, int 
     glDisable(GL_BLEND);
 }
 
-void Painter::DrawText(std::string_view text, Position pos)
+void arx::Painter::RenderText(std::string_view text, Position pos)
 {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

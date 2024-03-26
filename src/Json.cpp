@@ -306,7 +306,7 @@ size_t Json::Count() const
     else if (GetType() == JsonValueType::ObjectMap)
         return m_json_obj.GetValue<const JsonObjectMap&>().size();
     else
-        throw std::runtime_error("not an array/object container");
+        throw ArxException(ArxException::ErrorCode::JsonValueTypeMismatch, "not an array/object container");
 
     return 0;
 

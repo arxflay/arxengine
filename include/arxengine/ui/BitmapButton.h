@@ -13,7 +13,7 @@ class MouseEnterEvent;
 class MouseExitEvent;
 class MouseUpEvent;
 
-class BitmapButton : public UIControl
+class ARX_EXPORTS BitmapButton : public UIControl
 {
 public:
     BitmapButton(UIControl *parent, const Image &img = {}, SizeF size = SizeF::DEFAULT_SIZE, Position pos = constants::DEFAULT_POSITION);

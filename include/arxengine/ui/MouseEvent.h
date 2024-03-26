@@ -10,7 +10,7 @@
 
 ARX_NAMESPACE_BEGIN
 
-class MouseButtonEvent : public Event
+class ARX_EXPORTS MouseButtonEvent : public Event
 {
 public:
     MouseButtonEvent();
@@ -33,19 +33,19 @@ private:
     ButtonType m_buttonType;
 };
 
-class MouseDownEvent : public MouseButtonEvent
+class ARX_EXPORTS MouseDownEvent : public MouseButtonEvent
 {
 private:
     void HandleEvent() override {};
 };
 
-class MouseUpEvent : public MouseButtonEvent
+class ARX_EXPORTS MouseUpEvent : public MouseButtonEvent
 {
 private:
     void HandleEvent() override {};
 };
 
-class MouseScrollEvent : public Event
+class ARX_EXPORTS MouseScrollEvent : public Event
 {
 public:
     enum class Direction
@@ -63,7 +63,7 @@ private:
 };
 
 //emitted by window
-class MouseMoveEvent : public Event
+class ARX_EXPORTS MouseMoveEvent : public Event
 {
 public:
     MouseMoveEvent();
@@ -77,13 +77,13 @@ private:
     Position m_viewportAffectedPosition;
 };
 
-class MouseEnterEvent : public Event 
+class ARX_EXPORTS MouseEnterEvent : public Event 
 {
 private:
     void HandleEvent() override {};
 };
 
-class MouseExitEvent : public Event
+class ARX_EXPORTS MouseExitEvent : public Event
 {
 public:
     MouseExitEvent();

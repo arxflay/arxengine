@@ -7,7 +7,7 @@ class DefaultJsonConvertor : public IJsonConverter
 public:
     std::string ToJsonStr(const Json &j) const;
 private:
-    std::string ToJsonStrRec(const Json &j, uint depth) const;
+    std::string ToJsonStrRec(const Json &j, unsigned int depth) const;
 };
 
 ARX_NAMESPACE_END

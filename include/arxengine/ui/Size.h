@@ -17,7 +17,7 @@ template<typename T>
 struct Size
 {
     Size()
-        : Size(0.0f, 0.0f)
+        : Size(0, 0)
     {
     }
     

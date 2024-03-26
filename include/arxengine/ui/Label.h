@@ -8,7 +8,7 @@
 
 ARX_NAMESPACE_BEGIN
 
-class Label : public UIControl
+class ARX_EXPORTS Label : public UIControl
 {
 public:
     Label(UIControl *parent, std::string_view text = "", SizeF size = SizeF::DEFAULT_SIZE, Position pos = constants::DEFAULT_POSITION);

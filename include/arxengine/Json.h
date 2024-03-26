@@ -4,6 +4,7 @@
 #include <string>
 #include <functional>
 #include <vector>
+#include <array>
 #include <map>
 #include <exception>
 #include <algorithm>
@@ -18,24 +19,24 @@ ARX_NAMESPACE_BEGIN
 
 class Json;
 
-class JsonObjectMap : public std::map<std::string, Json>
+class ARX_EXPORTS JsonObjectMap : public std::map<std::string, Json>
 {
     
 };
 
-class IJsonSerializable
+class ARX_EXPORTS IJsonSerializable
 {
 public:
     virtual void FromJson(Json &json) const = 0;
 };
 
-class IJsonDeserializable
+class ARX_EXPORTS IJsonDeserializable
 {
 public:
     virtual void ToJson(Json &json) const = 0;
 };
 
-class IJsonObject : public IJsonSerializable, IJsonDeserializable
+class ARX_EXPORTS IJsonObject : public IJsonSerializable, IJsonDeserializable
 {
 public:
     void FromJson(Json &json) const override = 0;
@@ -57,26 +58,24 @@ enum class JsonValueType
 
 ENUM_FROM_TO_STRING_DECLARE(JsonValueType);
 
-class JsonExpectionTypeError : public ArxException
+class ARX_EXPORTS JsonExpectionTypeError : public ArxException
 {
 public:
     JsonExpectionTypeError(JsonValueType expected, JsonValueType was); 
 };
 
-
-
 class IJsonLexer;
 class IJsonParser;
 class IJsonConverter;
 
-class Json final
+class ARX_EXPORTS Json final
 {
 private:
     /*
      * @brief union-like object that stores data of specific json object  
      * @description this object is used by Json class
      */
-    class JsonValue final
+    class ARX_EXPORTS JsonValue final
     {
     private:
         union value
@@ -551,19 +550,19 @@ enum class LexerValueType
 
 ENUM_FROM_TO_STRING_DECLARE(LexerValueType);
 
-class IJsonLexer    
+class ARX_EXPORTS IJsonLexer    
 {
 public:
     virtual std::vector<std::pair<LexerValueType, std::string>> GetTokens(std::string_view text) = 0;
 };
 
-class IJsonParser
+class ARX_EXPORTS IJsonParser
 {
 public:
     virtual Json Parse(std::string_view text) = 0;
 };
 
-class IJsonConverter
+class ARX_EXPORTS IJsonConverter
 {
 public:
     virtual std::string ToJsonStr(const Json &j) const = 0;
