@@ -103,6 +103,12 @@ else()
     set(CPACK_GENERATOR TGZ)
 endif()
 
+if (WIN32)
+    target_sources(arxengine PRIVATE 
+    "${CMAKE_CURRENT_SOURCE_DIR}/resources/arxengine.rc" 
+    "${CMAKE_CURRENT_SOURCE_DIR}/resources/resource.h")
+endif()
+
 set(CPACK_PACKAGE_NAME arxengine)
 set(CPACK_PACKAGE_VENDOR arxflay)
 set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/LICENSE)
