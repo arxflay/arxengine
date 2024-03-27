@@ -143,7 +143,7 @@ private:
     static void DrawInternal(UIControl *obj);
     static void DrawNowInternal(UIControl *obj);
 
-    Position CalculateCenterPosition() override;
+    virtual Position CalculateCenterPosition() override;
 
 private:
     std::unique_ptr<GLFWwindow, void(*)(GLFWwindow*)> m_win;

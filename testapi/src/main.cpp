@@ -600,7 +600,7 @@ TEST(ArxWindow, DISABLED_PositiveLabel)
     GameApp::GetGlobalApp()->Run();
 }
 
-TEST(ArxWindow, PositiveBitmapButton)
+TEST(ArxWindow, DISABLED_PositiveBitmapButton)
 {
     ArxWindow *win = new ArxWindow("test", SizeF(640, 360));
     win->Show();
@@ -673,5 +673,36 @@ TEST(ArxWindow, PositiveBitmapButton)
 TEST(ArxWindow, DISABLED_NegativeBitmapButtonNullptr)
 { 
     BitmapButton *btn2 = nullptr;
+    (void)btn2;
     ASSERT_ANY_THROW((btn2 = new BitmapButton(nullptr)));
 }
+
+TEST(ArxWindow, DISABLED_PositiveCenterWindow)
+{
+    ArxWindow *win = new ArxWindow("test", SizeF(600, 600));
+    win->Show();
+    win->Center();
+     
+    GameApp::GetGlobalApp()->Run();
+}
+
+TEST(ArxWindow, DISBALED_PositiveCenterControl)
+{
+    ArxWindow *win = new ArxWindow("test", SizeF(600, 600), Position(0, 0), 0);
+    win->Show();
+    win->GetEventManager().Bind<KeyDownEvent>([win](KeyDownEvent &e) {
+        if (e.GetKey() == KeyEvent::Key::Esc)
+            win->RequestDelete();
+    });
+
+    std::filesystem::path testJpgPath(TEST_DATA_PATH / std::filesystem::path("test_png.png"));
+    Image img(Image::LoadFromFile(testJpgPath.u8string()));
+    ImageControl *ctrl = new ImageControl(win, img, SizeF(100, 100), Position(100, 100));
+    ctrl->SetFilteringMode(Texture::TextureFilteringMode::Linear);
+    ctrl->SetBackgroundColor(constants::COLOR_BLACK);
+    ctrl->Center();
+     
+    GameApp::GetGlobalApp()->Run();
+}
+
+

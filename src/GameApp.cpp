@@ -45,6 +45,22 @@ namespace internal
         if (err != GLFW_TRUE)
             throw ArxException(ArxException::ErrorCode::FailedToInitializeFreetype, Utils::Format("Failed to initialize glfw library, glfw_error_code='%d'", err));
     }
+
+    void CheckOpenGLVersionSupport()
+    {
+        GLOG->Info("Checking if OpenGL version %d.%d is supported...", constants::GL_VERSION_MAJOR, constants::GL_VERSION_MINOR);    
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, constants::GL_VERSION_MAJOR);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, constants::GL_VERSION_MINOR);
+        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+        std::unique_ptr<GLFWwindow, void(*)(GLFWwindow*)> win(glfwCreateWindow(1, 1, "test", nullptr, nullptr), &glfwDestroyWindow);        
+        if (win == nullptr)
+            throw ArxException(ArxException::ErrorCode::FailedOpenGLSupportTests, "Failed to create gl window");
+        glfwMakeContextCurrent(win.get());
+        if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+            throw ArxException(ArxException::ErrorCode::FailedOpenGLSupportTests, "Failed to load gl functions using glad");
+        glfwMakeContextCurrent(nullptr);
+        GLOG->Info("OpenGL %d.%d support tests passed", constants::GL_VERSION_MAJOR, constants::GL_VERSION_MINOR);
+    }
 }
 
 void DeleteEvent::HandleEvent()
@@ -88,6 +104,7 @@ int GameApp::Init()
             throw ArxException(ArxException::ErrorCode::GameAppAlreadyInitialized, "App is already inititalized");
     
         internal::InitGLFW();
+        internal::CheckOpenGLVersionSupport();
         auto m_soundDeviceContextPair = internal::InitAL();
         m_fontLoader = internal::InitFT();
         m_eventProcessor = std::make_unique<UIEventProcessor>();

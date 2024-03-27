@@ -33,7 +33,8 @@ public:
         GameAppAlreadyScheduledExit = 14,
         JsonValueTypeMismatch       = 15,
         DefaultJsonLexerFailure     = 16,
-        DefaultJsonConvertorFailure = 17
+        DefaultJsonConvertorFailure = 17,
+        FailedOpenGLSupportTests    = 18
         
     };
 
