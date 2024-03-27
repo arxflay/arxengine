@@ -2,17 +2,17 @@
 
 ARX_NAMESPACE_BEGIN
 
-Pen::Pen(Color color)
+Pen::Pen(const Color &color)
     : m_color(color)
 {
 }
 
-Color Pen::GetColor()
+const Color &Pen::GetColor() const
 {
     return m_color;
 }
 
-void Pen::SetColor(Color col)
+void Pen::SetColor(const Color &col)
 {
     m_color = col;
 }

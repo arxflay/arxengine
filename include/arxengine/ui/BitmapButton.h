@@ -16,14 +16,14 @@ class MouseUpEvent;
 class ARX_EXPORTS BitmapButton : public UIControl
 {
 public:
-    BitmapButton(UIControl *parent, const Image &img = {}, SizeF size = SizeF::DEFAULT_SIZE, Position pos = constants::DEFAULT_POSITION);
+    BitmapButton(UIControl *parent, const Image &img = {}, const SizeF &size = SizeF::DEFAULT_SIZE, const Position &pos = constants::DEFAULT_POSITION);
     void SetMouseEnterImage(const Image &img);
     void SetMouseHoldImage(const Image &img);
     void SetNormalImage(const Image &img);
     void SetText(std::string_view text);
     const std::string &GetText() const;
-    void SetTextColor(Color);
-    Color GetTextColor() const;
+    void SetTextColor(const Color&);
+    const Color &GetTextColor() const;
 
     void SetVerticalTextAlignment(VerticalTextAlignment verticalAlignment);
     void SetHorizontalTextAlignment(HorizontalTextAlignment horizontalAlignment);

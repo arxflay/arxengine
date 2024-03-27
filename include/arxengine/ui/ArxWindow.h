@@ -51,7 +51,7 @@ public:
         int bottom;
     };
     
-    ArxWindow(std::string_view title, SizeF size = SizeF::DEFAULT_SIZE, Position position = constants::DEFAULT_POSITION, int attributes = WindowAttributes::RESIZABLE | WindowAttributes::DECORATED); //, bool isFullScreen= false);
+    ArxWindow(std::string_view title, const SizeF &size = SizeF::DEFAULT_SIZE, const Position &position = constants::DEFAULT_POSITION, int attributes = WindowAttributes::RESIZABLE | WindowAttributes::DECORATED); //, bool isFullScreen= false);
     
     void SetWindowAttributes(int attributes);
     
@@ -59,13 +59,13 @@ public:
     void SetTitle(std::string_view title);
 
     //Sets ClientSize and calculates size with win borders 
-    void SetSize(SizeF s) override;
+    void SetSize(const SizeF &s) override;
 
     //returns size without window borders
-    SizeF GetClientSize() const override;
+    const SizeF &GetClientSize() const override;
 
     //position is relative to main monitor
-    void SetPosition(Position pos) override;
+    void SetPosition(const Position &pos) override;
 
     //non relative window position (multimonitor position)
     Position GetRealPosition() const;
@@ -114,17 +114,17 @@ public:
 
     Position GetCursorPosition();
 
-    void SetCameraPos(Position cameraPos);
+    void SetCameraPos(const Position &cameraPos);
     const Position &GetCameraPos() const;
 private:
-    void OnShow(ShowEvent &e);
+    void OnShow(ShowEvent &e) ;
     void OnDraw(DrawEvent &e) override;
-    void RecalculateSizes(SizeF s);
+    void RecalculateSizes(const SizeF &s);
     void RegisterWindowFromWindowList();
     void UnregisterWindowFromWindowList();
-    void SendMouseEnterExitEvents(UIControl *ctrl, Position pos);
-    static UIControl *FindClickEventCandidate(UIControl *ctrl, Position pos);
-    void SendMouseDownEvent(Position pos, MouseButtonEvent::ButtonType button);
+    void SendMouseEnterExitEvents(UIControl *ctrl, const Position &pos);
+    static UIControl *FindClickEventCandidate(UIControl *ctrl, const Position &pos);
+    void SendMouseDownEvent(const Position &pos, MouseButtonEvent::ButtonType button);
     void SendMouseUpEvent(MouseButtonEvent::ButtonType button);
 
     static void PositionCallback(GLFWwindow *win, int x, int y);
@@ -142,6 +142,8 @@ private:
 
     static void DrawInternal(UIControl *obj);
     static void DrawNowInternal(UIControl *obj);
+
+    Position CalculateCenterPosition() override;
 
 private:
     std::unique_ptr<GLFWwindow, void(*)(GLFWwindow*)> m_win;

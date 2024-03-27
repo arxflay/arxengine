@@ -11,12 +11,12 @@ ARX_NAMESPACE_BEGIN
 class ARX_EXPORTS Label : public UIControl
 {
 public:
-    Label(UIControl *parent, std::string_view text = "", SizeF size = SizeF::DEFAULT_SIZE, Position pos = constants::DEFAULT_POSITION);
+    Label(UIControl *parent, std::string_view text = "", const SizeF &size = SizeF::DEFAULT_SIZE, const Position &pos = constants::DEFAULT_POSITION);
     void SetText(std::string_view text); 
     const std::string &GetText() const;
 
-    void SetTextColor(Color color);
-    Color GetTextColor() const;
+    void SetTextColor(const Color &color);
+    const Color &GetTextColor() const;
 
     void EnableFontSmoothing(bool enable);
 private:

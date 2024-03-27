@@ -12,9 +12,9 @@ ARX_NAMESPACE_BEGIN
 class ARX_EXPORTS Pen
 {
 public:
-    Pen(Color color);
-    Color GetColor();
-    void SetColor(Color col);
+    Pen(const Color &color);
+    const Color &GetColor() const;
+    void SetColor(const Color &col);
 private:
     Color m_color;
 };

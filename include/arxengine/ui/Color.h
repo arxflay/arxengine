@@ -15,7 +15,7 @@ struct ARX_EXPORTS Color
     Color();
     Color(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255);
     Color(std::string_view hexString);
-    glm::vec4 GetNormalizedColorRGBA();
+    glm::vec4 GetNormalizedColorRGBA() const;
     uint8_t r;
     uint8_t g;
     uint8_t b;

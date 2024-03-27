@@ -13,7 +13,7 @@ ARX_NAMESPACE_BEGIN
 
 namespace
 {
-    SizeF MakeSizeValid(SizeF s)
+    SizeF MakeSizeValid(const SizeF &s)
     {
         if (s.height < 1 || s.width < 1)
             return SizeF::DEFAULT_SIZE;
@@ -133,7 +133,7 @@ bool ArxWindow::IsCursorVisible() const
     return m_showCursor;
 }
 
-/*static*/UIControl *ArxWindow::FindClickEventCandidate(UIControl *parent, Position pos)
+/*static*/UIControl *ArxWindow::FindClickEventCandidate(UIControl *parent, const Position &pos)
 {
     for (UIControl *ctrl : parent->GetMouseEventRecievers())
         if (ctrl->IsShown() && ctrl->HitTest(pos))
@@ -142,7 +142,7 @@ bool ArxWindow::IsCursorVisible() const
     return parent;
 }
 
-void ArxWindow::SendMouseDownEvent(Position pos, MouseButtonEvent::ButtonType button)
+void ArxWindow::SendMouseDownEvent(const Position &pos, MouseButtonEvent::ButtonType button)
 {
     UIControl *candidate = !IsCursorVisible() ? this : FindClickEventCandidate(this, pos);
     if(candidate->GetEventManager().HasNonDefaultEventHandler<MouseDownEvent>())
@@ -187,7 +187,7 @@ void ArxWindow::SendMouseUpEvent(MouseButtonEvent::ButtonType button)
     }
 }
 
-void ArxWindow::SendMouseEnterExitEvents(UIControl *parent, Position pos)
+void ArxWindow::SendMouseEnterExitEvents(UIControl *parent, const Position &pos)
 {
     bool foundMouseEnterReciever = false;
     
@@ -245,7 +245,7 @@ void ArxWindow::CursorPosCallback(GLFWwindow *win, double xpos, double ypos)
 }
 
 //uncompelte fullscreen
-ArxWindow::ArxWindow(std::string_view title, SizeF size, Position position, int attributes) //, bool isFullScreen)
+ArxWindow::ArxWindow(std::string_view title, const SizeF &size, const Position &position, int attributes) //, bool isFullScreen)
     : UIControl()
     , m_win(nullptr, glfwDestroyWindow)
     , m_attributes(attributes)
@@ -331,21 +331,21 @@ void ArxWindow::SetTitle(std::string_view title)
     glfwSetWindowTitle(m_win.get(), title.data());
 }
 
-void ArxWindow::SetSize(SizeF s)
+void ArxWindow::SetSize(const SizeF &s)
 {
     RecalculateSizes(s);
     glfwSetWindowSize(m_win.get(), static_cast<int>(GetSize().height), static_cast<int>(GetSize().width));
 }
 
-void ArxWindow::RecalculateSizes(SizeF s)
+void ArxWindow::RecalculateSizes(const SizeF &s)
 {
-    Size newClientSize = MakeSizeValid(s);
+    SizeF newClientSize = MakeSizeValid(s);
     m_clientSize = newClientSize;
     if (!m_useFixedViewport)
         m_viewport = Viewport{ glm::ortho(0.0f, m_clientSize.width, 0.0f, m_clientSize.height), m_clientSize };
 
     WindowBorders borders = GetWindowBorders();
-    Size newSize = Size(newClientSize.width + static_cast<float>(borders.left + borders.right), newClientSize.height + static_cast<float>(borders.bottom + borders.top));
+    SizeF newSize = SizeF(newClientSize.width + static_cast<float>(borders.left + borders.right), newClientSize.height + static_cast<float>(borders.bottom + borders.top));
     UIControl::SetSize(newSize);
 }
 
@@ -359,7 +359,7 @@ void ArxWindow::UnregisterWindowFromWindowList()
     const_cast<ArxWindowSet&>(GameApp::GetGlobalApp()->GetWindowSet()).erase(this);
 }
 
-SizeF ArxWindow::GetClientSize() const
+const SizeF &ArxWindow::GetClientSize() const
 {
     return m_clientSize;
 }
@@ -370,7 +370,7 @@ ArxWindow::WindowBorders ArxWindow::GetWindowBorders() const
     glfwGetWindowFrameSize(m_win.get(), &borders.left, &borders.top, &borders.right, &borders.bottom);
     return borders;
 }
-void ArxWindow::SetPosition(Position pos)
+void ArxWindow::SetPosition(const Position &pos)
 {
     UIControl::SetPosition(pos);
     int xOffset, yOffset;
@@ -607,13 +607,21 @@ void ArxWindow::ForgetPressedMouseButtons(UIControl *ctrl, bool sendMouseUpEvent
     }
 }
 
-void ArxWindow::SetCameraPos(Position cameraPos)
+void ArxWindow::SetCameraPos(const Position &cameraPos)
 {
     m_cameraPos = cameraPos;
 }
 
 const Position &ArxWindow::GetCameraPos() const { return m_cameraPos; }
 
+Position ArxWindow::CalculateCenterPosition() 
+{
+    const GLFWvidmode *curVidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+    Position pos;
+    pos.x = std::max(((float)curVidMode->width - GetSize().width) / 2, 0.0f);
+    pos.y = std::max(((float)curVidMode->height - GetSize().height) / 2, 0.0f);
 
+    return pos;
+}
 
 ARX_NAMESPACE_END

@@ -30,7 +30,7 @@ namespace
     {
         ArxWindow *window = obj->GetWindow();
         Position senderPos = GetSenderPosition(obj);
-        Size senderSize = obj->GetClientSize();
+        SizeF senderSize = obj->GetClientSize();
         if (obj->CanBeAffectedByCamera())
         {
             senderPos.x -= window->GetCameraPos().x;
@@ -44,14 +44,14 @@ namespace
             senderSize.width = std::clamp(senderSize.width, 0.0f, parentSize.width - relativeSenderPos.x);
             senderSize.height = std::clamp(senderSize.width, 0.0f, parentSize.width - relativeSenderPos.y);
         }
-        Size windowSize = window->GetClientSize();
-        Size viewPortSize = window->GetViewport().size;
+        const SizeF &windowSize = window->GetClientSize();
+        const SizeF &viewPortSize = window->GetViewport().size;
         
         //invert y axis, top = 0
         Position clipPosition = senderPos;
         
 
-        Size clipSize(senderSize.width, senderSize.height);
+        SizeF clipSize(senderSize.width, senderSize.height);
         if (!(viewPortSize == windowSize))
         {
             //transform screen coordinates and size to viewport dimensions
@@ -97,7 +97,7 @@ Painter::Painter(DrawEvent &evt)
 
 }
 
-void Painter::DrawRectangle(Position pos, SizeF size)
+void Painter::DrawRectangle(const Position &pos, const SizeF &size)
 {
     OldClippingAreaGuard clipGuard;
     OldVAOGuard vaoGuard;
@@ -114,7 +114,7 @@ void Painter::DrawRectangle(Position pos, SizeF size)
     glm::mat4 viewMatrix = glm::mat4(1.0f);
     if (GetSender()->CanBeAffectedByCamera())
     {
-        Position cameraPos = GetSender()->GetWindow()->GetCameraPos();
+        const Position &cameraPos = GetSender()->GetWindow()->GetCameraPos();
         viewMatrix =  glm::translate(viewMatrix, glm::vec3(-cameraPos.x, -cameraPos.y, 0.0f));
     }
         
@@ -127,7 +127,7 @@ void Painter::DrawRectangle(Position pos, SizeF size)
     glDrawArrays(GL_TRIANGLES, 0, 6); 
 }
 
-void Painter::DrawTexture2D(Position pos, SizeF size, const Texture2D *tex, int tileWidthCount, int tileHeightCount)
+void Painter::DrawTexture2D(const Position &pos, const SizeF &size, const Texture2D *tex, int tileWidthCount, int tileHeightCount)
 {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -146,7 +146,7 @@ void Painter::DrawTexture2D(Position pos, SizeF size, const Texture2D *tex, int 
     glm::mat4 viewMatrix = glm::mat4(1.0f);
     if (GetSender()->CanBeAffectedByCamera())
     {
-        Position cameraPos = GetSender()->GetWindow()->GetCameraPos();
+        const Position &cameraPos = GetSender()->GetWindow()->GetCameraPos();
         viewMatrix =  glm::translate(viewMatrix, glm::vec3(-cameraPos.x, -cameraPos.y, 0.0f));
     }
 
@@ -162,7 +162,7 @@ void Painter::DrawTexture2D(Position pos, SizeF size, const Texture2D *tex, int 
     glDisable(GL_BLEND);
 }
 
-void arx::Painter::RenderText(std::string_view text, Position pos)
+void arx::Painter::RenderText(std::string_view text, const Position &pos)
 {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -177,7 +177,7 @@ void arx::Painter::RenderText(std::string_view text, Position pos)
     glm::mat4 viewMatrix = glm::mat4(1.0f);
     if (GetSender()->CanBeAffectedByCamera())
     {
-        Position cameraPos = GetSender()->GetWindow()->GetCameraPos();
+        const Position &cameraPos = GetSender()->GetWindow()->GetCameraPos();
         viewMatrix = glm::translate(viewMatrix, glm::vec3(-cameraPos.x, -cameraPos.y, 0.0f));
     }
     
@@ -187,7 +187,7 @@ void arx::Painter::RenderText(std::string_view text, Position pos)
     shader.UseShader();
     shader.SetUniformVec4("color", m_pen.GetColor().GetNormalizedColorRGBA());
 
-    Position drawingPos = CalculateDrawPosition(pos, Size(0.0f, 0.0f));
+    Position drawingPos = CalculateDrawPosition(pos, SizeF(0.0f, 0.0f));
     auto *fontCache = m_sender->GetFontCache();
     for (char ch : text)
     {
@@ -207,21 +207,20 @@ void arx::Painter::RenderText(std::string_view text, Position pos)
     glDisable(GL_BLEND);
 }
 
-Position Painter::CalculateDrawPosition(Position drawPos, SizeF drawSize)
+Position Painter::CalculateDrawPosition(const Position &originalDrawPos, const SizeF &originalDrawSize)
 {
     Position senderPos = GetSenderPosition(m_sender); //draw offset, because sender could be positioned somewhereElse
     ArxWindow *window = m_sender->GetWindow();
-    Size viewPortSize = window->GetViewport().size;
-    
+    SizeF viewPortSize = window->GetViewport().size;
+    Position newDrawPos; 
     //inverse top axis, top should be 0 and bottom == viewPortSize.size()
-    drawPos.y = -drawPos.y;
-    drawPos.y += viewPortSize.height;
-    drawPos.y -= drawSize.height;
-    drawPos.x = senderPos.x + drawPos.x;
-    drawPos.y -= senderPos.y;
+    newDrawPos.y = -originalDrawPos.y;
+    newDrawPos.y += viewPortSize.height;
+    newDrawPos.y -= originalDrawSize.height;
+    newDrawPos.x = senderPos.x + originalDrawPos.x;
+    newDrawPos.y -= senderPos.y;
 
-    
-    return drawPos;
+    return newDrawPos;
 }
 
 void Painter::Clear()

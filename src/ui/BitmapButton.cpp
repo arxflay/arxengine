@@ -15,8 +15,8 @@ void BitmapButton::SetText(std::string_view text)
 }
 
 const std::string &BitmapButton::GetText() const{ return m_text; }
-void BitmapButton::SetTextColor(Color color) { m_textColor = color; }
-Color BitmapButton::GetTextColor() const { return m_textColor; }
+void BitmapButton::SetTextColor(const Color &color) { m_textColor = color; }
+const Color &BitmapButton::GetTextColor() const { return m_textColor; }
 
 void BitmapButton::SetVerticalTextAlignment(VerticalTextAlignment verticalAlignment) { m_verticalTextAlignment = verticalAlignment; }
 void BitmapButton::SetHorizontalTextAlignment(HorizontalTextAlignment horizontalAlignment) { m_horizontalTextAlignment = horizontalAlignment; }
@@ -28,7 +28,7 @@ HorizontalTextAlignment BitmapButton::GetHorizontalTextAlignment() const { retur
 int BitmapButton::GetTextAlignmentPaddingX() const { return m_textPaddingX; }
 int BitmapButton::GetTextAlignmentPaddingY() const { return m_textPaddingY; }
 
-BitmapButton::BitmapButton(UIControl *parent, const Image &img, SizeF size, Position pos)
+BitmapButton::BitmapButton(UIControl *parent, const Image &img, const SizeF &size, const Position &pos)
     : UIControl(parent, size, pos)
     , m_normalTexture(new Texture2D(this))
     , m_mouseEnterTexture(new Texture2D(this))

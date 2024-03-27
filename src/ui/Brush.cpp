@@ -3,17 +3,17 @@
 ARX_NAMESPACE_BEGIN
 
 
-Brush::Brush(Color color)
+Brush::Brush(const Color &color)
     : m_color(color)
 {
 }
 
-Color Brush::GetColor()
+const Color &Brush::GetColor() const
 {
     return m_color;
 }
 
-void Brush::SetColor(Color col)
+void Brush::SetColor(const Color &col)
 {
     m_color = col;
 }

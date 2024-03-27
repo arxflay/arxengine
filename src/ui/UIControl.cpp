@@ -4,7 +4,7 @@
 #include "arxengine/ui/Painter.h"
 ARX_NAMESPACE_BEGIN
 
-UIControl::UIControl(UIControl *parent, SizeF size, Position pos)
+UIControl::UIControl(UIControl *parent, const SizeF &size, const Position &pos)
     : ArxObject(nullptr)
     , m_size(size)
     , m_position(pos)
@@ -22,18 +22,17 @@ UIControl::UIControl(UIControl *parent, SizeF size, Position pos)
     m_ownerWindow = parent->GetWindow();
 }
 
-void UIControl::SetBackgroundColor(Color c) { m_backgroundColor = c; }
-Color UIControl::GetColor() const { return m_backgroundColor; }
+void UIControl::SetBackgroundColor(const Color &c) { m_backgroundColor = c; }
+const Color &UIControl::GetColor() const { return m_backgroundColor; }
 
-void UIControl::SetSize(SizeF s) 
+void UIControl::SetSize(const SizeF &s) 
 {
+    m_size = s;
     if (GetParent() != GetOwnerWindow())
     {
-        Size parentSize = static_cast<UIControl*>(GetParent())->GetClientSize();
-        s = Size(std::clamp(s.width, 0.0f, parentSize.width), std::clamp(s.height, 0.0f, parentSize.height));
+        SizeF parentSize = static_cast<UIControl*>(GetParent())->GetClientSize();
+        m_size = SizeF(std::clamp(m_size.width, 0.0f, parentSize.width), std::clamp(m_size.height, 0.0f, parentSize.height));
     }
-        
-    m_size = s;
 }
 
 bool UIControl::CanRecieveMouseEvents() const { return m_canRecieveMouseEvents; }
@@ -83,11 +82,11 @@ void UIControl::SetCanRecieveMouseEvents(bool canRecieve)
     m_canRecieveMouseEvents = canRecieve;
 }
 
-SizeF UIControl::GetSize() const { return m_size; }
-SizeF UIControl::GetClientSize() const { return m_size; }
+const SizeF &UIControl::GetSize() const { return m_size; }
+const SizeF &UIControl::GetClientSize() const { return m_size; }
 
-void UIControl::SetPosition(Position pos) { m_position = pos; }
-Position UIControl::GetPosition() const { return m_position; }
+void UIControl::SetPosition(const Position &pos) { m_position = pos; }
+const Position &UIControl::GetPosition() const { return m_position; }
 
 ArxWindow *UIControl::GetOwnerWindow() { return m_ownerWindow; }
 const ArxWindow *UIControl::GetOwnerWindow() const { return m_ownerWindow; }
@@ -323,5 +322,20 @@ void UIControl::SetCanBeAffectedByCamera(bool canBeAffectedByCamera)
 {
     m_canBeAffectedByCamera = canBeAffectedByCamera;
 }
+
+void UIControl::Center()
+{
+    SetPosition(CalculateCenterPosition());
+}
+
+Position UIControl::CalculateCenterPosition()
+{
+    UIControl *parent = static_cast<UIControl*>(GetParent());
+    Position pos;
+    pos.x = (parent->m_size.width - m_size.width) / 2;
+    pos.y = (parent->m_size.height - m_size.height) / 2;
+    return pos;
+}
+
 
 ARX_NAMESPACE_END

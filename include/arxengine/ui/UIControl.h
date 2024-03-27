@@ -59,21 +59,21 @@ friend class ArxWindow;
 friend class DrawEvent;
 friend class ShowEvent;
 public:
-    UIControl(UIControl *parent, SizeF size = SizeF::DEFAULT_SIZE, Position pos = constants::DEFAULT_POSITION);
+    UIControl(UIControl *parent, const SizeF &size = SizeF::DEFAULT_SIZE, const Position &pos = constants::DEFAULT_POSITION);
     
-    virtual void SetBackgroundColor(Color c);
-    virtual Color GetColor() const;
+    virtual void SetBackgroundColor(const Color &c);
+    virtual const Color &GetColor() const;
 
-    virtual void SetSize(SizeF s);
+    virtual void SetSize(const SizeF &s);
     
     //size with borders (limits)
-    virtual SizeF GetSize() const;
+    virtual const SizeF &GetSize() const;
 
     //size available for client
-    virtual SizeF GetClientSize() const;
+    virtual const SizeF &GetClientSize() const;
     
-    virtual void SetPosition(Position pos);
-    virtual Position GetPosition() const;
+    virtual void SetPosition(const Position &pos);
+    virtual const Position &GetPosition() const;
 
     Position GetParentsPosition() const;
 
@@ -100,6 +100,8 @@ public:
     virtual void EnableClipToBounds(bool enable = true);
     virtual bool IsEnabledClipToBounds() const;
 
+    void Center();
+
     bool HitTest(Position pos) const;
 
     FontCache *GetFontCache();
@@ -116,7 +118,7 @@ public:
 
 protected:
     Position CalculateTextPosition(const TextExtent &textExtent, VerticalTextAlignment verticalAlignment, HorizontalTextAlignment horizontalAlignment, int paddingX, int paddingY);
-
+    virtual Position CalculateCenterPosition();
 private:
     virtual void OnDraw(DrawEvent &);
     

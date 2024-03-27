@@ -23,7 +23,7 @@ Color::Color(std::string_view hexString)
     Utils::HexStrToBin(hexString, reinterpret_cast<uint8_t*>(this), sizeof(Color) / sizeof(uint8_t));
 }
 
-glm::vec4 Color::GetNormalizedColorRGBA()
+glm::vec4 Color::GetNormalizedColorRGBA() const
 {
     return glm::vec4 {
         static_cast<float>(r) / std::numeric_limits<uint8_t>::max(),
