@@ -2,6 +2,9 @@ find_package(OpenGL REQUIRED)
 set(CPM_SOURCE_CACHE "${CMAKE_CURRENT_LIST_DIR}/third_party/CPM")
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/FetchCPM.cmake")
 include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/CPM/CPM.cmake")
+if (UNIX)
+	set(CPM_LOCAL_PACKAGES_ONLY ON)
+endif()
 CPMFindPackage(NAME glm
     GITHUB_REPOSITORY g-truc/glm
     VERSION 0.9.9.8

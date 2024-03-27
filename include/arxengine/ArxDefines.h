@@ -5,6 +5,7 @@
 #ifndef ARX_ARXDEFINES_H
 #define ARX_ARXDEFINES_H
 #include <cstdint>
+#include <cstddef>
 
 #define ARX_NAMESPACE arx
 

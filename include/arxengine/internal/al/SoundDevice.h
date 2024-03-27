@@ -6,9 +6,7 @@
 #define ARX_SOUNDDEVICE_H
 #include "arxengine/ArxDefines.h"
 #include <string_view>
-
-struct ALCdevice;
-struct ALCcontext;
+#include <AL/alc.h>
 
 ARX_NAMESPACE_BEGIN
 

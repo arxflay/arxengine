@@ -105,11 +105,18 @@ endif()
 
 if (WIN32)
     target_sources(arxengine PRIVATE 
-    "${CMAKE_CURRENT_SOURCE_DIR}/resources/arxengine.rc" 
+    "${CMAKE_CURRENT_SOURCE_DIR}/resources/arxengine.rc"
     "${CMAKE_CURRENT_SOURCE_DIR}/resources/resource.h")
 endif()
 
-set(CPACK_PACKAGE_NAME arxengine)
+if (CMAKE_BUILD_TYPE STREQUAL Debug)
+    set(CPACK_PACKAGE_NAME arxengine-dev)
+    set(CPACK_DEBIAN_PACKAGE_CONFLICTS arxengine)
+else()
+    set(CPACK_PACKAGE_NAME arxengine)
+    set(CPACK_DEBIAN_PACKAGE_CONFLICTS arxengine-dev)
+endif()
+
 set(CPACK_PACKAGE_VENDOR arxflay)
 set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/LICENSE)
 set(CPACK_PACKAGE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
@@ -118,7 +125,14 @@ set(CPACK_PACKAGE_VERSION_MINOR ${VER_MINOR})
 set(CPACK_PACKAGE_VERSION ${VER_MAJOR}.${VER_MINOR})
 set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${PKG_VER_NAME}")
 set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS ON)
+set(CPACK_DEBIAN_PACKAGE_SOURCE "${CPACK_PACKAGE_NAME} (${CMAKE_PACKAGE_VERSION})")
+set(CPACK_DEBIAN_PACKAGE_PROVIDES ${CPACK_PACKAGE_NAME})
+set(CPACK_DEBIAN_PACKAGE_SECTION libs)
+set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "arxengine - graphical library for creating 2d games")
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Alexej Fedorenko(arxflay)")
+set(CPACK_DEBIAN_PACKAGE_PRIORITY "standard")
+
 set_target_properties(arxengine PROPERTIES VERSION ${VER_MAJOR}.${VER_MINOR} SOVERSION ${VER_MAJOR})
 set_target_properties(arxengine PROPERTIES DEBUG_POSTFIX "d")
 
@@ -131,7 +145,5 @@ if (NOT ARX_DISABLE_INSTALL)
     endif()
 endif()
 
-
 #this must be a last entry in this file
 include(CPack)
-
