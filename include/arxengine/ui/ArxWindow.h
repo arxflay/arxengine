@@ -98,6 +98,8 @@ public:
     void ForgetMouseEnteredControl(UIControl *ctrl, bool sendMouseExitEvent);
     void ForgetPressedMouseButtons(UIControl *ctrl, bool sendMouseUpEvent);
 
+    void SetFullscreen(bool fullscreen);
+    bool IsFullscreen() const;
     
     /* schedules draw event */
     void Draw();
@@ -158,6 +160,7 @@ private:
     std::map<MouseButtonEvent::ButtonType, UIControl*> m_pressedMouseButtons;
     UIControl *m_lastMouseEnterReciever;
     Position m_cameraPos;
+    bool m_fullscreen;
 };
 
 ARX_NAMESPACE_END

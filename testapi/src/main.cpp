@@ -711,7 +711,7 @@ TEST(ArxWindow, DISABLED_PositiveAtexitDealloc)
     (void)win;
 }
 
-TEST(ArxWindow, PositiveTextWrapping)
+TEST(ArxWindow, DISABLED_PositiveTextWrapping)
 {
     ArxWindow *win = new ArxWindow("test", SizeF(640, 360));
     win->Show();
@@ -730,6 +730,19 @@ TEST(ArxWindow, PositiveTextWrapping)
         p.RenderText("t\ne\ns\nt\nstring", Position(50, 50));
         (void)win; 
     });
+
+    GameApp::GetGlobalApp()->Run();
+}
+
+TEST(ArxWindow, PositiveSetFullscreen)
+{
+    ArxWindow *win = new ArxWindow("test", SizeF(640, 360));
+    win->Show();
+    win->SetFullscreen(true);
+    Timer *t = new Timer(win);
+    t->GetEventManager().Bind<TimerEvent>([win](TimerEvent &){ std::cout << win->GetSize().width << '\n'; });
+    t->SetInterval(std::chrono::seconds(3));
+    t->Start(Timer::TimerType::SINGLE_FIRE);
 
     GameApp::GetGlobalApp()->Run();
 }

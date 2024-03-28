@@ -256,6 +256,7 @@ ArxWindow::ArxWindow(std::string_view title, const SizeF &size, const Position &
     , m_showCursor(true)
     , m_lastMouseEnterReciever(nullptr)
     , m_cameraPos(0, 0)
+    , m_fullscreen(false)
 {
     glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
     glfwWindowHint(GLFW_FOCUS_ON_SHOW, GLFW_TRUE);
@@ -265,12 +266,7 @@ ArxWindow::ArxWindow(std::string_view title, const SizeF &size, const Position &
     /*if (isFullScreen) //TODO fullscreen
     {
         
-        GLFWmonitor *primaryMonitor = glfwGetPrimaryMonitor();
-        const GLFWvidmode *currentVideoMode = glfwGetVideoMode(primaryMonitor);
-        UIControl::SetPosition(Position{ 0, 0 });
-        UIControl::SetSize(Size{ static_cast<float>(currentVideoMode->width), static_cast<float>(currentVideoMode->height) });
-        m_win.reset(glfwCreateWindow(static_cast<int>(GetSize().width), static_cast<int>(GetSize().height), m_title.c_str(), primaryMonitor, nullptr));
-    }
+           }
     else
     {*/
         SizeF validSize = MakeSizeValid(size); 
@@ -333,6 +329,8 @@ void ArxWindow::SetTitle(std::string_view title)
 
 void ArxWindow::SetSize(const SizeF &s)
 {
+    if (m_fullscreen)
+        return;
     RecalculateSizes(s);
     glfwSetWindowSize(m_win.get(), static_cast<int>(GetSize().height), static_cast<int>(GetSize().width));
 }
@@ -372,6 +370,9 @@ ArxWindow::WindowBorders ArxWindow::GetWindowBorders() const
 }
 void ArxWindow::SetPosition(const Position &pos)
 {
+    if (m_fullscreen)
+        return;
+
     UIControl::SetPosition(pos);
     int xOffset, yOffset;
     glfwGetMonitorPos(glfwGetPrimaryMonitor(), &xOffset, &yOffset);
@@ -622,6 +623,25 @@ Position ArxWindow::CalculateCenterPosition()
     pos.y = std::max(((float)curVidMode->height - GetSize().height) / 2, 0.0f);
 
     return pos;
+}
+
+void ArxWindow::SetFullscreen(bool fullscreen)
+{
+    if (fullscreen)
+    {
+        GLFWmonitor *primaryMonitor = glfwGetPrimaryMonitor();
+        const GLFWvidmode *currentVideoMode = glfwGetVideoMode(primaryMonitor);
+        glfwSetWindowMonitor(m_win.get(), primaryMonitor, 0, 0, currentVideoMode->width, currentVideoMode->height, GLFW_DONT_CARE);
+    }
+    else
+        glfwSetWindowMonitor(m_win.get(), nullptr, 0, 0, 0, 0, GLFW_DONT_CARE);
+
+    m_fullscreen = fullscreen;
+}
+
+bool ArxWindow::IsFullscreen() const
+{
+    return m_fullscreen;
 }
 
 ARX_NAMESPACE_END
