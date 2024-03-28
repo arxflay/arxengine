@@ -2,6 +2,7 @@
 #include "arxengine/ArxException.h"
 #include "arxengine/ui/UIControl.h"
 #include <iostream>
+#include <ctype.h>
 ARX_NAMESPACE_BEGIN
 
 
@@ -84,7 +85,7 @@ const FontCache::FontCacheEntry &FontCache::GetCacheEntry(char ch)
     {
         FontCache::FontCacheEntry entry(parent);
         entry.UpdateDimensions(font.GetGlyphDimensions(ch));
-        if (ch != ' ')
+        if (ch >= '!' && ch <= '~')
         {
             entry.UpdateTexture(font.RenderGlyph(ch));
             entry.UpdateTextureFiltering(m_textureFiltering);
@@ -117,7 +118,7 @@ void FontCache::UpdateCacheEntries()
     m_oldChangeTime = font.GetLastChangeTime();
     for(auto &[ch, entry] : m_cache)
     {
-        if (ch != ' ')
+        if (ch >= '!' && ch <= '~')
             entry.UpdateTexture(font.RenderGlyph(ch));
         entry.UpdateDimensions(font.GetGlyphDimensions(ch));
     }

@@ -33,11 +33,13 @@ void ArxObject::Reparent(ArxObject *parent)
     {
         if (parent == this)
             throw ArxException(ArxException::ErrorCode::GenericError, "parent points to this");
-        
+
         if (GetParent())
             m_parent->m_children.remove(this);
         if (parent)
             parent->m_children.push_back(this);
+        if(parent->IsDestroyCalled())
+            RequestDelete();
 
         m_parent = parent;
     }
@@ -69,14 +71,11 @@ EventManager &ArxObject::GetEventManager()
 
 ArxObject::~ArxObject()
 {
-    m_destroyCalled = true;
-    if (GetParent() && !GetParent()->IsDestroyCalled())
+    if (GetParent())
         m_parent->m_children.remove(this);
-    
-    for(ArxObject *child : m_children)
-        if (!child->IsDestroyCalled())
-            delete child;
-}
 
+    while(!m_children.empty())
+        delete *m_children.begin();
+}
 
 ARX_NAMESPACE_END

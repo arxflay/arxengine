@@ -188,11 +188,21 @@ void arx::Painter::RenderText(std::string_view text, const Position &pos)
     shader.SetUniformVec4("color", m_pen.GetColor().GetNormalizedColorRGBA());
 
     Position drawingPos = CalculateDrawPosition(pos, SizeF(0.0f, 0.0f));
+    float originalDrawPosX = drawingPos.x;
     auto *fontCache = m_sender->GetFontCache();
     for (char ch : text)
     {
         const auto &cacheEntry = fontCache->GetCacheEntry(ch);
-        drawingPos.x += cacheEntry.GetGlyphDimensions().bearings.x;
+        if (ch == '\n')
+        {
+            drawingPos.x = originalDrawPosX;
+            drawingPos.y -= static_cast<float>(cacheEntry.GetGlyphDimensions().size.height + 5);
+            continue;
+        }
+        
+        if (drawingPos.x != originalDrawPosX)
+            drawingPos.x += cacheEntry.GetGlyphDimensions().bearings.x;
+        
         if (ch != ' ')
         {
             cacheEntry.GetTexture()->Bind();

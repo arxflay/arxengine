@@ -686,7 +686,7 @@ TEST(ArxWindow, DISABLED_PositiveCenterWindow)
     GameApp::GetGlobalApp()->Run();
 }
 
-TEST(ArxWindow, DISBALED_PositiveCenterControl)
+TEST(ArxWindow, DISABLED_PositiveCenterControl)
 {
     ArxWindow *win = new ArxWindow("test", SizeF(600, 600), Position(0, 0), 0);
     win->Show();
@@ -705,4 +705,30 @@ TEST(ArxWindow, DISBALED_PositiveCenterControl)
     GameApp::GetGlobalApp()->Run();
 }
 
+TEST(ArxWindow, DISABLED_PositiveAtexitDealloc)
+{
+    ArxWindow *win = new ArxWindow("test", SizeF(600, 600));
+    (void)win;
+}
 
+TEST(ArxWindow, PositiveTextWrapping)
+{
+    ArxWindow *win = new ArxWindow("test", SizeF(640, 360));
+    win->Show();
+
+    win->SetFixedViewport(640, 360);
+    std::filesystem::path testFontPath(TEST_DATA_PATH / std::filesystem::path("test-font-roboto.ttf"));
+    Font font(Font::LoadFromFile(testFontPath.u8string()));
+    font.SetSizeInPt(30);
+    ASSERT_FALSE(font.IsInvalid());
+    win->SetFont(std::move(font));
+    win->GetEventManager().Bind<DrawEvent>([win](DrawEvent &e)
+    {
+        Painter p(e);
+        p.Clear(); 
+        p.RenderText("t\ne\ns\nt\nstring", Position(50, 50));
+        (void)win; 
+    });
+
+    GameApp::GetGlobalApp()->Run();
+}
