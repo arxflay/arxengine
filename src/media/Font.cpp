@@ -7,6 +7,8 @@
 #include "arxengine/misc/Convertors.h"
 #include <iostream>
 #include "arxengine/logging/Logger.h"
+#include "arxengine/misc/Math.h"
+
 ARX_NAMESPACE_BEGIN
 
 Font::Font()
@@ -125,22 +127,43 @@ GlyphDimensions Font::GetGlyphDimensions(char ch)
     return dimensions;
 }
 
-Image Font::RenderGlyph(char ch)
+std::vector<uint8_t> GetMonochromeImage(unsigned char *buffer, const SizeUL &bitmapSizeInBits, int pitch)
+{
+    //pitch = number of bytes to next row in bitmap
+    std::vector<uint8_t> out;
+    out.resize(bitmapSizeInBits.height * bitmapSizeInBits.width);
+
+    for (unsigned long row = 0; row < bitmapSizeInBits.height; ++row) 
+        for(unsigned long column = 0; column < bitmapSizeInBits.width; ++column)
+            out[row * bitmapSizeInBits.width + column] = 0xFF * !!GET_BIT(buffer[(row * pitch + (column >> 3))], PowerOfTwoModulo(column, 3));
+
+    return out;
+}
+
+Image Font::RenderGlyph(char ch, bool renderWithAntialising)
 {
     if (!m_face.get())
         return Image{};
 
     LoadGlyph(ch);
 
-    FT_Error status = 0;
-    if (m_face->glyph->bitmap.buffer == nullptr)
-        status = FT_Render_Glyph(m_face->glyph, FT_RENDER_MODE_NORMAL);
+    FT_Error status = FT_Render_Glyph(m_face->glyph, renderWithAntialising ? FT_RENDER_MODE_NORMAL : FT_RENDER_MODE_MONO);
     
     if (status != FT_Err_Ok)
+    {
         GLOG->Debug("Font - failed to render glyph");
+        return Image{};
+    }
 
-    SizeUL size(m_face->glyph->bitmap.width, m_face->glyph->bitmap.rows);
-    return Image::LoadFromData(size, 1, m_face->glyph->bitmap.buffer);
+    FT_Bitmap &bitmap = m_face->glyph->bitmap;
+    SizeUL size(bitmap.width, bitmap.rows);
+
+    if (!renderWithAntialising)
+    {
+        std::vector<uint8_t> monochromeBuffer = GetMonochromeImage(bitmap.buffer, size, bitmap.pitch);
+        return Image::LoadFromData(size, 1, monochromeBuffer.data());
+    }
+    return Image::LoadFromData(size, 1, bitmap.buffer);
 }
 
 void Font::UpdateLastChangeTime()

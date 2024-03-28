@@ -100,6 +100,11 @@ public:
     virtual void EnableClipToBounds(bool enable = true);
     virtual bool IsEnabledClipToBounds() const;
 
+    void EnableTextSmoothing(bool enable = true);
+    void EnableTextAntialising(bool enable = true);
+    bool IsTextSmoothingEnabled() const;
+    bool IsTextAntialisingEnabled() const;
+
     void Center();
 
     bool HitTest(Position pos) const;

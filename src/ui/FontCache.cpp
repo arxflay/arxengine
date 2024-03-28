@@ -65,6 +65,7 @@ FontCache::FontCache(UIControl *parent)
     : UIObject(parent)
     , m_oldChangeTime(parent->GetFont().GetLastChangeTime())
     , m_textureFiltering(Texture::TextureFilteringMode::Default)
+    , m_antialisingEnabled(true)
 {
 
 }
@@ -78,18 +79,16 @@ const FontCache::FontCacheEntry &FontCache::GetCacheEntry(char ch)
         throw ArxException(ArxException::ErrorCode::GenericError, "FontCacheEntry invalid font set");
 
     if (m_oldChangeTime != font.GetLastChangeTime())
+    {
         UpdateCacheEntries();
+        m_oldChangeTime = font.GetLastChangeTime();
+    }
      
     auto it = m_cache.find(ch);
     if (it == m_cache.end())
     {
         FontCache::FontCacheEntry entry(parent);
-        entry.UpdateDimensions(font.GetGlyphDimensions(ch));
-        if (ch >= '!' && ch <= '~')
-        {
-            entry.UpdateTexture(font.RenderGlyph(ch));
-            entry.UpdateTextureFiltering(m_textureFiltering);
-        }
+        UpdateCacheEntry(ch, entry);
         it = m_cache.emplace(ch, std::move(entry)).first;
     }
 
@@ -101,10 +100,8 @@ void FontCache::EnableFontSmoothing(bool enable)
     Texture::TextureFilteringMode filtering = enable ? Texture::TextureFilteringMode::Linear : Texture::TextureFilteringMode::Nearest;
     if (m_textureFiltering == filtering)
         return;
-
     m_textureFiltering = filtering;
-    for(auto &[ch, entry] : m_cache)
-        entry.UpdateTextureFiltering(m_textureFiltering);
+    m_oldChangeTime = decltype(m_oldChangeTime)(std::chrono::seconds(-1));
 }
 
 bool FontCache::IsFontSmoothingEnabled() const
@@ -112,16 +109,36 @@ bool FontCache::IsFontSmoothingEnabled() const
     return m_textureFiltering == Texture::TextureFilteringMode::Linear;
 }
 
+void FontCache::EnableAntialising(bool enable)
+{
+    if (m_antialisingEnabled == enable)
+        return;
+
+    m_antialisingEnabled = enable;
+    m_oldChangeTime = decltype(m_oldChangeTime)(std::chrono::seconds(-1));
+}
+
+void FontCache::UpdateCacheEntry(char ch, FontCache::FontCacheEntry &e)
+{
+    Font &font = GetOwnerUIControl()->GetFont();
+    if (ch >= '!' && ch <= '~')
+    {
+        e.UpdateTexture(font.RenderGlyph(ch, m_antialisingEnabled));
+        e.UpdateTextureFiltering(m_textureFiltering);
+    }
+
+    e.UpdateDimensions(font.GetGlyphDimensions(ch));
+}
+
 void FontCache::UpdateCacheEntries()
 {
-    Font &font = static_cast<UIControl*>(GetParent())->GetFont();
-    m_oldChangeTime = font.GetLastChangeTime();
     for(auto &[ch, entry] : m_cache)
-    {
-        if (ch >= '!' && ch <= '~')
-            entry.UpdateTexture(font.RenderGlyph(ch));
-        entry.UpdateDimensions(font.GetGlyphDimensions(ch));
-    }
+        UpdateCacheEntry(ch, entry);
+}
+
+bool FontCache::IsAntialisingEnabled() const
+{
+    return m_antialisingEnabled;
 }
 
 const Font::ChangeTime_t &FontCache::GetLastFontChangeTime() const

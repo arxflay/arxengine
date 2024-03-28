@@ -49,7 +49,7 @@ public:
     unsigned int GetSizeInPixels();
     bool IsInvalid();
     GlyphDimensions GetGlyphDimensions(char ch);
-    Image RenderGlyph(char ch);
+    Image RenderGlyph(char ch, bool renderWithAntialising = true);
     const ChangeTime_t &GetLastChangeTime();
     TextExtent GetTextExtent(std::string_view text);
 

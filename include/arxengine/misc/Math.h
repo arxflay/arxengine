@@ -28,6 +28,13 @@ inline bool AreNumsEqual<double>(const double &a, const double &b)
     return std::abs(a - b) <= std::numeric_limits<double>::epsilon();
 }
 
+static inline unsigned long constexpr PowerOfTwoModulo(unsigned long value, unsigned long powerOfTwo)
+{
+    return value - ((value >> powerOfTwo) << powerOfTwo);
+}
+
+#define GET_BIT(byteVal, pos) (byteVal & (1 << (7 - (pos))))
+
 ARX_NAMESPACE_END
 
 #endif

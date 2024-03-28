@@ -39,17 +39,22 @@ public:
     //creates cache entry if character doesnt exists
     const FontCache::FontCacheEntry &GetCacheEntry(char ch);
     void EnableFontSmoothing(bool enable);
+    void EnableAntialising(bool enable);
+    bool IsAntialisingEnabled() const;
     bool IsFontSmoothingEnabled() const;
     const Font::ChangeTime_t &GetLastFontChangeTime() const;
 
 private:
     void UpdateCacheEntries();
+    void UpdateCacheEntry(char ch, FontCacheEntry &e);
+
     FontCache(FontCache&&) = delete;
     FontCache(const FontCache&) = delete;
     FontCache &operator=(FontCache&&) = delete;
     FontCache &operator=(const FontCache&);
     Font::ChangeTime_t m_oldChangeTime;
     Texture::TextureFilteringMode m_textureFiltering;
+    bool m_antialisingEnabled;
     std::map<char, FontCache::FontCacheEntry> m_cache; 
 };
 

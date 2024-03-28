@@ -337,5 +337,24 @@ Position UIControl::CalculateCenterPosition()
     return pos;
 }
 
+void UIControl::EnableTextSmoothing(bool enable)
+{
+    GetFontCache()->EnableFontSmoothing(enable);
+}
+
+void UIControl::EnableTextAntialising(bool enable)
+{
+    GetFontCache()->EnableAntialising(enable);
+}
+
+bool UIControl::IsTextSmoothingEnabled() const
+{
+    return m_fontCache->IsFontSmoothingEnabled();
+}
+
+bool UIControl::IsTextAntialisingEnabled() const 
+{
+    return m_fontCache->IsAntialisingEnabled();
+}
 
 ARX_NAMESPACE_END

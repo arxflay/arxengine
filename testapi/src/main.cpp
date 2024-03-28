@@ -722,10 +722,11 @@ TEST(ArxWindow, PositiveTextWrapping)
     font.SetSizeInPt(30);
     ASSERT_FALSE(font.IsInvalid());
     win->SetFont(std::move(font));
+    win->EnableTextAntialising(false);
     win->GetEventManager().Bind<DrawEvent>([win](DrawEvent &e)
     {
         Painter p(e);
-        p.Clear(); 
+        p.Clear();
         p.RenderText("t\ne\ns\nt\nstring", Position(50, 50));
         (void)win; 
     });
