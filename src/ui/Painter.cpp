@@ -190,16 +190,19 @@ void arx::Painter::RenderText(std::string_view text, const Position &pos)
     Position drawingPos = CalculateDrawPosition(pos, SizeF(0.0f, 0.0f));
     float originalDrawPosX = drawingPos.x;
     auto *fontCache = m_sender->GetFontCache();
+    float maxHeight = 0;
     for (char ch : text)
     {
         const auto &cacheEntry = fontCache->GetCacheEntry(ch);
         if (ch == '\n')
         {
             drawingPos.x = originalDrawPosX;
-            drawingPos.y -= static_cast<float>(cacheEntry.GetGlyphDimensions().size.height + 5);
+            drawingPos.y -= static_cast<float>(maxHeight + 1);
+            maxHeight = static_cast<float>(cacheEntry.GetGlyphDimensions().size.height);
             continue;
         }
-        
+
+        maxHeight = std::max(maxHeight, static_cast<float>(cacheEntry.GetGlyphDimensions().size.height) + static_cast<float>(cacheEntry.GetGlyphDimensions().size.height) - cacheEntry.GetGlyphDimensions().bearings.y);
         if (drawingPos.x != originalDrawPosX)
             drawingPos.x += cacheEntry.GetGlyphDimensions().bearings.x;
         

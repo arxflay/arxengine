@@ -34,8 +34,8 @@ Font &Font::operator=(Font &&font)
     swap(m_sizeInPixels, font.m_sizeInPixels);
     swap(m_face, font.m_face);
     swap(m_fontData, font.m_fontData);
-    font.UpdateLastChangeTime();
-    UpdateLastChangeTime();
+    font.CommitUpdate();
+    CommitUpdate();
 
     return *this;
 }
@@ -76,7 +76,7 @@ bool Font::SetSizeInPixels(unsigned int heightInPixels)
     if(status != FT_Err_Ok)
         return false;
 
-    UpdateLastChangeTime();
+    CommitUpdate();
 
     m_sizeInPixels = heightInPixels;
     return true;
@@ -166,9 +166,11 @@ Image Font::RenderGlyph(char ch, bool renderWithAntialising)
     return Image::LoadFromData(size, 1, bitmap.buffer);
 }
 
-void Font::UpdateLastChangeTime()
+void Font::CommitUpdate()
 {
     m_lastChangeTime = std::chrono::steady_clock::now();
+    if (m_face != nullptr && m_face->glyph != nullptr)
+        FT_Load_Glyph(m_face.get(), 0, FT_LOAD_DEFAULT);
 }
 
 const Font::ChangeTime_t &Font::GetLastChangeTime()
@@ -189,7 +191,7 @@ Font &Font::operator=(const Font &f)
     m_fontData = f.m_fontData;
     m_face = GameApp::GetGlobalApp()->GetFontLoader().NewFaceFromExistingDataBinary(m_fontData->data(), m_fontData->size(), 0);
     SetSizeInPixels(f.m_sizeInPixels);
-    UpdateLastChangeTime();
+    CommitUpdate();
     
     return *this;
 }
@@ -197,15 +199,26 @@ Font &Font::operator=(const Font &f)
 TextExtent Font::GetTextExtent(std::string_view text) 
 {
     TextExtent textExtent{};
+    auto nlDimensions = GetGlyphDimensions('\n');
+    float newLineHeight = static_cast<float>(nlDimensions.size.height);
     for (size_t i = 0; i < text.size(); i++)
     {
+        if (text[i] == '\n')
+        {
+            textExtent.newLineHeightSum += newLineHeight;
+            newLineHeight = static_cast<float>(nlDimensions.size.height); 
+            continue;
+        }
         GlyphDimensions dimensions = GetGlyphDimensions(text[i]);
         textExtent.maxHeight = (std::max)(static_cast<float>(dimensions.size.height), textExtent.maxHeight);
         float yMin = static_cast<float>(dimensions.size.height) - dimensions.bearings.y;
         textExtent.yMin = (std::max)(textExtent.yMin, yMin);
-        textExtent.yMax = (std::max)(static_cast<float>(dimensions.size.height) - yMin, textExtent.yMax); 
+        textExtent.yMax = (std::max)(static_cast<float>(dimensions.size.height) - yMin, textExtent.yMax);
+
+        newLineHeight = static_cast<float>(dimensions.size.height) + yMin;
         textExtent.widthSum += dimensions.advance.x + static_cast<float>(dimensions.bearings.x);
     }
+    
     return textExtent;
 }
 

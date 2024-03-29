@@ -28,6 +28,7 @@ struct TextExtent
     float widthSum;
     float yMin;
     float yMax;
+    float newLineHeightSum;
 };
 
 class ARX_EXPORTS Font final 
@@ -55,7 +56,7 @@ public:
 
 private:
     void LoadGlyph(char ch);
-    void UpdateLastChangeTime();
+    void CommitUpdate();
     unsigned int m_sizeInPixels;
     ChangeTime_t m_lastChangeTime;
     std::shared_ptr<std::vector<uint8_t>> m_fontData;

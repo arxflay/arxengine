@@ -61,6 +61,8 @@ public:
 
     static LoadFileErrorCode LoadBinaryFile(std::string_view filename, std::vector<uint8_t> &data);
     static LoadFileErrorCode LoadFile(std::string_view filename, std::string &data);
+
+    static std::string GetExecutablePath();
 };
 
 ARX_NAMESPACE_END

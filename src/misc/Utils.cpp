@@ -9,6 +9,11 @@
 #include <charconv>
 #include <fstream>
 #include <sstream>
+#include <filesystem>
+
+#if WIN32 
+    #include <windows.h>
+#endif
 ARX_NAMESPACE_BEGIN
 constexpr std::string_view BASE64_CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 constexpr char BASE64_PADDING_CHAR = '=';
@@ -220,4 +225,18 @@ static inline Utils::Base64DecodeErrCode Base64DecodeInternal(std::string_view e
 
     return Utils::LoadFileErrorCode::NoError;
 }
+
+std::string Utils::GetExecutablePath()
+{
+#ifdef WIN32
+    char buffer[MAX_PATH]{};
+    DWORD len = GetModuleFileNameA(nullptr, &buffer, sizeof(buffer));
+    return std::string(buffer, len);
+#else
+    //https://stackoverflow.com/questions/1528298/get-path-of-executable
+    // /proc/self - folder with info about current executable; /proc/self/exe - symlink to self
+    return std::filesystem::canonical("/proc/self/exe").native();
+#endif
+}
+
 ARX_NAMESPACE_END

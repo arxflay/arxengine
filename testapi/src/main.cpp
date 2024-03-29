@@ -600,7 +600,7 @@ TEST(ArxWindow, DISABLED_PositiveLabel)
     GameApp::GetGlobalApp()->Run();
 }
 
-TEST(ArxWindow, DISABLED_PositiveBitmapButton)
+TEST(ArxWindow, PositiveBitmapButton)
 {
     ArxWindow *win = new ArxWindow("test", SizeF(640, 360));
     win->Show();
@@ -608,7 +608,7 @@ TEST(ArxWindow, DISABLED_PositiveBitmapButton)
     BitmapButton *btn = new BitmapButton(win);
     btn->SetSize(SizeF(200, 200));
     btn->SetPosition(Position(100, 100));
-    btn->SetText("tegi");
+    btn->SetText("t\ne\ng\ni");
     btn->SetHorizontalTextAlignment(HorizontalTextAlignment::Center);
     btn->SetVerticalTextAlignment(VerticalTextAlignment::Center);
     btn->SetTextAlignmentPaddingX(50);
@@ -727,14 +727,14 @@ TEST(ArxWindow, DISABLED_PositiveTextWrapping)
     {
         Painter p(e);
         p.Clear();
-        p.RenderText("t\ne\ns\nt\nstring", Position(50, 50));
+        p.RenderText("S\ne\nt\nt\ni\nn\ng\ns", Position(50, 50));
         (void)win; 
     });
 
     GameApp::GetGlobalApp()->Run();
 }
 
-TEST(ArxWindow, PositiveSetFullscreen)
+TEST(ArxWindow, DISABLED_PositiveSetFullscreen)
 {
     ArxWindow *win = new ArxWindow("test", SizeF(640, 360));
     win->Show();
@@ -745,4 +745,11 @@ TEST(ArxWindow, PositiveSetFullscreen)
     t->Start(Timer::TimerType::SINGLE_FIRE);
 
     GameApp::GetGlobalApp()->Run();
+}
+
+TEST(Utils, PositiveGetPath)
+{
+    std::string path = Utils::GetExecutablePath();
+    std::cout << path << '\n';
+    ASSERT_STRNE(path.c_str(), "");
 }
