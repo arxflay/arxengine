@@ -215,7 +215,7 @@ TextExtent Font::GetTextExtent(std::string_view text)
         textExtent.yMin = (std::max)(textExtent.yMin, yMin);
         textExtent.yMax = (std::max)(static_cast<float>(dimensions.size.height) - yMin, textExtent.yMax);
 
-        newLineHeight = static_cast<float>(dimensions.size.height) + yMin;
+        newLineHeight = std::max(newLineHeight, static_cast<float>(dimensions.size.height) + yMin);
         textExtent.widthSum += dimensions.advance.x + static_cast<float>(dimensions.bearings.x);
     }
     

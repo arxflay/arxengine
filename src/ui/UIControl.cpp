@@ -300,7 +300,7 @@ Position UIControl::CalculateTextPosition(const TextExtent &textExtent, Vertical
     switch(verticalAlignment)
     {
         case VerticalTextAlignment::Center:
-            pos.y += (GetClientSize().height + (textExtent.yMax - textExtent.yMin - textExtent.newLineHeightSum)) / 2;
+            pos.y += std::max((GetClientSize().height + (textExtent.yMax - textExtent.yMin - textExtent.newLineHeightSum)) / 2, 0.0f);
             break;
         case VerticalTextAlignment::Bottom:
             pos.y += GetClientSize().height - textExtent.yMin - textExtent.newLineHeightSum;

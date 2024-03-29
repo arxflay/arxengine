@@ -608,7 +608,7 @@ TEST(ArxWindow, PositiveBitmapButton)
     BitmapButton *btn = new BitmapButton(win);
     btn->SetSize(SizeF(200, 200));
     btn->SetPosition(Position(100, 100));
-    btn->SetText("t\ne\ng\ni");
+    btn->SetText("O\np\nt\ni\no\ns");
     btn->SetHorizontalTextAlignment(HorizontalTextAlignment::Center);
     btn->SetVerticalTextAlignment(VerticalTextAlignment::Center);
     btn->SetTextAlignmentPaddingX(50);
