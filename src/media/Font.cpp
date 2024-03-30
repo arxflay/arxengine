@@ -201,12 +201,15 @@ TextExtent Font::GetTextExtent(std::string_view text)
     TextExtent textExtent{};
     auto nlDimensions = GetGlyphDimensions('\n');
     float newLineHeight = static_cast<float>(nlDimensions.size.height);
+    float widthSum = 0;
     for (size_t i = 0; i < text.size(); i++)
     {
         if (text[i] == '\n')
         {
             textExtent.newLineHeightSum += newLineHeight;
-            newLineHeight = static_cast<float>(nlDimensions.size.height); 
+            newLineHeight = static_cast<float>(nlDimensions.size.height);
+            textExtent.widthSum = std::max(textExtent.widthSum, widthSum);
+            widthSum = 0;
             continue;
         }
         GlyphDimensions dimensions = GetGlyphDimensions(text[i]);
@@ -214,10 +217,10 @@ TextExtent Font::GetTextExtent(std::string_view text)
         float yMin = static_cast<float>(dimensions.size.height) - dimensions.bearings.y;
         textExtent.yMin = (std::max)(textExtent.yMin, yMin);
         textExtent.yMax = (std::max)(static_cast<float>(dimensions.size.height) - yMin, textExtent.yMax);
-
         newLineHeight = std::max(newLineHeight, static_cast<float>(dimensions.size.height) + yMin);
-        textExtent.widthSum += dimensions.advance.x + static_cast<float>(dimensions.bearings.x);
+        widthSum += dimensions.advance.x + static_cast<float>(dimensions.bearings.x);
     }
+    textExtent.widthSum = std::max(textExtent.widthSum, widthSum);
     
     return textExtent;
 }

@@ -608,10 +608,10 @@ TEST(ArxWindow, PositiveBitmapButton)
     BitmapButton *btn = new BitmapButton(win);
     btn->SetSize(SizeF(200, 200));
     btn->SetPosition(Position(100, 100));
-    btn->SetText("O\np\nt\ni\no\ns");
+    btn->SetText("O\np\nt\ni\no\nn\ns");
     btn->SetHorizontalTextAlignment(HorizontalTextAlignment::Center);
     btn->SetVerticalTextAlignment(VerticalTextAlignment::Center);
-    btn->SetTextAlignmentPaddingX(50);
+    //btn->SetTextAlignmentPaddingX(50);
     btn->SetCanBeAffectedByCamera(true);
     win->SetCameraPos(Position(99, 50));
     btn->SetNormalImage(Image::LoadFromFile((TEST_DATA_PATH / std::filesystem::path("btn_normal.jpg")).u8string()));
