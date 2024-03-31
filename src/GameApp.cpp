@@ -108,7 +108,6 @@ int GameApp::Init()
         auto m_soundDeviceContextPair = internal::InitAL();
         m_fontLoader = internal::InitFT();
         m_eventProcessor = std::make_unique<UIEventProcessor>();
-        OnAfterInit();
         m_initialized = true;
         GLOG->Info("Initialization done");
         m_soundDevice = m_soundDeviceContextPair.first.release();
@@ -122,6 +121,16 @@ int GameApp::Init()
         glfwTerminate();
     }
 
+    try
+    {
+        OnAfterInit();
+    }
+    catch(...)
+    {
+        code = static_cast<int>(UniversalExceptionHandler::HandleException());
+        GLOG->Info("Call to AfterInit failed");
+    }
+
     return code;
 }
 
@@ -132,6 +141,8 @@ int GameApp::Run()
     
     m_running = true;
     OnRun();
+    if (m_windows.empty())
+        return 0;
     
     double m_past = glfwGetTime();
     double m_now = 0; 

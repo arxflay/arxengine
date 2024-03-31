@@ -43,7 +43,7 @@ namespace
             Position relativeSenderPos = obj->GetPosition();
             SizeF parentSize = static_cast<UIControl*>(obj->GetParent())->GetSize();
             senderSize.width = std::clamp(senderSize.width, 0.0f, parentSize.width - relativeSenderPos.x);
-            senderSize.height = std::clamp(senderSize.width, 0.0f, parentSize.width - relativeSenderPos.y);
+            senderSize.height = std::clamp(senderSize.height, 0.0f, parentSize.height - relativeSenderPos.y);
         }
         const SizeF &windowSize = window->GetClientSize();
         const SizeF &viewPortSize = window->GetViewport().size;
@@ -109,6 +109,7 @@ Painter::Painter(DrawEvent &evt)
 
 void Painter::DrawRectangle(const Position &pos, const SizeF &size)
 {
+    glEnable(GL_BLEND);
     OldClippingAreaGuard clipGuard;
     OldVAOGuard vaoGuard;
     if (m_clippingArea)
@@ -134,14 +135,15 @@ void Painter::DrawRectangle(const Position &pos, const SizeF &size)
     shader.UseShader();
     shader.SetTransformMatrices(modelMatrix, viewMatrix, GetViewport().projectionMatrix);
     shader.SetUniformVec4("color", m_brush.GetColor().GetNormalizedColorRGBA());
-    glDrawArrays(GL_TRIANGLES, 0, 6); 
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glDisable(GL_BLEND);
 }
 
 void Painter::DrawTexture2D(const Position &pos, const SizeF &size, const Texture2D *tex, int tileWidthCount, int tileHeightCount)
 {
     if (!tex)
         throw ArxException(ArxException::ErrorCode::GenericError, "Painter: Texture2D texture is null");
-    else if (tex->GetOwnerUIControl() != GetSender())    
+    else if (tex->GetWindow() != GetSender()->GetWindow())    
         throw ArxException(ArxException::ErrorCode::GenericError, "Painter: Texture2D owner mismatch");
 
     glEnable(GL_BLEND);
@@ -238,7 +240,7 @@ void arx::Painter::RenderText(std::string_view text, const Position &pos)
 
 void Painter::SetUserShader(std::optional<Shader*> m_shader)
 {   
-    if (m_shader.has_value() && m_shader.value()->GetOwnerUIControl() != GetSender())
+    if (m_shader.has_value() && m_shader.value()->GetWindow() != GetSender()->GetWindow())
         throw ArxException(ArxException::ErrorCode::GenericError, "Painter: Shader owner mismatch");
     m_userShader = m_shader;
 }
@@ -267,12 +269,11 @@ Position Painter::CalculateDrawPosition(const Position &originalDrawPos, const S
 void Painter::Clear()
 {
     OldClippingAreaGuard clipGuard;
-    OldVAOGuard vaoGuard;
     if (m_clippingArea)
         m_clippingArea->UseThisClippingArea();
     
     glm::vec4 normalizedColor = m_brush.GetColor().GetNormalizedColorRGBA();
-    glClearColor(normalizedColor.r, normalizedColor.g, normalizedColor.b, normalizedColor.a);
+    glClearColor(normalizedColor.r, normalizedColor.g, normalizedColor.b, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 }
 

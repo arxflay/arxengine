@@ -10,7 +10,7 @@
 #include <memory>
 #include "arxengine/misc/EnumHelpers.h"
 ARX_NAMESPACE_BEGIN
-#define GLOG Logger::GetGlobalLogger()
+#define GLOG ::ARX_NAMESPACE::Logger::GetGlobalLogger()
 
 class ARX_EXPORTS Logger
 {

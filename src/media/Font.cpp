@@ -182,15 +182,21 @@ Font::Font(const Font &f)
     : Font()
 {
     m_fontData = f.m_fontData;
-    m_face = GameApp::GetGlobalApp()->GetFontLoader().NewFaceFromExistingDataBinary(m_fontData->data(), m_fontData->size(), 0);
-    SetSizeInPixels(f.m_sizeInPixels);
+    if (m_fontData)
+    {
+        m_face = GameApp::GetGlobalApp()->GetFontLoader().NewFaceFromExistingDataBinary(m_fontData->data(), m_fontData->size(), 0);
+        SetSizeInPixels(f.m_sizeInPixels);
+    }
 }
 
 Font &Font::operator=(const Font &f)
 {
     m_fontData = f.m_fontData;
-    m_face = GameApp::GetGlobalApp()->GetFontLoader().NewFaceFromExistingDataBinary(m_fontData->data(), m_fontData->size(), 0);
-    SetSizeInPixels(f.m_sizeInPixels);
+    if (m_fontData)
+    {
+        m_face = GameApp::GetGlobalApp()->GetFontLoader().NewFaceFromExistingDataBinary(m_fontData->data(), m_fontData->size(), 0);
+        SetSizeInPixels(f.m_sizeInPixels);
+    }
     CommitUpdate();
     
     return *this;

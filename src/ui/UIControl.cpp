@@ -20,6 +20,7 @@ UIControl::UIControl(UIControl *parent, const SizeF &size, const Position &pos)
     m_fontCache = new FontCache(this);
     ArxObject::Reparent(parent);
     m_ownerWindow = parent->GetWindow();
+    m_font = parent->GetFont();
 }
 
 void UIControl::SetBackgroundColor(const Color &c) { m_backgroundColor = c; }
@@ -274,7 +275,7 @@ void UIControl::OnDraw(DrawEvent &e)
 {
    Painter painter(e);
    painter.SetBrush(GetColor());
-   painter.Clear();
+   painter.DrawRectangle(Position(0,0), GetClientSize());
 }
 
 const UIControlList &UIControl::GetMouseEventRecievers() const
