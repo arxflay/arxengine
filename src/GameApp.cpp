@@ -174,8 +174,9 @@ void GameApp::CleanUp()
         m_eventProcessor->RemoveEvents();
     while(!m_windows.empty())
     {
-        ArxWindow *win = *m_windows.begin();
-        m_windows.erase(m_windows.begin());
+        auto it = m_windows.begin();
+        ArxWindow *win = *it;
+        m_windows.erase(it);
         delete win;
     }
     m_shouldExit = false;
@@ -225,7 +226,7 @@ GameApp::~GameApp()
     if (m_initialized)
     {
         glfwTerminate();
-        CleanUp();
+        //CleanUp();
         //delete context and then device
         delete m_soundContext;
         delete m_soundDevice;

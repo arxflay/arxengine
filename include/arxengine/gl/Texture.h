@@ -110,7 +110,7 @@ protected:
         unsigned int m_texture;
     };
 
-    static unsigned int ImageChannelsToGL(const Image &img);
+    static int ImageChannelsToGL(const Image &img);
     static int DetermineBestPackingAlignmentSize(const Image &img);
 
     unsigned int GetTextureHandle();

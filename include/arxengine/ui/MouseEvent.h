@@ -26,11 +26,14 @@ public:
     };
 
     void SetMouseButtonType(ButtonType buttonType);
-    ButtonType GetMouseButtonType() const; 
+    ButtonType GetMouseButtonType() const;
+    bool WasForced() const;
+    void SetWasForced(bool forced);
 
 private:
     void HandleEvent() override = 0;
     ButtonType m_buttonType;
+    bool m_wasForced;
 };
 
 class ARX_EXPORTS MouseDownEvent : public MouseButtonEvent

@@ -1,24 +1,14 @@
-#include "arxengine/internal/gl/Shader.h"
+#include "arxengine/internal/gl/ShaderImpl.h"
 #include <glad/glad.h>
 #include <fstream>
 #include <sstream>
 #include <iostream>
 #include <glm/gtc/type_ptr.hpp>
 #include "arxengine/logging/Logger.h"
+#include "arxengine/misc/Utils.h"
 #include <utility>
 
 ARX_NAMESPACE_BEGIN
-
-std::string LoadFile(std::string_view filename)
-{
-    std::stringstream stream;
-    std::ifstream file;
-    file.exceptions(std::ifstream::badbit | std::ifstream::failbit);
-    file.open(filename.data());
-    stream << file.rdbuf();
-    file.close();
-    return stream.str();
-}
 
 enum ShaderType : unsigned int
 {
@@ -61,9 +51,8 @@ unsigned int CreateAndCompileShader(ShaderType shaderType, std::string_view data
     return shader;
 }
 
-unsigned int CreateAndLinkProgram(unsigned int vertexShader, unsigned int fragmentShader, std::optional<unsigned int> geometryShader)
+unsigned int LinkProgram(unsigned int program, unsigned int vertexShader, unsigned int fragmentShader, std::optional<unsigned int> geometryShader)
 {
-    unsigned int program = glCreateProgram();
     glAttachShader(program, vertexShader);
     glAttachShader(program, fragmentShader);
     if (geometryShader.has_value())
@@ -83,89 +72,95 @@ unsigned int CreateAndLinkProgram(unsigned int vertexShader, unsigned int fragme
     return program;
 }
 
-Shader::~Shader()
+ShaderImpl::~ShaderImpl()
 {
-    glDeleteProgram(m_programHandle);
+    if (m_programHandle != 0)
+        glDeleteProgram(m_programHandle);
 }
 
-/*static*/ Shader Shader::FromFiles(std::string_view vertexShaderFile, std::string_view fragmentShaderFile, std::optional<std::string_view> geometryShaderFile)
+void ShaderImpl::LoadFromFiles(std::string_view vertexShaderFile, std::string_view fragmentShaderFile, std::optional<std::string_view> geometryShaderFile)
 {
-    std::string vertexShaderData = LoadFile(vertexShaderFile);
-    std::string fragmentShaderData = LoadFile(fragmentShaderFile);
+    std::string vertexShaderData;
+    Utils::LoadFile(vertexShaderFile, vertexShaderData);
+    std::string fragmentShaderData;
+    Utils::LoadFile(fragmentShaderFile, vertexShaderData);
+
     std::optional<std::string> geometryShaderData = std::nullopt;
     if (geometryShaderFile.has_value())
-        geometryShaderData = LoadFile(geometryShaderFile.value());
+    {
+        geometryShaderData.emplace();
+        Utils::LoadFile(geometryShaderFile.value(), geometryShaderData.value());
+    }
 
-    return FromData(vertexShaderData, fragmentShaderData, geometryShaderData);
+    LoadFromData(vertexShaderData, fragmentShaderData, geometryShaderData);
 }
 
-/*static*/ Shader Shader::FromData(std::string_view vertexShaderData, std::string_view fragmentShaderData, std::optional<std::string_view> geometryShaderData)
+void ShaderImpl::LoadFromData(std::string_view vertexShaderData, std::string_view fragmentShaderData, std::optional<std::string_view> geometryShaderData)
 {
-    Shader shader;
-
     unsigned int vertexShader = CreateAndCompileShader(ShaderType::VertexShader, vertexShaderData); 
     unsigned int fragmentShader = CreateAndCompileShader(ShaderType::FragmentShader, fragmentShaderData);
     std::optional<unsigned int> geometryShader = std::nullopt;
     if (geometryShaderData.has_value())
         geometryShader = CreateAndCompileShader(ShaderType::GeometryShader, geometryShaderData.value());
-    shader.m_programHandle = CreateAndLinkProgram(vertexShader, fragmentShader, geometryShader);
+    if (m_programHandle == 0)
+        m_programHandle = glCreateProgram();
+
+    LinkProgram(m_programHandle, vertexShader, fragmentShader, geometryShader);
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
     if (geometryShader.has_value())
         glDeleteShader(geometryShader.value());
-
-    return shader;
 }
 
-Shader::Shader()
+ShaderImpl::ShaderImpl()
     : m_programHandle(0)
 {
 }
 
-Shader::Shader(Shader &&shader) 
+ShaderImpl::ShaderImpl(ShaderImpl &&shader) 
 {
     m_programHandle = std::exchange(shader.m_programHandle, 0);
 }
 
-Shader &Shader::operator=(Shader &&shader)
+ShaderImpl &ShaderImpl::operator=(ShaderImpl &&shader)
 {
     std::swap(m_programHandle, shader.m_programHandle);
     return *this;
 }
 
-void Shader::SetUniformInt(std::string_view name, int num)
+void ShaderImpl::SetUniformInt(std::string_view name, int num)
 {
     glUniform1i(glGetUniformLocation(m_programHandle, name.data()), num);
 }
 
-void Shader::SetUniformFloat(std::string_view name, float num)
+void ShaderImpl::SetUniformFloat(std::string_view name, float num)
 {
     glUniform1f(glGetUniformLocation(m_programHandle, name.data()), num);
 }
 
-void Shader::SetUniformVec4(std::string_view name, const glm::vec4 &vec)
+void ShaderImpl::SetUniformVec4(std::string_view name, const glm::vec4 &vec)
 {
     glUniform4fv(glGetUniformLocation(m_programHandle, name.data()), 1, glm::value_ptr(vec));
 }
 
-void Shader::SetUniformMat4(std::string_view name, const glm::mat4 &mat)
+void ShaderImpl::SetUniformMat4(std::string_view name, const glm::mat4 &mat)
 {
     glUniformMatrix4fv(glGetUniformLocation(m_programHandle, name.data()), 1, GL_FALSE, glm::value_ptr(mat));
 }
 
-void Shader::SetTransformMatrices(const glm::mat4 &modelMatrix, const glm::mat4 &viewMatrix, const glm::mat4 &projectionMatrix)
+void ShaderImpl::SetTransformMatrices(const glm::mat4 &modelMatrix, const glm::mat4 &viewMatrix, const glm::mat4 &projectionMatrix)
 {
    SetUniformMat4(MODEL_MATRIX_NAME, modelMatrix);
    SetUniformMat4(VIEW_MATRIX_NAME, viewMatrix);
    SetUniformMat4(PROJECTION_MATRIX_NAME, projectionMatrix);
 }
 
-unsigned int Shader::GetProgramHandle()
+unsigned int ShaderImpl::GetProgramHandle()
 {
     return m_programHandle;
 }
 
-void Shader::UseShader()
+void ShaderImpl::UseShader()
 {
     glUseProgram(m_programHandle);
 }

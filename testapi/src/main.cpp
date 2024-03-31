@@ -661,6 +661,7 @@ TEST(ArxWindow, PositiveBitmapButton)
 
     btn->GetEventManager().Bind<MouseDownEvent>([btn](MouseDownEvent &e)
     {
+        GameApp::GetGlobalApp()->Exit(0);
         (void)btn;
         std::cout << "Click" << '\n';
         e.Skip();

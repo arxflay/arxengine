@@ -7,7 +7,7 @@
 #include "arxengine/ArxDefines.h"
 #include "arxengine/internal/gl/VAO.h"
 #include "arxengine/internal/gl/VBO.h"
-#include "arxengine/internal/gl/Shader.h"
+#include "arxengine/internal/gl/ShaderImpl.h"
 #include <map>
 #include <string>
 #include <array>
@@ -37,7 +37,7 @@ public:
 
     using VAOMap = std::map<VAO_ID, VAO>;
     using VBOMap = std::map<VBO_ID, VBO>;
-    using ShaderMap = std::map<SHADER_PROGRAM_ID, Shader>;
+    using ShaderMap = std::map<SHADER_PROGRAM_ID, ShaderImpl>;
 
     VAOMap &GetVAOMap()
     {

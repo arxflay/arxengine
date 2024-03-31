@@ -48,7 +48,8 @@ void UICache::InitRectangleData()
     vbo.SetData(verticies.begin(), verticies.end());
     vbo.SetVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
     vbo.EnableVertexAttribPointer(0);
-    Shader shader = Shader::FromData(RECTANGLE_VERTEX_SHADER, RECTANGLE_FRAGMENT_SHADER, std::nullopt);
+    ShaderImpl shader;
+    shader.LoadFromData(RECTANGLE_VERTEX_SHADER, RECTANGLE_FRAGMENT_SHADER, std::nullopt);
     m_vaos.insert(std::make_pair(VAO_ID::RECTANGLE, std::move(vao)));
     m_vbos.insert(std::make_pair(VBO_ID::RECTANGLE, std::move(vbo)));
     m_shaderPrograms.insert(std::make_pair(SHADER_PROGRAM_ID::RECTANGLE, std::move(shader)));
@@ -77,16 +78,18 @@ constexpr std::string_view IMAGE_FRAGMENT_SHADER = R"(
     in vec2 TexPos;
     out vec4 FragColor;
     uniform sampler2D imageTex;
+    uniform float transparencyFactor;
     void main()
     {
-        FragColor = texture(imageTex, TexPos);
+        FragColor = texture(imageTex, TexPos) * transparencyFactor;;
     }
 )";
 
 
 void UICache::InitImageData()
 {
-    Shader shader = Shader::FromData(IMAGE_VERTEX_SHADER, IMAGE_FRAGMENT_SHADER, std::nullopt);
+    ShaderImpl shader; 
+    shader.LoadFromData(IMAGE_VERTEX_SHADER, IMAGE_FRAGMENT_SHADER, std::nullopt);
     m_shaderPrograms.insert(std::make_pair(SHADER_PROGRAM_ID::IMAGE, std::move(shader)));
 }
 
@@ -121,7 +124,8 @@ constexpr std::string_view TEXT_FRAGMENT_SHADER = R"(
 
 void UICache::InitTextData()
 {
-    Shader shader = Shader::FromData(TEXT_VERTEX_SHADER, TEXT_FRAGMENT_SHADER, std::nullopt);
+    ShaderImpl shader;
+    shader.LoadFromData(TEXT_VERTEX_SHADER, TEXT_FRAGMENT_SHADER, std::nullopt);
     m_shaderPrograms.insert(std::make_pair(SHADER_PROGRAM_ID::TEXT, std::move(shader)));
 }
 

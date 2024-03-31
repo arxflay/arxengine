@@ -34,7 +34,7 @@ namespace
     }
 }
 
-/*static*/ unsigned int Texture::ImageChannelsToGL(const Image &img)
+/*static*/ int Texture::ImageChannelsToGL(const Image &img)
 {
     switch (img.GetColorChannels())
     {
@@ -136,7 +136,8 @@ Texture::TextureUnit Texture::GetTextureUnit() const
 //cleanup
 Texture::~Texture()
 {
-    if (m_texture != 0)
+    //OpenGL objects cleanup after context destruction
+    if (!IsInvalid() && !GetWindow()->IsDestroyCalled())     
     {
         GetWindow()->SetAsCurrentContext();
         glDeleteTextures(1, &m_texture);

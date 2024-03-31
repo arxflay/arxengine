@@ -7,10 +7,12 @@ ARX_NAMESPACE_BEGIN
 
 //UIControl parent can't be nullptr, otherwise exception will be thrown
 UIObject::UIObject(UIControl *parent)
+    : m_window(nullptr)
 {
     if (!parent)
         throw ArxException(ArxException::ErrorCode::GenericError, "Failed to set parent for UIObject, parent is null");
-
+    
+    m_window = parent->GetWindow();
     ArxObject::Reparent(parent);
 }
 
@@ -34,7 +36,7 @@ UIControl *UIObject::GetOwnerUIControl()
 
 ArxWindow *UIObject::GetWindow()
 {
-    return GetOwnerUIControl()->GetWindow();
+    return m_window;
 }
 
 const UIControl *UIObject::GetOwnerUIControl() const
@@ -44,7 +46,7 @@ const UIControl *UIObject::GetOwnerUIControl() const
 
 const ArxWindow *UIObject::GetWindow() const
 {
-    return GetOwnerUIControl()->GetWindow();
+    return m_window;
 }
 
 

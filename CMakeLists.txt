@@ -27,7 +27,7 @@ list(APPEND ARX_SOURCES
     ${ARX_SOURCE_PATH}/evt/UIEventProcessor.cpp
     ${ARX_SOURCE_PATH}/Timer.cpp
     ${ARX_SOURCE_PATH}/internal/gl/ClippingArea.cpp
-    ${ARX_SOURCE_PATH}/internal/gl/Shader.cpp
+    ${ARX_SOURCE_PATH}/internal/gl/ShaderImpl.cpp
     ${ARX_SOURCE_PATH}/internal/gl/VBO.cpp
     ${ARX_SOURCE_PATH}/internal/gl/VAO.cpp
     ${ARX_SOURCE_PATH}/ui/Painter.cpp
@@ -49,6 +49,7 @@ list(APPEND ARX_SOURCES
     ${ARX_SOURCE_PATH}/internal/json/DefaultJsonLexer.cpp
     ${ARX_SOURCE_PATH}/internal/json/DefaultJsonParser.cpp
     ${ARX_SOURCE_PATH}/internal/json/DefaultJsonConvertor.cpp
+    ${ARX_SOURCE_PATH}/gl/Shader.cpp
 
 )
 set(CMAKE_EXPORT_COMPILE_COMMANDS True)

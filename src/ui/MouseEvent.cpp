@@ -5,6 +5,9 @@ void MouseButtonEvent::SetMouseButtonType(ButtonType buttonType) { m_buttonType 
 
 MouseButtonEvent::ButtonType MouseButtonEvent::GetMouseButtonType() const { return m_buttonType; }
 
+bool MouseButtonEvent::WasForced() const { return m_wasForced; }
+void MouseButtonEvent::SetWasForced(bool forced) { m_wasForced = forced; }
+
 void MouseScrollEvent::SetScrollDirection(Direction direction) { m_direction = direction; }
 MouseScrollEvent::Direction MouseScrollEvent::GetScrollDirection() const { return m_direction; }
 

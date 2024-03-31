@@ -263,7 +263,7 @@ void UIControl::MoveToBack()
 
 UIControl::~UIControl()
 {
-    if (GetOwnerWindow())
+    if (GetOwnerWindow() && !GetOwnerWindow()->IsDestroyCalled())
     {
         GetOwnerWindow()->ForgetMouseEnteredControl(this, false);
         GetOwnerWindow()->ForgetPressedMouseButtons(this, false);

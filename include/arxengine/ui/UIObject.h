@@ -29,6 +29,8 @@ public:
 
     const UIControl *GetOwnerUIControl() const;
     const ArxWindow *GetWindow() const;
+private:
+    ArxWindow *m_window;
 };
 
 ARX_NAMESPACE_END

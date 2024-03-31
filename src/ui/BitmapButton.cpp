@@ -30,10 +30,6 @@ int BitmapButton::GetTextAlignmentPaddingY() const { return m_textPaddingY; }
 
 BitmapButton::BitmapButton(UIControl *parent, const Image &img, const SizeF &size, const Position &pos)
     : UIControl(parent, size, pos)
-    , m_normalTexture(new Texture2D(this))
-    , m_mouseEnterTexture(new Texture2D(this))
-    , m_mouseHoldTexture(new Texture2D(this))
-    , m_currentTexture(m_normalTexture)
     , m_textColor(constants::COLOR_BLACK)
     , m_isLeftMouseBtnDown(false)
     , m_isMouseEntered(false)
@@ -44,9 +40,15 @@ BitmapButton::BitmapButton(UIControl *parent, const Image &img, const SizeF &siz
     , m_textPaddingY(0)
 {
     SetCanRecieveMouseEvents(true);
+    m_normalTexture = new Texture2D(this);
+    m_mouseEnterTexture = new Texture2D(this);
+    m_mouseHoldTexture = new Texture2D(this);
+    m_currentTexture = m_normalTexture;
+
     m_normalTexture->SetData(img);
     m_mouseEnterTexture->SetData(img);
     m_mouseHoldTexture->SetData(img);
+
     m_normalTexture->SetTextureWrapping(Texture::TextureWrapping::ClampToEdge);
     m_mouseEnterTexture->SetTextureWrapping(Texture::TextureWrapping::ClampToEdge);
     m_mouseHoldTexture->SetTextureWrapping(Texture::TextureWrapping::ClampToEdge);

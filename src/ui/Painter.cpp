@@ -8,6 +8,7 @@
 #include "arxengine/internal/gl/ClippingArea.h"
 #include "arxengine/ui/internal/UICache.h"
 #include "arxengine/gl/Texture2D.h"
+#include "arxengine/gl/Shader.h"
 #include <iostream>
 
 ARX_NAMESPACE_BEGIN
@@ -82,12 +83,21 @@ namespace
         return clipBox;
     }
 
+    IShader &GetShader(UICache::SHADER_PROGRAM_ID programId, std::optional<Shader*> userShader, UICache *cache)
+    {
+        if (userShader.has_value())
+            return *userShader.value();
+
+        return cache->GetShaderMap().at(programId);
+    }
+
 }
 
 Painter::Painter(DrawEvent &evt)
     : m_sender(dynamic_cast<UIControl*>(evt.GetSender()))
     , m_brush(m_sender->GetColor())
     , m_pen(constants::COLOR_BLACK)
+    , m_trasparencyFactor(1.0f)
 {
     if (m_sender->IsEnabledClipToBounds())
     {     
@@ -120,7 +130,7 @@ void Painter::DrawRectangle(const Position &pos, const SizeF &size)
         
     VAO &rectVao = GetUICache(m_sender)->GetVAOMap().at(UICache::VAO_ID::RECTANGLE);
     rectVao.Bind();
-    Shader &shader = GetUICache(m_sender)->GetShaderMap().at(UICache::SHADER_PROGRAM_ID::RECTANGLE);
+    IShader &shader = GetShader(UICache::SHADER_PROGRAM_ID::RECTANGLE, m_userShader, GetUICache(m_sender));
     shader.UseShader();
     shader.SetTransformMatrices(modelMatrix, viewMatrix, GetViewport().projectionMatrix);
     shader.SetUniformVec4("color", m_brush.GetColor().GetNormalizedColorRGBA());
@@ -129,6 +139,11 @@ void Painter::DrawRectangle(const Position &pos, const SizeF &size)
 
 void Painter::DrawTexture2D(const Position &pos, const SizeF &size, const Texture2D *tex, int tileWidthCount, int tileHeightCount)
 {
+    if (!tex)
+        throw ArxException(ArxException::ErrorCode::GenericError, "Painter: Texture2D texture is null");
+    else if (tex->GetOwnerUIControl() != GetSender())    
+        throw ArxException(ArxException::ErrorCode::GenericError, "Painter: Texture2D owner mismatch");
+
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     OldClippingAreaGuard clipGuard;
@@ -153,11 +168,12 @@ void Painter::DrawTexture2D(const Position &pos, const SizeF &size, const Textur
     tex->Bind();
     VAO &rectVao = GetUICache(m_sender)->GetVAOMap().at(UICache::VAO_ID::RECTANGLE);
     rectVao.Bind();
-    Shader &shader = GetUICache(m_sender)->GetShaderMap().at(UICache::SHADER_PROGRAM_ID::IMAGE);
+    IShader &shader = GetShader(UICache::SHADER_PROGRAM_ID::IMAGE, m_userShader, GetUICache(m_sender));
     shader.UseShader();
     shader.SetTransformMatrices(modelMatrix, viewMatrix, GetViewport().projectionMatrix);
     shader.SetUniformInt("tileHeightCount", tileHeightCount);
     shader.SetUniformInt("tileWidthCount", tileWidthCount);
+    shader.SetUniformFloat("transparencyFactor", m_trasparencyFactor);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glDisable(GL_BLEND);
 }
@@ -183,7 +199,7 @@ void arx::Painter::RenderText(std::string_view text, const Position &pos)
     
     VAO &rectVao = GetUICache(m_sender)->GetVAOMap().at(UICache::VAO_ID::RECTANGLE);
     rectVao.Bind();
-    Shader &shader = GetUICache(m_sender)->GetShaderMap().at(UICache::SHADER_PROGRAM_ID::TEXT);
+    IShader &shader = GetShader(UICache::SHADER_PROGRAM_ID::TEXT, m_userShader, GetUICache(m_sender));
     shader.UseShader();
     shader.SetUniformVec4("color", m_pen.GetColor().GetNormalizedColorRGBA());
 
@@ -218,6 +234,18 @@ void arx::Painter::RenderText(std::string_view text, const Position &pos)
         drawingPos.x += cacheEntry.GetGlyphDimensions().advance.x;
     }
     glDisable(GL_BLEND);
+}
+
+void Painter::SetUserShader(std::optional<Shader*> m_shader)
+{   
+    if (m_shader.has_value() && m_shader.value()->GetOwnerUIControl() != GetSender())
+        throw ArxException(ArxException::ErrorCode::GenericError, "Painter: Shader owner mismatch");
+    m_userShader = m_shader;
+}
+
+std::optional<Shader*> Painter::GetUserShader() const
+{
+    return m_userShader;
 }
 
 Position Painter::CalculateDrawPosition(const Position &originalDrawPos, const SizeF &originalDrawSize)
@@ -276,6 +304,16 @@ void Painter::SetPen(const Pen &pen)
 const Pen &Painter::GetPen() const
 {
     return m_pen;
+}
+
+void Painter::SetTextureTransparencyFactor(float factor)
+{
+    m_trasparencyFactor = factor;
+}
+
+float Painter::GetTextureTransparencyFactor() const
+{
+    return m_trasparencyFactor;
 }
 
 Painter::~Painter() = default;

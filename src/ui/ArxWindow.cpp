@@ -105,6 +105,7 @@ private:
                 {
                     std::unique_ptr<MouseUpEvent> mouseUp = std::make_unique<MouseUpEvent>();
                     mouseUp->SetMouseButtonType(key);
+                    mouseUp->SetWasForced(true);
                     control->GetEventManager().QueueEvent<MouseUpEvent>(std::move(mouseUp));
                 }
             }
@@ -263,15 +264,9 @@ ArxWindow::ArxWindow(std::string_view title, const SizeF &size, const Position &
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, constants::GL_VERSION_MAJOR);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, constants::GL_VERSION_MINOR);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    /*if (isFullScreen) //TODO fullscreen
-    {
-        
-           }
-    else
-    {*/
-        SizeF validSize = MakeSizeValid(size); 
-        m_win.reset(glfwCreateWindow(static_cast<int>(validSize.width), static_cast<int>(validSize.height), m_title.c_str(), nullptr, nullptr));
-    //}
+
+    SizeF validSize = MakeSizeValid(size); 
+    m_win.reset(glfwCreateWindow(static_cast<int>(validSize.width), static_cast<int>(validSize.height), m_title.c_str(), nullptr, nullptr));
     if (!m_win)
     {
         GLOG->Error("Failed to create window. Probably platform doesn't support OpenGL %d %d", constants::GL_VERSION_MAJOR, constants::GL_VERSION_MINOR);
@@ -581,7 +576,11 @@ void ArxWindow::ForgetMouseEnteredControl(UIControl *ctrl, bool sendMouseExitEve
     if (m_lastMouseEnterReciever != nullptr && m_lastMouseEnterReciever == ctrl)
     {
         if (sendMouseExitEvent && m_lastMouseEnterReciever->CanRecieveMouseEvents() && m_lastMouseEnterReciever->GetEventManager().HasNonDefaultEventHandler<MouseExitEvent>())
+        {
+            std::unique_ptr<MouseExitEvent> mouseEvent(std::make_unique<MouseExitEvent>());
+            mouseEvent->SetWasForced(true);
             m_lastMouseEnterReciever->GetEventManager().QueueEvent<MouseExitEvent>(std::make_unique<MouseExitEvent>());
+        }
         m_lastMouseEnterReciever = nullptr;
     }
 }
@@ -601,6 +600,7 @@ void ArxWindow::ForgetPressedMouseButtons(UIControl *ctrl, bool sendMouseUpEvent
             {
                 std::unique_ptr<MouseUpEvent> mouseEvent = std::make_unique<MouseUpEvent>(); 
                 mouseEvent->SetMouseButtonType(it->first);
+                mouseEvent->SetWasForced(true);
                 it->second->GetEventManager().QueueEvent<MouseUpEvent>(std::move(mouseEvent));
             }
             m_pressedMouseButtons.erase(it);
