@@ -161,6 +161,8 @@ private:
     UIControl *m_lastMouseEnterReciever;
     Position m_cameraPos;
     bool m_fullscreen;
+    SizeF m_preFullscreenSize;
+    Position m_preFullscreenPos;
 };
 
 ARX_NAMESPACE_END

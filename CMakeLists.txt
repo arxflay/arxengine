@@ -16,7 +16,7 @@ list(APPEND ARX_SOURCES
     ${ARX_SOURCE_PATH}/logging/FileLogger.cpp
     ${ARX_SOURCE_PATH}/media/SoundPlayer.cpp
     ${ARX_SOURCE_PATH}/GameApp.cpp
-    ${ARX_SOURCE_PATH}/internal/UniversalExceptionHandler.cpp
+    ${ARX_SOURCE_PATH}/UniversalExceptionHandler.cpp
     ${ARX_SOURCE_PATH}/media/Font.cpp
     ${ARX_SOURCE_PATH}/evt/Event.cpp
     ${ARX_SOURCE_PATH}/evt/EventProcessor.cpp
@@ -50,6 +50,7 @@ list(APPEND ARX_SOURCES
     ${ARX_SOURCE_PATH}/internal/json/DefaultJsonParser.cpp
     ${ARX_SOURCE_PATH}/internal/json/DefaultJsonConvertor.cpp
     ${ARX_SOURCE_PATH}/gl/Shader.cpp
+    ${ARX_SOURCE_PATH}/ui/Monitor.cpp
 
 )
 set(CMAKE_EXPORT_COMPILE_COMMANDS True)

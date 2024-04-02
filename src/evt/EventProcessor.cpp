@@ -1,5 +1,5 @@
 #include "arxengine/evt/EventProcessor.h"
-#include "arxengine/internal/UniversalExceptionHandler.h"
+#include "arxengine/UniversalExceptionHandler.h"
 #include "arxengine/evt/Event.h"
 #include "arxengine/evt/EventManager.h"
 #include "arxengine/ArxObject.h"

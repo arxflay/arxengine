@@ -27,7 +27,7 @@ class ARX_EXPORTS JsonObjectMap : public std::map<std::string, Json>
 class ARX_EXPORTS IJsonSerializable
 {
 public:
-    virtual void FromJson(Json &json) const = 0;
+    virtual void FromJson(const Json &json) = 0;
 };
 
 class ARX_EXPORTS IJsonDeserializable
@@ -39,7 +39,7 @@ public:
 class ARX_EXPORTS IJsonObject : public IJsonSerializable, IJsonDeserializable
 {
 public:
-    void FromJson(Json &json) const override = 0;
+    void FromJson(const Json &json) override = 0;
     void ToJson(Json &json) const override = 0;
 };
 

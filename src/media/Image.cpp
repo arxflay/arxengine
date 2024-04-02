@@ -16,6 +16,7 @@ WARNING_POP
 #include <memory>
 #include <glad/glad.h>
 #include <iostream>
+#include "arxengine/logging/Logger.h"
 
 ARX_NAMESPACE_BEGIN
 
@@ -40,6 +41,8 @@ bool Image::IsInvalid() const
     Image img;
     int width = 0, height = 0;
     std::unique_ptr<void, void(*)(void*)> data{ stbi_load(filename.data(), &width, &height, reinterpret_cast<int*>(&img.m_colorChannels), 0), stbi_image_free };
+    if (!data.get())
+        GLOG->Error("Failed to open file %s", filename.data());
     const uint8_t *dataBytePtr = reinterpret_cast<uint8_t*>(data.get());
     img.m_size = SizeUL(static_cast<uint64_t>(width), static_cast<uint64_t>(height));
     img.m_data.insert(img.m_data.end(), dataBytePtr, dataBytePtr + static_cast<uint64_t>(width * height) * img.m_colorChannels);

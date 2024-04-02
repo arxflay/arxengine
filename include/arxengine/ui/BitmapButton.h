@@ -34,10 +34,9 @@ public:
     HorizontalTextAlignment GetHorizontalTextAlignment() const;
     int GetTextAlignmentPaddingX() const;
     int GetTextAlignmentPaddingY() const;
-
+    void OnDraw(DrawEvent &e) override;
 
 private:
-    void OnDraw(DrawEvent &e) override;
     void OnMouseEnter(MouseEnterEvent &e);
     void OnMouseExit(MouseExitEvent &e);
     void OnMouseDown(MouseDownEvent &e);
@@ -54,7 +53,6 @@ private:
     TextExtent m_textExtent;
     VerticalTextAlignment m_verticalTextAlignment;
     HorizontalTextAlignment m_horizontalTextAlignment;
-    Font::ChangeTime_t m_lastFontChange;
     int m_textPaddingX;
     int m_textPaddingY;
 };

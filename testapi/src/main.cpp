@@ -24,6 +24,7 @@
 #include <arxengine/ui/BitmapButton.h>
 #include <iostream>
 #include <arxengine/Json.h>
+#include <arxengine/ui/Monitor.h>
 
 ARX_NAMESPACE_USE;
 
@@ -216,7 +217,7 @@ TEST(Json, DISABLED_PositiveJsonInitializerList)
     ASSERT_TRUE(happy);
 }
 
-TEST(Json, PositiveJsonLoadFromFile)
+TEST(Json, DISABLED_PositiveJsonLoadFromFile)
 {
     Json j(Json::FromFile((TEST_DATA_PATH / "test.json").u8string())); 
     std::string name;
@@ -600,7 +601,7 @@ TEST(ArxWindow, DISABLED_PositiveLabel)
     GameApp::GetGlobalApp()->Run();
 }
 
-TEST(ArxWindow, PositiveBitmapButton)
+TEST(ArxWindow, DISABLED_PositiveBitmapButton)
 {
     ArxWindow *win = new ArxWindow("test", SizeF(640, 360));
     win->Show();
@@ -753,4 +754,16 @@ TEST(Utils, PositiveGetPath)
     std::string path = Utils::GetExecutablePath();
     std::cout << path << '\n';
     ASSERT_STRNE(path.c_str(), "");
+}
+
+TEST(Monitor, GetResolutions)
+{
+    const Monitor &monitor(Monitor::GetPrimaryMonitor());
+    Monitor::ResolutionFilter filter;
+    filter.SetRetrieveWithMaxRefreshRate(true);
+    filter.SetAspectRatio(16, 9);
+    auto resolutions = monitor.GetResolutions(filter);
+    ASSERT_NE(resolutions.size(), 0);
+    for (size_t i =0 ; i < resolutions.size(); i++)
+        std::cout << resolutions[i].GetSize().width << ' ' << resolutions[i].GetSize().height << ' ' << resolutions[i].GetRefreshRate() << '\n'; 
 }

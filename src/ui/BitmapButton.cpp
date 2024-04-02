@@ -35,7 +35,6 @@ BitmapButton::BitmapButton(UIControl *parent, const Image &img, const SizeF &siz
     , m_isMouseEntered(false)
     , m_verticalTextAlignment(VerticalTextAlignment::Center)
     , m_horizontalTextAlignment(HorizontalTextAlignment::Center)
-    , m_lastFontChange(GetFont().GetLastChangeTime())
     , m_textPaddingX(0)
     , m_textPaddingY(0)
 {
@@ -44,10 +43,12 @@ BitmapButton::BitmapButton(UIControl *parent, const Image &img, const SizeF &siz
     m_mouseEnterTexture = new Texture2D(this);
     m_mouseHoldTexture = new Texture2D(this);
     m_currentTexture = m_normalTexture;
-
-    m_normalTexture->SetData(img);
-    m_mouseEnterTexture->SetData(img);
-    m_mouseHoldTexture->SetData(img);
+    if (!img.IsInvalid())
+    {
+        m_normalTexture->SetData(img);
+        m_mouseEnterTexture->SetData(img);
+        m_mouseHoldTexture->SetData(img);
+    }
 
     m_normalTexture->SetTextureWrapping(Texture::TextureWrapping::ClampToEdge);
     m_mouseEnterTexture->SetTextureWrapping(Texture::TextureWrapping::ClampToEdge);

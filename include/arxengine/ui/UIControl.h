@@ -125,8 +125,8 @@ protected:
     Position CalculateTextPosition(const TextExtent &textExtent, VerticalTextAlignment verticalAlignment, HorizontalTextAlignment horizontalAlignment, int paddingX, int paddingY);
     virtual Position CalculateCenterPosition();
 private:
-    virtual void OnDraw(DrawEvent &);
     
+    virtual void OnDraw(DrawEvent &);
     //this constructor is used for windows
     UIControl();
 private:

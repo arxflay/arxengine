@@ -11,6 +11,7 @@
 #include "arxengine/evt/Event.h"
 #include <set>
 #include <memory>
+#include "arxengine/UniversalExceptionHandler.h"
 
 #ifdef WIN32
 #include <windows.h>
@@ -109,7 +110,7 @@ private:
     }\
     catch(...)\
     {\
-        errCode = static_cast<int>(::ARX_NAMESPACE::ArxException::ErrorCode::GenericError);\
+        errCode = static_cast<int>(UniversalExceptionHandler::HandleException());\
     }\
     return errCode;\
 }
@@ -126,7 +127,7 @@ private:
     }\
     catch(...)\
     {\
-        errCode = static_cast<int>(::ARX_NAMESPACE::ArxException::ErrorCode::GenericError);\
+        errCode = static_cast<int>(::ARX_NAMESPACE::UniversalExceptionHandler::HandleException());\
     }\
     return errCode;\
 }

@@ -258,6 +258,7 @@ ArxWindow::ArxWindow(std::string_view title, const SizeF &size, const Position &
     , m_lastMouseEnterReciever(nullptr)
     , m_cameraPos(0, 0)
     , m_fullscreen(false)
+    , m_preFullscreenSize(size)
 {
     glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
     glfwWindowHint(GLFW_FOCUS_ON_SHOW, GLFW_TRUE);
@@ -327,7 +328,7 @@ void ArxWindow::SetSize(const SizeF &s)
     if (m_fullscreen)
         return;
     RecalculateSizes(s);
-    glfwSetWindowSize(m_win.get(), static_cast<int>(GetSize().height), static_cast<int>(GetSize().width));
+    glfwSetWindowSize(m_win.get(), static_cast<int>(GetSize().width), static_cast<int>(GetSize().height));
 }
 
 void ArxWindow::RecalculateSizes(const SizeF &s)
@@ -627,14 +628,19 @@ Position ArxWindow::CalculateCenterPosition()
 
 void ArxWindow::SetFullscreen(bool fullscreen)
 {
+    if (m_fullscreen == fullscreen)
+        return;
+
     if (fullscreen)
     {
         GLFWmonitor *primaryMonitor = glfwGetPrimaryMonitor();
         const GLFWvidmode *currentVideoMode = glfwGetVideoMode(primaryMonitor);
+        m_preFullscreenSize = m_clientSize;
+        m_preFullscreenPos = GetRealPosition();
         glfwSetWindowMonitor(m_win.get(), primaryMonitor, 0, 0, currentVideoMode->width, currentVideoMode->height, GLFW_DONT_CARE);
     }
     else
-        glfwSetWindowMonitor(m_win.get(), nullptr, 0, 0, 0, 0, GLFW_DONT_CARE);
+        glfwSetWindowMonitor(m_win.get(), nullptr, static_cast<int>(m_preFullscreenPos.x), static_cast<int>(m_preFullscreenPos.y), static_cast<int>(m_preFullscreenSize.width), static_cast<int>(m_preFullscreenSize.height), GLFW_DONT_CARE); 
 
     m_fullscreen = fullscreen;
 }
