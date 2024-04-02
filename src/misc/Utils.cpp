@@ -230,7 +230,7 @@ std::string Utils::GetExecutablePath()
 {
 #ifdef WIN32
     char buffer[MAX_PATH]{};
-    DWORD len = GetModuleFileNameA(nullptr, &buffer, sizeof(buffer));
+    DWORD len = GetModuleFileNameA(nullptr, buffer, sizeof(buffer));
     return std::string(buffer, len);
 #else
     //https://stackoverflow.com/questions/1528298/get-path-of-executable

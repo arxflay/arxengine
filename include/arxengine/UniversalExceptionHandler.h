@@ -10,7 +10,7 @@
 
 ARX_NAMESPACE_BEGIN
 
-class UniversalExceptionHandler
+class ARX_EXPORTS UniversalExceptionHandler
 {
 public:
     static ArxException::ErrorCode HandleException();

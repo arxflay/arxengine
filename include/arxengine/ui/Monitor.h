@@ -13,7 +13,7 @@ ARX_NAMESPACE_BEGIN
  * @brief GLFW Monitor C++ wrapper 
  */
 
-class ResolutionMode
+class ARX_EXPORTS ResolutionMode
 {
 friend class Monitor;
 public:
@@ -24,10 +24,10 @@ private:
     const GLFWvidmode *m_vidMode;
 };
 
-class Monitor
+class ARX_EXPORTS Monitor
 {
 public:
-    class ResolutionFilter
+    class ARX_EXPORTS ResolutionFilter
     {
     public:
         ResolutionFilter();

@@ -8,7 +8,7 @@
 
 ARX_NAMESPACE_BEGIN
 
-class IShader
+class ARX_EXPORTS IShader
 {
 public:
     virtual ~IShader() = default;

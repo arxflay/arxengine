@@ -7,7 +7,7 @@ ARX_NAMESPACE_BEGIN
 
 class ShaderImpl;
 
-class Shader final : public UIObject, public IShader 
+class ARX_EXPORTS Shader final : public UIObject, public IShader 
 {
 public:
     Shader(UIControl *control);
