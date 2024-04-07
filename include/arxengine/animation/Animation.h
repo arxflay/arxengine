@@ -17,9 +17,10 @@ public:
     std::optional<size_t> GetLastFrameNum();
     void Run(bool loop);
     void Stop();
+    virtual ~Animation();
 private:
     std::chrono::time_point<std::chrono::steady_clock> m_animatorTimePoint;
-    std::map<size_t, std::unique_ptr<AbstractAnimationAction>> m_frames;
+    std::map<size_t, AbstractAnimationAction*> m_frames;
 };
 
 ARX_NAMESPACE_END

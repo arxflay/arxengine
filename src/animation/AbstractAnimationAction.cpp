@@ -1,4 +1,4 @@
-#include "arxengine/ui/AbstractAnimationAction.h"
+#include "arxengine/animation/AbstractAnimationAction.h"
 
 ARX_NAMESPACE_BEGIN
 
@@ -11,7 +11,7 @@ AbstractAnimationAction::AbstractAnimationAction(std::unique_ptr<AbstractAnimati
 void AbstractAnimationAction::PerformAction()
 {
     PerformActionImpl();
-    if (m_next)
+    if (m_next.get())
         m_next->PerformActionImpl();
 }
 

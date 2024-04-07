@@ -1,5 +1,5 @@
-#include "arxengine/ui/AnimationManager.h"
-#include "arxengine/ui/Animation.h"
+#include "arxengine/animation/AnimationManager.h"
+#include "arxengine/animation/Animation.h"
 
 ARX_NAMESPACE_BEGIN
 

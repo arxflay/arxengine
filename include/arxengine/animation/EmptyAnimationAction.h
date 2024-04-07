@@ -7,7 +7,7 @@ ARX_NAMESPACE_BEGIN
 class ARX_EXPORTS EmptyAnimationAction : public AbstractAnimationAction
 { 
 public:
-    EmptyAnimationAction(std::unique_ptr<AbstractAnimationAction> &&next)
+    EmptyAnimationAction(std::unique_ptr<AbstractAnimationAction> &&next = nullptr)
         : AbstractAnimationAction(std::move(next))
     {
     }
