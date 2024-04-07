@@ -29,11 +29,6 @@ const Color &UIControl::GetColor() const { return m_backgroundColor; }
 void UIControl::SetSize(const SizeF &s) 
 {
     m_size = s;
-    if (GetParent() != GetOwnerWindow())
-    {
-        SizeF parentSize = static_cast<UIControl*>(GetParent())->GetClientSize();
-        m_size = SizeF(std::clamp(m_size.width, 0.0f, parentSize.width), std::clamp(m_size.height, 0.0f, parentSize.height));
-    }
 }
 
 bool UIControl::CanRecieveMouseEvents() const { return m_canRecieveMouseEvents; }
@@ -208,19 +203,7 @@ Position UIControl::GetParentsPosition() const
 
 bool UIControl::HitTest(Position pos) const
 {
-    Position ctrlPos;
-    if (GetParent())
-    {
-        ctrlPos = GetPosition() + GetParentsPosition();
-        if (CanBeAffectedByCamera())
-        {
-            ctrlPos.x -= GetOwnerWindow()->GetCameraPos().x;
-            ctrlPos.y += GetOwnerWindow()->GetCameraPos().y; //inversed y axis
-        }
-    }    
-
-    return pos.x >= ctrlPos.x && pos.x <= ctrlPos.x + GetClientSize().width 
-        && pos.y >= ctrlPos.y && pos.y <= ctrlPos.y + GetClientSize().height; 
+    return GetRect().IntersectWith(pos);
 }
 
 void ShowEvent::SetWillBeShown(bool show)
@@ -356,6 +339,22 @@ bool UIControl::IsTextSmoothingEnabled() const
 bool UIControl::IsTextAntialisingEnabled() const 
 {
     return m_fontCache->IsAntialisingEnabled();
+}
+
+Rect UIControl::GetRect(bool affectedByCamera) const
+{
+    Position ctrlPos;
+    if (GetParent())
+    {
+        ctrlPos = GetPosition() + GetParentsPosition();
+        if (CanBeAffectedByCamera() && affectedByCamera)
+        {
+            ctrlPos.x -= GetOwnerWindow()->GetCameraPos().x;
+            ctrlPos.y += GetOwnerWindow()->GetCameraPos().y; //inversed y axis
+        }
+    }
+
+    return Rect(GetClientSize(), ctrlPos);
 }
 
 ARX_NAMESPACE_END

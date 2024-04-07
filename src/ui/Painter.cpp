@@ -75,10 +75,10 @@ namespace
         }
         //transform size in window to size in Viewport  
         ClippingArea::ClipBox clipBox;
-        clipBox.x = static_cast<int>(std::ceil(clipPosition.x));
-        clipBox.y = static_cast<int>(std::ceil(clipPosition.y));
-        clipBox.width = static_cast<int>(std::ceil(clipSize.width));
-        clipBox.height = static_cast<int>(std::ceil(clipSize.height));
+        clipBox.x = static_cast<int>(clipPosition.x);
+        clipBox.y = static_cast<int>(clipPosition.y);
+        clipBox.width = static_cast<int>(clipSize.width);
+        clipBox.height = static_cast<int>(clipSize.height);
 
         return clipBox;
     }

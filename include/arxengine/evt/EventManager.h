@@ -163,8 +163,9 @@ private:
 
             if (evtHandlerIt == eventHandlers->get().rend())
                 return false;
-
-            eventHandlers->get().erase(evtHandlerIt);
+            
+            auto unreversedIt = std::prev(eventHandlers->get().end(), std::distance(eventHandlers->get().rbegin(), evtHandlerIt));
+            eventHandlers->get().erase(unreversedIt);
             return true;
         }
     };
@@ -215,7 +216,7 @@ private:
     template<typename EventType>
     bool Unbind(detail::EventHandler::UnwrappedFuncAddrs params)
     {
-        if (m_eventsHandlersMap.RemoveFirstHandlerMatch<EventType>())
+        if (m_eventsHandlersMap.RemoveFirstHandlerMatch<EventType>(params))
         {
             GLOG->Debug("EventHandler with fn_addr=%p, instance_addr=%p for event %s not found or couldn't be removed", params.addr, params.instance_addr, typeid(EventType).name());
             return false;

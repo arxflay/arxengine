@@ -51,6 +51,11 @@ list(APPEND ARX_SOURCES
     ${ARX_SOURCE_PATH}/internal/json/DefaultJsonConvertor.cpp
     ${ARX_SOURCE_PATH}/gl/Shader.cpp
     ${ARX_SOURCE_PATH}/ui/Monitor.cpp
+    ${ARX_SOURCE_PATH}/ui/Rect.cpp
+
+    ${ARX_SOURCE_PATH}/animation/AbstractAnimationAction.cpp
+    ${ARX_SOURCE_PATH}/animation/Animation.cpp
+    ${ARX_SOURCE_PATH}/animation/AnimationManager.cpp
 
 )
 set(CMAKE_EXPORT_COMPILE_COMMANDS True)

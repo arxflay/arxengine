@@ -47,35 +47,37 @@ namespace
     glViewport(0, 0, static_cast<GLsizei>(arxWin->GetClientSize().width), static_cast<GLsizei>(arxWin->GetClientSize().height));
 }
 
-
 /*static*/ void ArxWindow::KeyboardInputCallback(GLFWwindow* window, int key, int, int action, int)
 {
     ArxWindow *arxWin = static_cast<ArxWindow*>(glfwGetWindowUserPointer(window));
     std::unique_ptr<KeyEvent> keyEvent;
+    KeyEvent::Key curKey = static_cast<KeyEvent::Key>(key);
     switch(action)
     {
         case GLFW_PRESS:
+            arxWin->m_heldKeys.emplace(curKey);
             if (arxWin->GetEventManager().HasNonDefaultEventHandler<KeyDownEvent>())
             {
                 keyEvent = std::make_unique<KeyDownEvent>();
-                keyEvent->SetKey(static_cast<KeyEvent::Key>(key));
+                keyEvent->SetKey(curKey);
                 arxWin->GetEventManager().QueueEvent<KeyDownEvent>(std::move(keyEvent));
             }
             break;
         case GLFW_RELEASE:
+            arxWin->m_heldKeys.erase(curKey);
             if (arxWin->GetEventManager().HasNonDefaultEventHandler<KeyUpEvent>())
             {
                 keyEvent = std::make_unique<KeyUpEvent>();
-                keyEvent->SetKey(static_cast<KeyEvent::Key>(key));
+                keyEvent->SetKey(curKey);
                 arxWin->GetEventManager().QueueEvent<KeyUpEvent>(std::move(keyEvent));
             }
             break;
         case GLFW_REPEAT:
-            if (arxWin->GetEventManager().HasNonDefaultEventHandler<KeyHoldEvent>())
+            if (arxWin->GetEventManager().HasNonDefaultEventHandler<KeyRepeatEvent>())
             {
-                keyEvent = std::make_unique<KeyHoldEvent>();
-                keyEvent->SetKey(static_cast<KeyEvent::Key>(key));
-                arxWin->GetEventManager().QueueEvent<KeyHoldEvent>(std::move(keyEvent));
+                keyEvent = std::make_unique<KeyRepeatEvent>();
+                keyEvent->SetKey(curKey);
+                arxWin->GetEventManager().QueueEvent<KeyRepeatEvent>(std::move(keyEvent));
             }
             break;
         default:
@@ -245,6 +247,28 @@ void ArxWindow::CursorPosCallback(GLFWwindow *win, double xpos, double ypos)
     glfwSetKeyCallback(win, ArxWindow::KeyboardInputCallback);
 }
 
+class KeyHoldEventSenderEvent : public Event
+{
+public:
+    KeyHoldEventSenderEvent(const KeySet &keys, EventManager &evtManager)
+        : m_heldKeys(keys), m_evtManager(evtManager)
+    {
+    }
+private:
+    void HandleEvent() override
+    {
+        if (!m_heldKeys.empty() && m_evtManager.HasNonDefaultEventHandler<KeyHoldEvent>())
+        {
+            std::unique_ptr<KeyHoldEvent> keyEvent(std::make_unique<KeyHoldEvent>(m_heldKeys));
+            m_evtManager.QueueEvent<KeyHoldEvent>(std::move(keyEvent));
+        }
+
+        ScheduleAfterProcessing(true);
+    }
+    const KeySet &m_heldKeys;
+    EventManager &m_evtManager;
+};
+
 //uncompelte fullscreen
 ArxWindow::ArxWindow(std::string_view title, const SizeF &size, const Position &position, int attributes) //, bool isFullScreen)
     : UIControl()
@@ -291,6 +315,8 @@ ArxWindow::ArxWindow(std::string_view title, const SizeF &size, const Position &
     m_uiCache->Init();
     RegisterWindowFromWindowList();
     glfwSwapInterval(1);
+    std::unique_ptr<KeyHoldEventSenderEvent> keyHoldEventSenderEvent(std::make_unique<KeyHoldEventSenderEvent>(m_heldKeys, GetEventManager()));
+    GetEventManager().QueueEvent<KeyHoldEventSenderEvent>(std::move(keyHoldEventSenderEvent));
 }
 
 void ArxWindow::OnDraw(DrawEvent &e)

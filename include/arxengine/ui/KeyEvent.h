@@ -6,10 +6,9 @@
 #define ARX_KEYEVENT_H
 #include "arxengine/ArxDefines.h"
 #include "arxengine/evt/Event.h"
+#include <set>
 
 ARX_NAMESPACE_BEGIN
-
-/*KeyEventsBegim*/
 
 /*because of time shortage keyevents are handled only by window*/
 
@@ -49,7 +48,8 @@ private:
     void HandleEvent() override {}
 };
 
-class ARX_EXPORTS KeyHoldEvent final : public KeyEvent
+//only last held key will be processed
+class ARX_EXPORTS KeyRepeatEvent final : public KeyEvent
 {
 private:
     void HandleEvent() override {}
@@ -60,7 +60,20 @@ class ARX_EXPORTS KeyUpEvent final : public KeyEvent
 private:
     void HandleEvent() override {}
 };
-/*KeyEventsEnd*/
+
+using KeySet = std::set<KeyEvent::Key>;
+
+class ARX_EXPORTS KeyHoldEvent final : public Event 
+{
+public:
+    KeyHoldEvent(const KeySet &keys);
+
+    const KeySet &GetHeldKeys() const;
+private:
+    const KeySet &m_keys;
+    void HandleEvent() override {}
+};
+
 
 ARX_NAMESPACE_END
 

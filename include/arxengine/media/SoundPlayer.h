@@ -22,6 +22,7 @@ public:
     };
     //for now accept only default device 
     SoundPlayer();
+    void SetVolumeInPercentage(float value);
     void LoadSound(const Sound &sound);
     void Play(PlayMode mode, bool loop = false);
     bool IsPlaying();

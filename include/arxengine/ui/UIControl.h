@@ -12,6 +12,7 @@
 #include "arxengine/ArxObject.h"
 #include <list>
 #include "arxengine/ui/FontCache.h"
+#include "arxengine/ui/Rect.h"
 
 ARX_NAMESPACE_BEGIN
 
@@ -121,6 +122,7 @@ public:
 
     const UIControlList &GetMouseEventRecievers() const;
 
+    Rect GetRect(bool affectedByCamera = true) const;
 protected:
     Position CalculateTextPosition(const TextExtent &textExtent, VerticalTextAlignment verticalAlignment, HorizontalTextAlignment horizontalAlignment, int paddingX, int paddingY);
     virtual Position CalculateCenterPosition();

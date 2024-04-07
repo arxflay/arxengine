@@ -2,6 +2,7 @@
 #include <ctime>
 #include <cstdio>
 #include <memory>
+#include <filesystem>
 
 ARX_NAMESPACE_BEGIN
 constexpr size_t MAX_LOGGING_ATTEMPTS = 10;

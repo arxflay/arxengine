@@ -53,7 +53,7 @@ struct Position
 
 namespace constants
 {
-    static inline const Position DEFAULT_POSITION = Position{ 1, 1 };
+    static inline const Position DEFAULT_POSITION = Position{ 0.0f, 0.0f };
 }
 
 ARX_NAMESPACE_END

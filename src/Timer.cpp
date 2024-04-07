@@ -1,7 +1,6 @@
 #include "arxengine/Timer.h"
+#include <thread>
 ARX_NAMESPACE_BEGIN
-
-
 
 void TimerEvent::HandleEvent()
 {
@@ -53,6 +52,7 @@ Timer::Timer(ArxObject *parent)
 void Timer::Stop()
 {
     m_isRunning = false;
+    std::this_thread::sleep_for(std::chrono::nanoseconds(1));
 }
 
 void Timer::Start(TimerType type)

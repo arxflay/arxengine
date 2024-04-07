@@ -18,4 +18,11 @@ int KeyEvent::GetKeyChar() const
 }
 
 
+KeyHoldEvent::KeyHoldEvent(const KeySet &keys)
+        : m_keys(keys)
+{
+}
+
+const KeySet &KeyHoldEvent::GetHeldKeys() const { return m_keys; }
+
 ARX_NAMESPACE_END

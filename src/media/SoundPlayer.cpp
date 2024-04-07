@@ -6,7 +6,7 @@
 #include <memory>
 #include "arxengine/GameApp.h"
 #include "arxengine/internal/al/SoundDevice.h"
-
+#include <iostream>
 ARX_NAMESPACE_BEGIN
 
 SoundPlayer::SoundPlayer()
@@ -38,12 +38,19 @@ void SoundPlayer::LoadSound(const Sound &sound)
     ALenum openalFormat = GetOpenALFormat(sound);
     if (openalFormat == AL_INVALID_VALUE)
     {
-        GLOG->Error("SoundPlayer::LoadSound() => invalid format");
+        GLOG->Error("SoundPlayer::LoadSound() => invalid openal format");
         return;
     }
+    Stop();
+    alSourcei(m_source, AL_BUFFER, 0); //unbind buffer
     alBufferData(m_buffer, GetOpenALFormat(sound), sound.GetData().data(), 
             static_cast<ALsizei>(sound.GetData().size()), static_cast<ALsizei>(sound.GetSampleFrequency()));
     alSourcei(m_source, AL_BUFFER, static_cast<ALint>(m_buffer));
+}
+
+void SoundPlayer::SetVolumeInPercentage(float value)
+{
+    alSourcef(m_source, AL_GAIN, std::max(value / 100.0f, 0.0f));
 }
 
 void SoundPlayer::Play(PlayMode mode, bool loop)

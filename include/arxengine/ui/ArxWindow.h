@@ -10,6 +10,7 @@
 #include "arxengine/ui/Viewport.h"
 #include <string_view>
 #include "arxengine/ui/MouseEvent.h"
+#include "arxengine/ui/KeyEvent.h"
 
 struct GLFWwindow;
 
@@ -118,6 +119,7 @@ public:
 
     void SetCameraPos(const Position &cameraPos);
     const Position &GetCameraPos() const;
+
 private:
     void OnShow(ShowEvent &e) ;
     void OnDraw(DrawEvent &e) override;
@@ -163,6 +165,7 @@ private:
     bool m_fullscreen;
     SizeF m_preFullscreenSize;
     Position m_preFullscreenPos;
+    KeySet m_heldKeys;
 };
 
 ARX_NAMESPACE_END

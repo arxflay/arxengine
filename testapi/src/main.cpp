@@ -384,7 +384,7 @@ TEST(ArxWindow, DISABLED_PositiveWindowInput)
             win->RequestDelete();
     });
 
-    win->GetEventManager().Bind<KeyHoldEvent>([ &position](KeyHoldEvent &e) {
+    win->GetEventManager().Bind<KeyRepeatEvent>([ &position](KeyRepeatEvent &e) {
         if (e.GetKey() == KeyEvent::Key::D)
             position += 1000 * static_cast<float>(GameApp::GetGlobalApp()->GetDeltaTime());
         if (e.GetKey() == KeyEvent::Key::A)
@@ -457,7 +457,7 @@ TEST(ArxWindow, DISABLED_PositiveImageControlTileSize)
     ctrl->SetBackgroundColor(constants::COLOR_BLACK);
     win->EnableVSync(true);
     Position pos(100, 100);
-    win->GetEventManager().Bind<KeyHoldEvent>([ctrl, &pos](KeyHoldEvent &e) {
+    win->GetEventManager().Bind<KeyRepeatEvent>([ctrl, &pos](KeyRepeatEvent &e) {
         if (e.GetKey() == KeyEvent::Key::W)
             pos.y -= 1000 * static_cast<float>(GameApp::GetGlobalApp()->GetDeltaTime());
         else if (e.GetKey() == KeyEvent::Key::S)
