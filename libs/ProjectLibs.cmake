@@ -8,7 +8,9 @@ endif()
 CPMFindPackage(NAME glm
     GITHUB_REPOSITORY g-truc/glm
     VERSION 0.9.9.8
-    GIT_TAG 0.9.9.8) 
+    GIT_TAG 0.9.9.8
+    OPTIONS 
+        "GLM_BUILD_LIBRARY OFF") 
 CPMFindPackage(NAME glfw3
     GITHUB_REPOSITORY glfw/glfw
     VERSION 3.3.1

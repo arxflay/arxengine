@@ -164,7 +164,7 @@ private:
             if (evtHandlerIt == eventHandlers->get().rend())
                 return false;
             
-            auto unreversedIt = std::prev(eventHandlers->get().end(), std::distance(eventHandlers->get().rbegin(), evtHandlerIt));
+            auto unreversedIt = std::prev(eventHandlers->get().end(), std::distance(eventHandlers->get().rbegin(), evtHandlerIt) + 1);
             eventHandlers->get().erase(unreversedIt);
             return true;
         }

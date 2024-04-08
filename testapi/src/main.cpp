@@ -767,3 +767,14 @@ TEST(Monitor, GetResolutions)
     for (size_t i =0 ; i < resolutions.size(); i++)
         std::cout << resolutions[i].GetSize().width << ' ' << resolutions[i].GetSize().height << ' ' << resolutions[i].GetRefreshRate() << '\n'; 
 }
+
+TEST(EventManager, DISABLED_UnbindEvt)
+{
+    Timer *t = new Timer(nullptr);
+    std::function<void(TimerEvent&)> x = [](TimerEvent &){ };
+    t->GetEventManager().Bind<TimerEvent>(x);
+    t->GetEventManager().Unbind<TimerEvent>(x);
+    t->SetInterval(std::chrono::seconds(3));
+    t->Start(Timer::TimerType::SINGLE_FIRE);
+    delete t;
+}
