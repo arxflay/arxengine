@@ -1,3 +1,7 @@
+/*
+ * @author Alexej Fedorenko
+ */
+
 #ifndef ARX_MONITOR_H
 #define ARX_MONITOR_H
 #include "arxengine/ArxDefines.h"

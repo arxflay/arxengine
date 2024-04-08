@@ -1,3 +1,6 @@
+/*
+ * @author Alexej Fedorenko
+ */
 #ifndef ARX_ANIMATIOMANAGER_H
 #define ARX_ANIMATIOMANAGER_H
 #include "arxengine/ArxObject.h"

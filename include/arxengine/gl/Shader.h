@@ -1,3 +1,7 @@
+/*
+ * @author Alexej Fedorenko
+ */
+
 #ifndef ARX_SHADER_H
 #define ARX_SHADER_H
 

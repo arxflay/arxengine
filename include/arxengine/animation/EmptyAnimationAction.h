@@ -1,3 +1,6 @@
+/*
+ * @author Alexej Fedorenko
+ */
 #ifndef ARX_EMPTYANIMATIONACTION_H
 #define ARX_EMPTYANIMATIONACTION_H
 #include "arxengine/animation/AbstractAnimationAction.h"

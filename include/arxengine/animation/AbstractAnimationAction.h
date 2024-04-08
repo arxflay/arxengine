@@ -1,3 +1,6 @@
+/*
+ * @author Alexej Fedorenko
+ */
 #ifndef ARX_ABSTRACTANIMATIONACTION_H
 #define ARX_ABSTRACTANIMATIONACTION_H
 #include <memory>

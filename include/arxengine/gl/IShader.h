@@ -1,3 +1,7 @@
+/*
+ * @author Alexej Fedorenko
+ */
+
 #ifndef ARX_ISHADER_H
 #define ARX_ISHADER_H
 
