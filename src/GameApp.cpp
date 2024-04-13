@@ -136,8 +136,10 @@ int GameApp::Init()
 
 int GameApp::Run()
 {
-    if (m_running)
-        return static_cast<int>(ArxException::ErrorCode::GameAppIsRunning); //TODO
+    if (!GetGlobalApp()->IsInitialized())
+        return static_cast<int>(ArxException::ErrorCode::GameAppNotInitialized);
+    else if (m_running)
+        return static_cast<int>(ArxException::ErrorCode::GameAppIsRunning);
     
     m_running = true;
     OnRun();
@@ -205,7 +207,9 @@ const ArxWindowSet &GameApp::GetWindowSet()
 
 int GameApp::Exit(int code)
 {
-    if (m_shouldExit)
+    if (!GetGlobalApp()->IsInitialized())
+        return static_cast<int>(ArxException::ErrorCode::GameAppNotInitialized);
+    else if (m_shouldExit)
         return static_cast<int>(ArxException::ErrorCode::GameAppAlreadyScheduledExit);
     m_shouldExit = true;
     m_exitCode = code;

@@ -713,7 +713,7 @@ TEST(ArxWindow, DISABLED_PositiveAtexitDealloc)
     (void)win;
 }
 
-TEST(ArxWindow, DISABLED_PositiveTextWrapping)
+TEST(ArxWindow, PositiveTextWrapping)
 {
     ArxWindow *win = new ArxWindow("test", SizeF(640, 360));
     win->Show();
