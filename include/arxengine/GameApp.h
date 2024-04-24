@@ -110,7 +110,7 @@ private:
     }\
     catch(...)\
     {\
-        errCode = static_cast<int>(UniversalExceptionHandler::HandleException());\
+        errCode = static_cast<int>(::ARX_NAMESPACE::UniversalExceptionHandler::HandleException());\
     }\
     return errCode;\
 }
